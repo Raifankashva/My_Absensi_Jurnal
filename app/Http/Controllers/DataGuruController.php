@@ -9,13 +9,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
+
 class DataGuruController extends Controller
 {
     public function index()
-    {
-        $guru = DataGuru::with(['user', 'sekolah'])->latest()->paginate(10);
-        return view('adminguru.index', compact('guru'));
-    }
+{
+    $guru = DataGuru::with(['user', 'sekolah'])
+        ->latest()
+        ->paginate(10); // Tetap gunakan paginate di sini
+
+    return view('adminguru.index', compact('guru'));
+}
+
 
     public function create()
     {
@@ -131,9 +136,14 @@ class DataGuruController extends Controller
 
     public function destroy(DataGuru $guru)
     {
-        // Delete associated user account
-        $guru->user->delete();
+        // Check if the user associated with the guru exists
+        if ($guru->user) {
+            $guru->user->delete();
+        } else {
+            return redirect()->route('adminguru.index')->with('error', 'Guru does not have an associated user.');
+        }
         
         return redirect()->route('adminguru.index')->with('success', 'Data guru berhasil dihapus');
     }
+    
 }

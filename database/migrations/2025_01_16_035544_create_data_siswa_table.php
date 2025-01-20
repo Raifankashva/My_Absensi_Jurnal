@@ -13,8 +13,8 @@ class CreateDataSiswaTable extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('sekolah_id')->constrained('sekolahs')->onDelete('cascade');
             $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
-            $table->string('nisn', 10)->unique(); // Nomor Induk Siswa Nasional
-            $table->string('nis', 10)->unique(); // Nomor Induk Siswa
+            $table->string('nisn', 10)->unique();  
+            $table->string('nis', 10)->unique(); 
             $table->string('nik', 16)->unique();
             $table->string('nama_lengkap');
             $table->enum('jenis_kelamin', ['L', 'P']);
@@ -49,7 +49,6 @@ class CreateDataSiswaTable extends Migration
             $table->integer('berat_badan')->nullable(); // dalam kg
             $table->integer('jarak_rumah')->nullable(); // dalam km
             $table->integer('waktu_tempuh')->nullable(); // dalam menit
-            $table->integer('jumlah_saudara_kandung');
             
             // Data Program Bantuan
             $table->string('kks')->nullable(); // Kartu Keluarga Sejahtera

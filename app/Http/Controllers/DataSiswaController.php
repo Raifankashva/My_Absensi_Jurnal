@@ -38,78 +38,87 @@ public function getKelasBySekolah($sekolah_id)
         return response()->json(['error' => 'Terjadi kesalahan saat memuat data kelas'], 500);
     }
 }
-    public function store(Request $request)
-    {
-        $request->validate([
-            'sekolah_id' => 'required|exists:sekolahs,id',
-            'kelas_id' => 'required|exists:kelas,id',
-            'nisn' => 'required|string|size:10|unique:data_siswa,nisn',
-            'nis' => 'required|string|size:10|unique:data_siswa,nis',
-            'nik' => 'required|string|size:16|unique:data_siswa,nik',
-            'nama_lengkap' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:L,P', 
-            'tempat_lahir' => 'required|string|max:255',
-            'tanggal_lahir' => 'required|date',
-            'agama' => 'required|string|max:50',
-            'alamat' => 'required|string|max:255',
-            'rt' => 'required|string|max:3',
-            'rw' => 'required|string|max:3',
-            'kelurahan' => 'required|string|max:255',
-            'kecamatan' => 'required|string|max:255',
-            'kota' => 'required|string|max:255',
-            'provinsi' => 'required|string|max:255',
-            'kode_pos' => 'required|string|max:5',
-            'jenis_tinggal' => 'required|string|max:50',
-            'transportasi' => 'required|string|max:50',
-            'no_hp' => 'required|string|max:15',
-            'email' => 'required|email|max:255|unique:users,email',
-            'nama_ayah' => 'required|string|max:255',
-            'nik_ayah' => 'nullable|string|max:16',
-            'tahun_lahir_ayah' => 'nullable|date_format:Y',
-            'pendidikan_ayah' => 'nullable|string|max:50',
-            'pekerjaan_ayah' => 'nullable|string|max:50',
-            'penghasilan_ayah' => 'required|numeric',
-            'nama_ibu' => 'required|string|max:255',
-            'nik_ibu' => 'nullable|string|max:16',
-            'tahun_lahir_ibu' => 'nullable|date_format:Y',
-            'pendidikan_ibu' => 'nullable|string|max:50',
-            'pekerjaan_ibu' => 'nullable|string|max:50',
-            'penghasilan_ibu' => 'required|numeric',
-            'nama_wali' => 'nullable|string|max:255',
-            'nik_wali' => 'nullable|string|max:16',
-            'tahun_lahir_wali' => 'nullable|date_format:Y',
-            'pendidikan_wali' => 'nullable|string|max:50',
-            'pekerjaan_wali' => 'nullable|string|max:50',
-            'penghasilan_wali' => 'nullable|numeric',
-            'tinggi_badan' => 'nullable|numeric',
-            'berat_badan' => 'nullable|numeric',
-            'jarak_rumah' => 'nullable|numeric',
-            'waktu_tempuh' => 'nullable|string|max:50',
-            'jumlah_saudara_kandung' => 'nullable|integer',
-            'kks' => 'nullable|string|max:20',
-            'kph' => 'nullable|string|max:20',
-            'kip' => 'nullable|string|max:20',
-            'password' => 'required|string|min:8|confirmed', // To confirm password
-        ]);
-        
+public function store(Request $request)
+{
+    // Validasi input
+    $request->validate([
+        'sekolah_id' => 'required|exists:sekolahs,id',
+        'kelas_id' => 'required|exists:kelas,id',
+        'nisn' => 'required|string|size:10|unique:data_siswa,nisn',
+        'nis' => 'required|string|size:10|unique:data_siswa,nis',
+        'nik' => 'required|string|size:16|unique:data_siswa,nik',
+        'nama_lengkap' => 'required|string|max:255',
+        'jenis_kelamin' => 'required|in:L,P',
+        'tempat_lahir' => 'required|string|max:255',
+        'tanggal_lahir' => 'required|date',
+        'agama' => 'required|string|max:50',
+        'alamat' => 'required|string|max:255',
+        'kelurahan' => 'required|string|max:255',
+        'kecamatan' => 'required|string|max:255',
+        'kota' => 'required|string|max:255',
+        'provinsi' => 'required|string|max:255',
+        'kode_pos' => 'required|string|max:5',
+        'jenis_tinggal' => 'required|string|max:50',
+        'transportasi' => 'required|string|max:50',
+        'no_hp' => 'required|string|max:15',
+        'email' => 'required|email|max:255|unique:users,email',
+        'nama_ayah' => 'required|string|max:255',
+        'nik_ayah' => 'nullable|string|max:16',
+        'tahun_lahir_ayah' => 'nullable|date_format:Y',
+        'pendidikan_ayah' => 'nullable|string|max:50',
+        'pekerjaan_ayah' => 'nullable|string|max:50',
+        'penghasilan_ayah' => 'required|numeric',
+        'nama_ibu' => 'required|string|max:255',
+        'nik_ibu' => 'nullable|string|max:16',
+        'tahun_lahir_ibu' => 'nullable|date_format:Y',
+        'pendidikan_ibu' => 'nullable|string|max:50',
+        'pekerjaan_ibu' => 'nullable|string|max:50',
+        'penghasilan_ibu' => 'required|numeric',
+        'nama_wali' => 'nullable|string|max:255',
+        'nik_wali' => 'nullable|string|max:16',
+        'tahun_lahir_wali' => 'nullable|date_format:Y',
+        'pendidikan_wali' => 'nullable|string|max:50',
+        'pekerjaan_wali' => 'nullable|string|max:50',
+        'penghasilan_wali' => 'nullable|numeric',
+        'tinggi_badan' => 'nullable|numeric',
+        'berat_badan' => 'nullable|numeric',
+        'jarak_rumah' => 'nullable|numeric',
+        'waktu_tempuh' => 'nullable|string|max:50',
+        'jumlah_saudara_kandung' => 'nullable|integer',
+        'kks' => 'nullable|string|max:20',
+        'kph' => 'nullable|string|max:20',
+        'kip' => 'nullable|string|max:20',
+        'password' => 'required|string|min:8|confirmed', // To confirm password
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi foto
+    ]);
 
-        // Create user account
-        $user = User::create([
-            'name' => $request->nama_lengkap,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'alamat' => $request->alamat,
-            'no_hp' => $request->no_hp,
-            'role' => 'siswa'
-        ]);
+    // Create user account
+    $user = User::create([
+        'name' => $request->nama_lengkap,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'alamat' => $request->alamat,
+        'no_hp' => $request->no_hp,
+        'role' => 'siswa'
+    ]);
 
-        // Create siswa data
-        $siswaData = $request->except(['email', 'password']);
-        $siswaData['user_id'] = $user->id;
-
-        DataSiswa::create($siswaData);
-        return redirect()->route('adminsiswa.index')->with('success', 'Data siswa berhasil ditambahkan');
+    // Upload photo if exists
+    $photoPath = null;
+    if ($request->hasFile('foto')) {
+        $photoPath = $request->file('foto')->store('public/fotos_siswa');
     }
+
+    // Create siswa data
+    $siswaData = $request->except(['email', 'password', 'foto']);
+    $siswaData['user_id'] = $user->id;
+    $siswaData['foto'] = $photoPath; // Simpan path foto
+
+    DataSiswa::create($siswaData);
+
+    return redirect()->route('adminsiswa.index')->with('success', 'Data siswa berhasil ditambahkan');
+}
+
+
 
     public function show(DataSiswa $siswa)
     {

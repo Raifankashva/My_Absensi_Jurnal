@@ -1,116 +1,155 @@
-<!-- resources/views/sekolahs/create.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h2>Tambah Sekolah</h2>
+<div class="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-6">Tambah Data Guru</h1>
+    @if ($errors->any())
+        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-        <form action="{{ route('sekolahs.store') }}" method="POST">
-            @csrf
+    <form action="{{ route('adminguru.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        @csrf
 
-            <div class="form-group">
-                <label for="npsn">NPSN</label>
-                <input type="text" name="npsn" class="form-control" id="npsn" required>
+        <!-- Sekolah -->
+        <div>
+            <label for="sekolah_id" class="block font-medium text-gray-700">Sekolah</label>
+            <select id="sekolah_id" name="sekolah_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option value="" disabled selected>Pilih Sekolah</option>
+                @foreach ($sekolahs as $sekolah)
+                    <option value="{{ $sekolah->id }}">{{ $sekolah->nama_sekolah }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- NIP -->
+        <div>
+            <label for="nip" class="block font-medium text-gray-700">NIP</label>
+            <input type="text" id="nip" name="nip" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan NIP (18 digit)" maxlength="18">
+        </div>
+
+        <!-- NUPTK -->
+        <div>
+            <label for="nuptk" class="block font-medium text-gray-700">NUPTK</label>
+            <input type="text" id="nuptk" name="nuptk" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan NUPTK (16 digit)" maxlength="16">
+        </div>
+
+        <!-- Nama Lengkap -->
+        <div>
+            <label for="nama_lengkap" class="block font-medium text-gray-700">Nama Lengkap</label>
+            <input type="text" id="nama_lengkap" name="nama_lengkap" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+
+        <!-- Email -->
+        <div>
+            <label for="email" class="block font-medium text-gray-700">Email</label>
+            <input type="email" id="email" name="email" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+
+        <!-- Password -->
+        <div>
+            <label for="password" class="block font-medium text-gray-700">Password</label>
+            <input type="password" id="password" name="password" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+
+        <!-- Jenis Kelamin -->
+        <div>
+            <label class="block font-medium text-gray-700">Jenis Kelamin</label>
+            <div class="mt-2 flex space-x-4">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="jenis_kelamin" value="L" class="form-radio text-blue-600" required>
+                    <span class="ml-2">Laki-Laki</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="jenis_kelamin" value="P" class="form-radio text-blue-600" required>
+                    <span class="ml-2">Perempuan</span>
+                </label>
             </div>
+        </div>
 
-            <div class="form-group">
-                <label for="nama_sekolah">Nama Sekolah</label>
-                <input type="text" name="nama_sekolah" class="form-control" id="nama_sekolah" required>
-            </div>
+        <!-- Tempat Lahir -->
+        <div>
+            <label for="tempat_lahir" class="block font-medium text-gray-700">Tempat Lahir</label>
+            <input type="text" id="tempat_lahir" name="tempat_lahir" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
 
-            <div class="form-group">
-                <label for="jenjang">Jenjang</label>
-                <select name="jenjang" id="jenjang" class="form-control" required>
-                    <option value="SD">SD</option>
-                    <option value="SMP">SMP</option>
-                    <option value="SMA">SMA</option>
-                    <option value="SMK">SMK</option>
-                </select>
-            </div>
+        <!-- Tanggal Lahir -->
+        <div>
+            <label for="tanggal_lahir" class="block font-medium text-gray-700">Tanggal Lahir</label>
+            <input type="date" id="tanggal_lahir" name="tanggal_lahir" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
 
-            <div class="form-group">
-                <label for="status">Status</label>
-                <select name="status" id="status" class="form-control" required>
-                    <option value="Negeri">Negeri</option>
-                    <option value="Swasta">Swasta</option>
-                </select>
-            </div>
+        <!-- NIK -->
+        <div>
+            <label for="nik" class="block font-medium text-gray-700">NIK</label>
+            <input type="text" id="nik" name="nik" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan NIK (16 digit)" required maxlength="16">
+        </div>
 
-            <!-- Data Provinsi, Kota, Kecamatan, Kelurahan -->
-            <div class="form-group">
-                <label for="province_id">Provinsi</label>
-                <select name="province_id" id="province_id" class="form-control" required>
-                    @foreach($provinces as $province)
-                        <option value="{{ $province->id }}">{{ $province->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+        <!-- Alamat -->
+        <div>
+            <label for="alamat" class="block font-medium text-gray-700">Alamat</label>
+            <input type="text" id="alamat" name="alamat" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
 
-            <div class="form-group">
-                <label for="city_id">Kota</label>
-                <select name="city_id" id="city_id" class="form-control" required>
-                    @foreach($cities as $city)
-                        <option value="{{ $city->id }}">{{ $city->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+        <!-- no_hp -->
+        <div>
+            <label for="no_hp" class="block font-medium text-gray-700">No HP</label>
+            <input type="text" id="no_hp" name="no_hp" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+        <!-- Status Kepegawaian -->
+        <div>
+            <label for="status_kepegawaian" class="block font-medium text-gray-700">Status Kepegawaian</label>
+            <select id="status_kepegawaian" name="status_kepegawaian" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option value="" disabled selected>Pilih Status</option>
+                <option value="PNS">PNS</option>
+                <option value="PPPK">PPPK</option>
+                <option value="Honorer">Honorer</option>
+                <option value="GTY">GTY</option>
+                <option value="GTT">GTT</option>
+            </select>
+        </div>
 
-            <div class="form-group">
-                <label for="district_id">Kecamatan</label>
-                <select name="district_id" id="district_id" class="form-control" required>
-                    @foreach($districts as $district)
-                        <option value="{{ $district->id }}">{{ $district->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+        <!-- Pendidikan Terakhir -->
+        <div>
+            <label for="pendidikan_terakhir" class="block font-medium text-gray-700">Pendidikan Terakhir</label>
+            <input type="text" id="pendidikan_terakhir" name="pendidikan_terakhir" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
 
-            <div class="form-group">
-                <label for="village_id">Kelurahan</label>
-                <select name="village_id" id="village_id" class="form-control" required>
-                    @foreach($villages as $village)
-                        <option value="{{ $village->id }}">{{ $village->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+        <!-- Jurusan Pendidikan -->
+        <div>
+            <label for="jurusan_pendidikan" class="block font-medium text-gray-700">Jurusan Pendidikan</label>
+            <input type="text" id="jurusan_pendidikan" name="jurusan_pendidikan" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
 
-            <!-- Other Fields -->
-            <div class="form-group">
-                <label for="kode_pos">Kode Pos</label>
-                <input type="text" name="kode_pos" class="form-control" id="kode_pos" required>
-            </div>
+        <!-- TMT Kerja -->
+        <div>
+            <label for="tmt_kerja" class="block font-medium text-gray-700">TMT Kerja</label>
+            <input type="date" id="tmt_kerja" name="tmt_kerja" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
 
-            <div class="form-group">
-                <label for="no_telp">No Telepon</label>
-                <input type="text" name="no_telp" class="form-control" id="no_telp" required>
-            </div>
+        <!-- Mata Pelajaran -->
+        <div>
+            <label for="mata_pelajaran" class="block font-medium text-gray-700">Mata Pelajaran</label>
+            <input type="text" id="mata_pelajaran" name="mata_pelajaran[]" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan Mata Pelajaran (Pisahkan dengan koma)" required>
+        </div>
 
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" name="email" class="form-control" id="email" required>
-            </div>
+        <!-- Foto -->
+        <div>
+            <label for="foto" class="block font-medium text-gray-700">Foto</label>
+            <input type="file" id="foto" name="foto" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
 
-            <div class="form-group">
-                <label for="website">Website</label>
-                <input type="url" name="website" class="form-control" id="website">
-            </div>
-
-            <div class="form-group">
-                <label for="akreditasi">Akreditasi</label>
-                <input type="text" name="akreditasi" class="form-control" id="akreditasi">
-            </div>
-
-            <div class="form-group">
-                <label for="kepala_sekolah">Kepala Sekolah</label>
-                <input type="text" name="kepala_sekolah" class="form-control" id="kepala_sekolah" required>
-            </div>
-
-            <div class="form-group">
-                <label for="nip_kepala_sekolah">NIP Kepala Sekolah</label>
-                <input type="text" name="nip_kepala_sekolah" class="form-control" id="nip_kepala_sekolah">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Simpan</button>
-        </form>
-    </div>
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700">
+                Simpan
+            </button>
+        </div>
+    </form>
+</div>
 @endsection

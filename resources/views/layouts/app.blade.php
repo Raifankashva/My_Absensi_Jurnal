@@ -32,7 +32,7 @@
                             <i class='bx bxs-dashboard mr-3 text-xl'></i>
                             Dashboard
                         </a>
-                        <a href="{{ route('sekolah.index') }}" class="flex items-center px-4 py-2 text-gray-700 rounded-lg sidebar-item">
+                        <a href="{{ route('sekolahs.index') }}" class="flex items-center px-4 py-2 text-gray-700 rounded-lg sidebar-item">
                             <i class='bx bxs-school mr-3 text-xl'></i>
                             Sekolah
                         </a>

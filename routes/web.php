@@ -12,25 +12,10 @@ use App\Http\Controllers\KelasController;
 use App\Models\DataSiswa;
 use App\Http\Controllers\LocationController;
 
-// routes/web.php
-use App\Models\Regency;
-use App\Models\District;
-use App\Models\Village;
+Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
+Route::get('getdistricts/{city}', [SekolahController::class, 'getDistricts']);
+Route::get('getvillages/{district}', [SekolahController::class, 'getVillages']);
 
-Route::get('/get-cities/{province_id}', function($province_id) {
-    $cities = Regency::where('province_id', $province_id)->get();
-    return response()->json($cities);
-});
-
-Route::get('/get-districts/{city_id}', function($city_id) {
-    $districts = District::where('city_id', $city_id)->get();
-    return response()->json($districts);
-});
-
-Route::get('/get-villages/{district_id}', function($district_id) {
-    $villages = Village::where('district_id', $district_id)->get();
-    return response()->json($villages);
-});
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -41,14 +26,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
-    Route::resource('sekolah', SekolahController::class);
-    // routes/web.php
-Route::get('cities/{province}', [LocationController::class, 'getCities']);
-Route::get('districts/{city}', [LocationController::class, 'getDistricts']);
-Route::get('villages/{district}', [LocationController::class, 'getVillages']);
+    Route::resource('sekolahs', SekolahController::class);
+
     Route::resource('adminguru', DataGuruController::class);
     Route::resource('adminsiswa', DataSiswaController::class);
-    
+
 Route::get('api/get-kelas/{sekolah_id}', [DataSiswaController::class, 'getKelasBySekolah'])->name('api.kelas.by.sekolah');
     Route::resource('kelas', KelasController::class);
 

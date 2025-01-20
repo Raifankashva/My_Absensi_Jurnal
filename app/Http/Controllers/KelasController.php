@@ -13,7 +13,7 @@ class KelasController extends Controller
     {
         $query = Kelas::with('sekolah');
 
-        // Filter by Sekolah
+        
         if ($request->filled('sekolah')) {
             $query->where('sekolah_id', $request->sekolah);
         }
@@ -57,7 +57,8 @@ class KelasController extends Controller
 
     public function show(Kelas $kelas)
     {
-        $kelas->load('sekolah', 'siswa');
+
+        $kelas->load('sekolah');
         return view('kelas.show', compact('kelas'));
     }
 

@@ -41,4 +41,6 @@ class Kelas extends Model
     {
         return $this->belongsTo(Sekolah::class);
     }
+
+    
 }

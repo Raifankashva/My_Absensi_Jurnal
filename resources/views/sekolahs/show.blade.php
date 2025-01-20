@@ -69,19 +69,19 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-blue-600 font-medium">Kelurahan</span>
-                                    <span class="text-gray-800">{{ $sekolah->kelurahan }}</span>
+                                    <span class="text-gray-800">{{ $sekolah->village->name }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-blue-600 font-medium">Kecamatan</span>
-                                    <span class="text-gray-800">{{ $sekolah->kecamatan }}</span>
+                                    <span class="text-gray-800">{{ $sekolah->district->name }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-blue-600 font-medium">Kota</span>
-                                    <span class="text-gray-800">{{ $sekolah->kota }}</span>
+                                    <span class="text-gray-800">{{ $sekolah->city->name }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-blue-600 font-medium">Provinsi</span>
-                                    <span class="text-gray-800">{{ $sekolah->provinsi }}</span>
+                                    <span class="text-gray-800">{{ $sekolah->province->name }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-blue-600 font-medium">Kode Pos</span>
@@ -109,10 +109,10 @@
 
             {{-- Footer --}}
             <div class="bg-blue-50 px-6 py-4 flex justify-end space-x-3">
-                <a href="{{ route('sekolah.edit', $sekolah) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300">
+                <a href="{{ route('sekolahs.edit', $sekolah) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300">
                     Edit Informasi
                 </a>
-                <a href="{{ route('sekolah.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition duration-300">
+                <a href="{{ route('sekolahs.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition duration-300">
                     Kembali
                 </a>
             </div>

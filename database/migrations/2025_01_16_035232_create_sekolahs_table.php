@@ -40,9 +40,10 @@ class CreateSekolahsTable extends Migration
                   
             $table->foreign('city_id')
                   ->references('id')
-                  ->on('cities')
+                  ->on('regencies')
                   ->onDelete('restrict')
                   ->onUpdate('cascade');
+            
                   
             $table->foreign('district_id')
                   ->references('id')
