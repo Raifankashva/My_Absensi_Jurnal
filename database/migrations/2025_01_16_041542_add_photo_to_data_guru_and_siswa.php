@@ -13,7 +13,7 @@ class AddPhotoToDataGuruAndSiswa extends Migration
         });
 
         Schema::table('data_siswa', function (Blueprint $table) {
-            $table->string('foto')->nullable()->after('nama_lengkap');
+            $table->string('foto')->nullable()->after('nama');
         });
     }
 
