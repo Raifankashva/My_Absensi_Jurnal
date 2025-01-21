@@ -17,7 +17,7 @@ class CreateDataSiswaTable extends Migration
             $table->string('nisn', 10)->unique();
             $table->string('nis', 10)->unique();
             $table->string('nik', 16)->unique();
-            $table->string('nama');
+            $table->string('nama_lengkap');
             $table->enum('jenis_kelamin', ['laki-laki', 'Perempuan']);
             $table->string('tmp_lahir');
             $table->date('tgl_lahir');

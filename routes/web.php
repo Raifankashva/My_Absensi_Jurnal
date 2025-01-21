@@ -15,7 +15,10 @@ use App\Http\Controllers\LocationController;
 Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
 Route::get('getdistricts/{city}', [SekolahController::class, 'getDistricts']);
 Route::get('getvillages/{district}', [SekolahController::class, 'getVillages']);
-
+Route::get('get-kelas/{sekolahId}', [DataSiswaController::class, 'getKelas']);
+Route::get('get-cities/{provinceId}', [DataSiswaController::class, 'getCities']);
+Route::get('get-districts/{cityId}', [DataSiswaController::class, 'getDistricts']);
+Route::get('get-villages/{districtId}', [DataSiswaController::class, 'getVillages']);
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

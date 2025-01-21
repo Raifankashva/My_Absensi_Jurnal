@@ -47,4 +47,8 @@ class Sekolah extends Model
     {
         return $this->belongsTo(Village::class, 'village_id');
     }
+    public function kelas()
+    {
+        return $this->hasMany(Kelas::class);
+    }
 }

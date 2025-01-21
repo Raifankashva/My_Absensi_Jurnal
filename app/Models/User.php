@@ -37,4 +37,8 @@ class User extends Authenticatable
     {
         return $this->role === 'siswa';
     }
+    public function dataSiswa()
+    {
+        return $this->hasOne(DataSiswa::class);
+    }
 }
