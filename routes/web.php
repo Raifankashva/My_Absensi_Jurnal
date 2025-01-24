@@ -10,6 +10,8 @@ use App\Http\Controllers\DataGuruController;
 use App\Http\Controllers\DataSiswaController;
 use App\Http\Controllers\KelasController;
 use App\Models\DataSiswa;
+use App\Http\Controllers\PengaturanAbsensiController;
+use App\Http\Controllers\JadwalAbsensiController;
 use App\Http\Controllers\LocationController;
 
 Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
@@ -42,6 +44,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 Route::get('api/get-kelas/{sekolah_id}', [DataSiswaController::class, 'getKelasBySekolah'])->name('api.kelas.by.sekolah');
     Route::resource('kelas', KelasController::class);
 
+    Route::prefix('pengaturan-absensi')->name('pengaturan-absensi.')->group(function () {
+        Route::get('/', [PengaturanAbsensiController::class, 'index'])->name('index');
+        Route::get('/create', [PengaturanAbsensiController::class, 'create'])->name('create');
+        Route::post('/', [PengaturanAbsensiController::class, 'store'])->name('store');
+        Route::get('/{sekolahId}', [PengaturanAbsensiController::class, 'show'])->name('show');
+        Route::get('/{sekolahId}/edit', [PengaturanAbsensiController::class, 'edit'])->name('edit');
+        Route::put('/{sekolahId}', [PengaturanAbsensiController::class, 'update'])->name('update');
+        Route::delete('/{sekolahId}', [PengaturanAbsensiController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // Routes untuk Guru

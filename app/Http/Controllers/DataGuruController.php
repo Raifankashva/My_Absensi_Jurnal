@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 class DataGuruController extends Controller
@@ -61,11 +62,11 @@ class DataGuruController extends Controller
     
         // Handle foto upload
         $guruData = $request->except(['email', 'password', 'foto']);
+        $fotoPath = null;
         if ($request->hasFile('foto')) {
             $foto = $request->file('foto');
-            $filename = 'guru_' . time() . '.' . $foto->getClientOriginalExtension();
-            $path = $foto->storeAs('public/foto/guru', $filename);
-            $guruData['foto'] = $filename;
+            $fotoName = Str::slug($request->nama_lengkap) . '-' . time() . '.' . $foto->getClientOriginalExtension();
+            $fotoPath = $foto->storeAs('public/guru-photos', $fotoName);
         }
     
         $guruData['user_id'] = $user->id;

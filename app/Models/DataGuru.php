@@ -38,6 +38,7 @@ class DataGuru extends Model
         'no_hp',
         'tmt_kerja',
         'mata_pelajaran',
+        'foto', 
     ];
 
     /**

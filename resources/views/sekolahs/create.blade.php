@@ -1,57 +1,87 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="py-12">
+    <div class="py-12 bg-gray-50">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
+            <div class="bg-white shadow-xl rounded-xl overflow-hidden">
+                <div class="p-8 bg-gradient-to-r from-blue-50 to-blue-100">
+                    <h2 class="text-3xl font-extrabold text-gray-800 mb-6 border-b-2 border-blue-500 pb-3">
+                        <i class="fas fa-school mr-3 text-blue-600"></i>Tambah Data Sekolah
+                    </h2>
+                    
                     <form method="POST" action="{{ route('sekolahs.store') }}" class="space-y-6">
                         @csrf
 
-                        <!-- NPSN dan Nama Sekolah -->
-                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        {{-- NPSN dan Nama Sekolah --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="npsn" class="block text-sm font-medium text-gray-700">NPSN</label>
-                                <input type="text" name="npsn" id="npsn" value="{{ old('npsn') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required maxlength="8">
+                                <label for="npsn" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-hashtag mr-2 text-blue-500"></i>NPSN
+                                </label>
+                                <input type="text" name="npsn" id="npsn" 
+                                    value="{{ old('npsn') }}" 
+                                    class="form-input w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-400 transition duration-300" 
+                                    required maxlength="8" 
+                                    placeholder="Nomor Pokok Sekolah Nasional">
                                 @error('npsn')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
                                 @enderror
                             </div>
 
                             <div>
-                                <label for="nama_sekolah" class="block text-sm font-medium text-gray-700">Nama Sekolah</label>
-                                <input type="text" name="nama_sekolah" id="nama_sekolah" value="{{ old('nama_sekolah') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
+                                <label for="nama_sekolah" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-university mr-2 text-blue-500"></i>Nama Sekolah
+                                </label>
+                                <input type="text" name="nama_sekolah" id="nama_sekolah" 
+                                    value="{{ old('nama_sekolah') }}" 
+                                    class="form-input w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-400 transition duration-300" 
+                                    required 
+                                    placeholder="Masukkan nama lengkap sekolah">
                                 @error('nama_sekolah')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
 
-                        <!-- Jenjang dan Status -->
-                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        {{-- Jenjang dan Status --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="jenjang" class="block text-sm font-medium text-gray-700">Jenjang</label>
-                                <select name="jenjang" id="jenjang" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                                <label for="jenjang" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-graduation-cap mr-2 text-blue-500"></i>Jenjang
+                                </label>
+                                <select name="jenjang" id="jenjang" 
+                                    class="form-select w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-400 transition duration-300" 
+                                    required>
                                     <option value="">Pilih Jenjang</option>
                                     @foreach(['SD', 'SMP', 'SMA', 'SMK'] as $jenjang)
-                                        <option value="{{ $jenjang }}" {{ old('jenjang') == $jenjang ? 'selected' : '' }}>{{ $jenjang }}</option>
+                                        <option value="{{ $jenjang }}" 
+                                            {{ old('jenjang') == $jenjang ? 'selected' : '' }}>
+                                            {{ $jenjang }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('jenjang')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
                                 @enderror
                             </div>
 
                             <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                                <select name="status" id="status" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                                <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-building mr-2 text-blue-500"></i>Status
+                                </label>
+                                <select name="status" id="status" 
+                                    class="form-select w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-400 transition duration-300" 
+                                    required>
                                     <option value="">Pilih Status</option>
                                     @foreach(['Negeri', 'Swasta'] as $status)
-                                        <option value="{{ $status }}" {{ old('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                                        <option value="{{ $status }}" 
+                                            {{ old('status') == $status ? 'selected' : '' }}>
+                                            {{ $status }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('status')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="text-red-500 text-xs mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
@@ -59,9 +89,10 @@
                         <!-- Lokasi -->
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div>
-                                <label for="province_id" class="block text-sm font-medium text-gray-700">Provinsi</label>
+                                <label for="province_id" class="block text-sm font-medium text-gray-700">                                <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>    
+                                Provinsi</label>
                                 <select name="province_id" id="province_id" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                                    <option value="">Pilih Provinsi</option>
+                                <option value="">Pilih Provinsi</option>
                                     @foreach($provinces as $province)
                                         <option value="{{ $province->id }}" {{ old('province_id') == $province->id ? 'selected' : '' }}>
                                             {{ $province->name }}
@@ -74,7 +105,7 @@
                             </div>
 
                             <div>
-                                <label for="city_id" class="block text-sm font-medium text-gray-700">Kota/Kabupaten</label>
+                                <label for="city_id" class="block text-sm font-medium text-gray-700"><i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Kota/Kabupaten</label>
                                 <select name="city_id" id="city_id" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required disabled>
                                     <option value="">Pilih Kota/Kabupaten</option>
                                 </select>
@@ -84,7 +115,7 @@
                             </div>
 
                             <div>
-                                <label for="district_id" class="block text-sm font-medium text-gray-700">Kecamatan</label>
+                                <label for="district_id" class="block text-sm font-medium text-gray-700"><i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Kecamatan</label>
                                 <select name="district_id" id="district_id" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required disabled>
                                     <option value="">Pilih Kecamatan</option>
                                 </select>
@@ -94,7 +125,7 @@
                             </div>
 
                             <div>
-                                <label for="village_id" class="block text-sm font-medium text-gray-700">Kelurahan/Desa</label>
+                                <label for="village_id" class="block text-sm font-medium text-gray-700"><i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Kelurahan/Desa</label>
                                 <select name="village_id" id="village_id" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required disabled>
                                     <option value="">Pilih Kelurahan/Desa</option>
                                 </select>
@@ -106,7 +137,7 @@
 
                         <!-- Alamat -->
                         <div>
-                            <label for="alamat" class="block text-sm font-medium text-gray-700">Alamat</label>
+                            <label for="alamat" class="block text-sm font-medium text-gray-700"><i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Alamat</label>
                             <textarea name="alamat" id="alamat" rows="3" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>{{ old('alamat') }}</textarea>
                             @error('alamat')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -116,7 +147,7 @@
                         <!-- Kode Pos dan No Telp -->
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div>
-                                <label for="kode_pos" class="block text-sm font-medium text-gray-700">Kode Pos</label>
+                                <label for="kode_pos" class="block text-sm font-medium text-gray-700"><i class="fas fa-map-marker-alt mr-2 text-blue-500"></i> Kode Pos</label>
                                 <input type="text" name="kode_pos" id="kode_pos" value="{{ old('kode_pos') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required maxlength="5">
                                 @error('kode_pos')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -124,7 +155,7 @@
                             </div>
 
                             <div>
-                                <label for="no_telp" class="block text-sm font-medium text-gray-700">No Telepon</label>
+                                <label for="no_telp" class="block text-sm font-medium text-gray-700"><i class="fas fa-phone mr-2 text-blue-500"></i> No Telepon</label>
                                 <input type="text" name="no_telp" id="no_telp" value="{{ old('no_telp') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
                                 @error('no_telp')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -135,7 +166,7 @@
                         <!-- Email dan Website -->
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                                <label for="email" class="block text-sm font-medium text-gray-700"><i class="fas fa-envelope mr-2 text-blue-500"></i> Email</label>
                                 <input type="email" name="email" id="email" value="{{ old('email') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
                                 @error('email')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -143,7 +174,7 @@
                             </div>
 
                             <div>
-                                <label for="website" class="block text-sm font-medium text-gray-700">Website</label>
+                                <label for="website" class="block text-sm font-medium text-gray-700"><i class="fas fa-globe mr-2 text-blue-500"></i> Website</label>
                                 <input type="url" name="website" id="website" value="{{ old('website') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                 @error('website')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -154,7 +185,7 @@
                         <!-- Akreditasi dan Kepala Sekolah -->
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div>
-                                <label for="akreditasi" class="block text-sm font-medium text-gray-700">Akreditasi</label>
+                                <label for="akreditasi" class="block text-sm font-medium text-gray-700"><i class="fas fa-award mr-2 text-blue-500"></i> Akreditasi</label>
                                 <select name="akreditasi" id="akreditasi" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                     <option value="">Pilih Akreditasi</option>
                                     @foreach(['A', 'B', 'C'] as $akreditasi)
@@ -167,7 +198,7 @@
                             </div>
 
                             <div>
-                                <label for="kepala_sekolah" class="block text-sm font-medium text-gray-700">Nama Kepala Sekolah</label>
+                                <label for="kepala_sekolah" class="block text-sm font-medium text-gray-700"><i class="fas fa-user-tie mr-2 text-blue-500"></i> Nama Kepala Sekolah</label>
                                 <input type="text" name="kepala_sekolah" id="kepala_sekolah" value="{{ old('kepala_sekolah') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required>
                                 @error('kepala_sekolah')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -177,7 +208,7 @@
 
                         <!-- NIP Kepala Sekolah -->
                         <div>
-                            <label for="nip_kepala_sekolah" class="block text-sm font-medium text-gray-700">NIP Kepala Sekolah</label>
+                            <label for="nip_kepala_sekolah" class="block text-sm font-medium text-gray-700"><i class="fas fa-id-card mr-2 text-blue-500"></i> NIP Kepala Sekolah</label>
                             <input type="text" name="nip_kepala_sekolah" id="nip_kepala_sekolah" value="{{ old('nip_kepala_sekolah') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" maxlength="18">
                             @error('nip_kepala_sekolah')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
