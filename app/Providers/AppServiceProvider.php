@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\DataSiswa;
+use App\Observers\DataSiswaObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
      * @return void
      */
     public function boot()
-    {
-        //
-    }
+{
+    DataSiswa::observe(DataSiswaObserver::class);
+}
 }

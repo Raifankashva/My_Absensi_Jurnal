@@ -59,6 +59,7 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NISN</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis Kelamin</th>
@@ -69,6 +70,17 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($kelas->siswa as $siswa)
                         <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($siswa->foto)
+                                    <img src="{{ Storage::url(''.$siswa->foto) }}" 
+                                         alt="Foto {{ $siswa->nama_lengkap }}"
+                                         class="h-10 w-10 rounded-full object-cover">
+                                @else
+                                    <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <span class="text-gray-500 text-sm">No Foto</span>
+                                    </div>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $siswa->nisn }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $siswa->nama_lengkap }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $siswa->jenis_kelamin }}</td>

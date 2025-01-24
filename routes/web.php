@@ -19,6 +19,10 @@ Route::get('get-kelas/{sekolahId}', [DataSiswaController::class, 'getKelas']);
 Route::get('get-cities/{provinceId}', [DataSiswaController::class, 'getCities']);
 Route::get('get-districts/{cityId}', [DataSiswaController::class, 'getDistricts']);
 Route::get('get-villages/{districtId}', [DataSiswaController::class, 'getVillages']);
+// Route untuk dropdown dinamis wilayah
+Route::get('/get-cities', [SekolahController::class, 'getCities'])->name('get.cities');
+Route::get('/get-districts', [SekolahController::class, 'getDistricts'])->name('get.districts');
+Route::get('/get-villages', [SekolahController::class, 'getVillages'])->name('get.villages');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -33,6 +37,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     Route::resource('adminguru', DataGuruController::class);
     Route::resource('adminsiswa', DataSiswaController::class);
+    Route::get('/siswa/{id}/download-qr', [DataSiswaController::class, 'downloadQrCode'])->name('siswa.download-qr');
 
 Route::get('api/get-kelas/{sekolah_id}', [DataSiswaController::class, 'getKelasBySekolah'])->name('api.kelas.by.sekolah');
     Route::resource('kelas', KelasController::class);

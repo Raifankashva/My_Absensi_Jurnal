@@ -9,34 +9,20 @@ class Kelas extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'kelas';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'sekolah_id',
         'nama_kelas',
         'tingkat',
         'jurusan',
         'kapasitas',
+        'sisa_kapasitas',
         'tahun_ajaran',
         'semester',
         'wali_kelas',
     ];
 
-    /**
-     * Get the associated Sekolah.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function sekolah()
     {
         return $this->belongsTo(Sekolah::class);
@@ -45,5 +31,12 @@ class Kelas extends Model
     public function siswa()
     {
         return $this->hasMany(DataSiswa::class);
+    }
+
+    // Method to update remaining capacity
+    public function updateRemainingCapacity()
+    {
+        $this->sisa_kapasitas = $this->kapasitas - $this->siswa()->count();
+        $this->save();
     }
 }

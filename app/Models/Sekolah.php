@@ -24,7 +24,8 @@ class Sekolah extends Model
         'website',
         'akreditasi',
         'kepala_sekolah',
-        'nip_kepala_sekolah'
+        'nip_kepala_sekolah',
+        'total_siswa',
     ];
 
     // Relationships with IndoRegion
@@ -50,5 +51,16 @@ class Sekolah extends Model
     public function kelas()
     {
         return $this->hasMany(Kelas::class);
+    }
+    public function dataSiswa()
+    {
+        return $this->hasMany(DataSiswa::class);
+    }
+
+    // Method to update total student count
+    public function updateTotalSiswa()
+    {
+        $this->total_siswa = $this->dataSiswa()->count();
+        $this->save();
     }
 }

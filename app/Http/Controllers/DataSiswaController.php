@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class DataSiswaController extends Controller
 {
@@ -84,7 +85,6 @@ class DataSiswaController extends Controller
 public function store(Request $request)
 {
     $request->validate([
-        // Validasi yang Anda miliki tetap sama
         'sekolah_id' => 'required|exists:sekolahs,id',
         'kelas_id' => 'required|exists:kelas,id',
         'nisn' => 'required|string|max:10|unique:data_siswa',
@@ -114,19 +114,20 @@ public function store(Request $request)
         'kks' => 'nullable|string',
         'kph' => 'nullable|string',
         'kip' => 'nullable|string',
-        'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'email' => 'required|email|unique:users,email',  // Ensure email is validated
     ]);
-
+    
     try {
         DB::beginTransaction();
-
-        // Proses pembuatan data
+    
+        // Proses pembuatan data user
         $user = User::create([
             'name' => $request->nama_lengkap,
-            'email' => $request->nisn . '@student.sch.id',
-            'password' => bcrypt($request->nis),
+            'email' => $request->email . '@student.sch.id',  // Ensure email is constructed and saved
+            'password' => bcrypt($request->password),
             'role' => 'siswa',
-            'alamat' => $request->village_id . ', ' . $request->district_id,
+            'alamat' => $request->alamat ?? '-',  // Ensure alamat is passed
             'no_hp' => $request->hp ?? '-'
         ]);
 
@@ -197,13 +198,34 @@ public function store(Request $request)
     }
 }
 
-    public function show($id)
-    {
-        $dataSiswa = DataSiswa::findOrFail($id);
-        $sekolahs = Sekolah::all();
-        return view('adminsiswa.show', compact('dataSiswa', 'sekolahs'));
-    }
-
+public function show($id)
+{
+    $dataSiswa = DataSiswa::findOrFail($id);
+    
+    $sekolahs = Sekolah::all();
+    
+    // Generate QR code with student ID
+    $qrCode = QrCode::size(300)->generate($dataSiswa->id);
+    
+    return view('adminsiswa.show', compact('dataSiswa', 'sekolahs', 'qrCode'));
+}
+public function downloadQrCode($id)
+{
+    $dataSiswa = DataSiswa::findOrFail($id);
+    
+    // Generate QR code
+    $qrCode = QrCode::format('png')
+                    ->size(300)
+                    ->generate($dataSiswa->id);
+    
+    // Create filename
+    $filename = 'qr_code_' . $dataSiswa->id . '.png';
+    
+    // Return download response
+    return response($qrCode)
+        ->header('Content-Type', 'image/png')
+        ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+}
     public function destroy($id)
     {
         try {

@@ -36,6 +36,10 @@
                             <i class='bx bxs-school mr-3 text-xl'></i>
                             Sekolah
                         </a>
+                        <a href="{{route ('kelas.index')}}" class="flex items-center px-4 py-2 text-gray-700 rounded-lg sidebar-item">
+                            <i class='bx bx-chalkboard mr-3 text-xl'></i>
+                            Kelas
+                        </a>
                         <a href="{{ route('adminguru.index') }}" class="flex items-center px-4 py-2 text-gray-700 rounded-lg sidebar-item">
                             <i class='bx bxs-user-detail mr-3 text-xl'></i>
                             Guru

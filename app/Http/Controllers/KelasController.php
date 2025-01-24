@@ -11,23 +11,22 @@ class KelasController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Kelas::with('sekolah');
-
-        
+        $query = Kelas::with('sekolah', 'siswa');
+    
         if ($request->filled('sekolah')) {
             $query->where('sekolah_id', $request->sekolah);
         }
-
-        // Filter by Tingkat
+    
         if ($request->filled('tingkat')) {
             $query->where('tingkat', $request->tingkat);
         }
-
+    
         $kelas = $query->latest()->paginate(10);
-
-        // Untuk mempertahankan query string saat pagination
+    
+        // Update remaining capacity for each class
+       
         $kelas->appends($request->query());
-
+    
         return view('kelas.index', compact('kelas'));
     }
 
@@ -57,8 +56,8 @@ class KelasController extends Controller
 
     public function show(Kelas $kelas)
     {
-
-        $kelas->load('sekolah');
+        $kelas->load('sekolah', 'siswa');
+        $kelas->updateRemainingCapacity();
         return view('kelas.show', compact('kelas'));
     }
 

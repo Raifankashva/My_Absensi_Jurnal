@@ -87,6 +87,7 @@
                                 <p>Tahun Ajaran: {{ $item->tahun_ajaran }}</p>
                                 <p>Semester: {{ $item->semester }}</p>
                                 <p>Kapasitas: {{ $item->kapasitas }} Siswa</p>
+                                <p>Sisa Kapasitas: {{ $item->sisa_kapasitas }} Siswa</p>
                             </div>
                             
                             <div class="flex justify-between items-center border-t pt-3">
