@@ -13,6 +13,13 @@ use App\Models\DataSiswa;
 use App\Http\Controllers\PengaturanAbsensiController;
 use App\Http\Controllers\JadwalAbsensiController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\FaceDataController;
+use App\Http\Controllers\HolidayController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceSettingController;
+use App\Http\Controllers\ScheduleTemplateController;
+use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AbsensiSiswaController;
 
 Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
 Route::get('getdistricts/{city}', [SekolahController::class, 'getDistricts']);
@@ -52,6 +59,45 @@ Route::get('api/get-kelas/{sekolah_id}', [DataSiswaController::class, 'getKelasB
         Route::get('/{sekolahId}/edit', [PengaturanAbsensiController::class, 'edit'])->name('edit');
         Route::put('/{sekolahId}', [PengaturanAbsensiController::class, 'update'])->name('update');
         Route::delete('/{sekolahId}', [PengaturanAbsensiController::class, 'destroy'])->name('destroy');
+    });
+    Route::prefix('attendance')->name('attendance.')->group(function () {
+        // Dashboard & Scan Routes
+        Route::get('/', [AttendanceController::class, 'index'])->name('index');
+        Route::get('/scan', [AttendanceController::class, 'scan'])->name('scan');
+        Route::post('/process', [AttendanceController::class, 'process'])->name('process');
+        Route::get('/report', [AttendanceController::class, 'report'])->name('report');
+        
+        // Settings Routes
+        Route::get('/settings', [AttendanceSettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [AttendanceSettingController::class, 'store'])->name('settings.store');
+    });
+
+    // Face Data Routes
+    Route::prefix('face')->name('face.')->group(function () {
+        Route::get('/', [FaceDataController::class, 'index'])->name('index');
+        Route::get('/create/{student}', [FaceDataController::class, 'create'])->name('create');
+        Route::post('/store/{student}', [FaceDataController::class, 'store'])->name('store');
+        Route::delete('/{faceData}', [FaceDataController::class, 'destroy'])->name('destroy');
+    });
+
+    // Schedule Template Routes
+    Route::prefix('schedule')->name('schedule.')->group(function () {
+        Route::get('/', [ScheduleTemplateController::class, 'index'])->name('index');
+        Route::get('/create', [ScheduleTemplateController::class, 'create'])->name('create');
+        Route::post('/', [ScheduleTemplateController::class, 'store'])->name('store');
+        Route::get('/{template}/edit', [ScheduleTemplateController::class, 'edit'])->name('edit');
+        Route::put('/{template}', [ScheduleTemplateController::class, 'update'])->name('update');
+        Route::delete('/{template}', [ScheduleTemplateController::class, 'destroy'])->name('destroy');
+    });
+
+    // Holiday Routes
+    Route::prefix('holiday')->name('holiday.')->group(function () {
+        Route::get('/', [HolidayController::class, 'index'])->name('index');
+        Route::get('/create', [HolidayController::class, 'create'])->name('create');
+        Route::post('/', [HolidayController::class, 'store'])->name('store');
+        Route::get('/{holiday}/edit', [HolidayController::class, 'edit'])->name('edit');
+        Route::put('/{holiday}', [HolidayController::class, 'update'])->name('update');
+        Route::delete('/{holiday}', [HolidayController::class, 'destroy'])->name('destroy');
     });
 });
 

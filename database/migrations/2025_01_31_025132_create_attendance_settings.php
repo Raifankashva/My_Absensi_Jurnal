@@ -4,23 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePengaturanAbsensiTable extends Migration
+class CreateAttendanceSettingsTable extends Migration
 {
     public function up()
     {
-        Schema::create('pengaturan_absensi', function (Blueprint $table) {
+        Schema::create('attendance_settings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sekolah_id')->constrained('sekolahs')->onDelete('cascade');
             $table->time('jam_masuk');
+            $table->time('batas_telat');
             $table->time('jam_pulang');
-            $table->time('batas_terlambat')->nullable();
-            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('pengaturan_absensi');
+        Schema::dropIfExists('attendance_settings');
     }
 }
