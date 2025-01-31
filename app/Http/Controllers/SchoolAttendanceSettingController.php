@@ -38,7 +38,7 @@ class SchoolAttendanceSettingController extends Controller
             'hari_aktif.*' => 'integer|between:1,7'
         ]);
 
-        $validated['token'] = Str::random(32);
+        $validated['token'] = Str::random(8);
         
         SchoolAttendanceSetting::create($validated);
         return redirect()->route('attendance.settings.index')->with('success', 'Pengaturan absensi berhasil dibuat');

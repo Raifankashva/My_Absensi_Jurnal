@@ -1,59 +1,122 @@
-<!-- resources/views/welcome.blade.php -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Welcome to Absensi Jurnal</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-        .floating { 
-            animation: float 6s ease-in-out infinite;
-        }
-        .gradient-text {
-            background: linear-gradient(45deg, #3B82F6, #1E40AF);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-    </style>
-</head>
-<body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
-    <div class="container mx-auto px-4">
-        <!-- Navigation -->
-        <nav class="py-4">
-            <div class="flex justify-between items-center">
-                <div class="text-2xl font-bold gradient-text">Absensi Jurnal</div>
-                
-            </div>
-        </nav>
+@extends('layouts.app')
 
-        <!-- Hero Section -->
-        <div class="flex flex-col-reverse lg:flex-row items-center justify-between py-20">
-            <div class="lg:w-1/2 mt-10 lg:mt-0">
-                <h1 class="text-5xl font-bold mb-6 gradient-text">Selamat Datang di Absensi Jurnal</h1>
-                <p class="text-xl text-gray-600 mb-8">Aplikasi absensi jurnal untuk sekolah</p>
-                <div class="space-x-4">
-                    <a href="{{ route('login') }}" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300 inline-block">Login</a>
-                    <a href="#features" class="border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg hover:bg-blue-50 transition duration-300 inline-block">Learn More</a>
+@section('title', 'Welcome')
+
+@section('content')
+<div class="min-h-screen relative overflow-hidden">
+    <!-- Background Design Elements -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="relative z-10 container mx-auto px-4 py-16">
+        <div class="text-center mb-16 animate-fade-in">
+            <div class="flex justify-center mb-8">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-2xl shadow-2xl transform hover:scale-110 transition-all duration-300">
+                    <i class="bx bxs-school text-5xl text-white"></i>
                 </div>
             </div>
-            <div class="lg:w-1/2 relative">
-                <!-- 3D-like Elements -->
-                <div class="floating">
-                    <div class="relative">
-                        <!-- Main Circle -->
-                        <div class="w-64 h-64 bg-blue-500 rounded-full absolute top-0 left-0 transform -translate-x-1/2 -translate-y-1/2 opacity-10"></div>
-                        <!-- Decorative Elements -->
-                        <div class="w-48 h-48 bg-blue-600 rounded-lg transform rotate-45 absolute top-10 right-10 opacity-20"></div>
-                        <div class="w-32 h-32 bg-blue-700 rounded-full absolute bottom-0 right-0 opacity-15"></div>
-                        <!-- Central Icon -->
-                        <div class="w-96 h-96 bg-white rounded-2xl shadow-2xl p-8 transform rotate-3 relative z-10">
-                            <div class="w-full h-full bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-32 w-32 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                                
+            <h1 class="text-4xl md:text-6xl font-bold text-blue-900 mb-4">
+                Welcome to School Management System
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Manage your school activities efficiently with our comprehensive system
+            </p>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            @php
+            $features = [
+                [
+                    'icon' => 'bxs-user-check',
+                    'color' => 'blue',
+                    'title' => 'Attendance Management',
+                    'description' => 'Track student and teacher attendance efficiently with our advanced system.'
+                ],
+                [
+                    'icon' => 'bxs-book-content',
+                    'color' => 'indigo',
+                    'title' => 'Course Management',
+                    'description' => 'Organize and manage courses, subjects, and class schedules effectively.'
+                ],
+                [
+                    'icon' => 'bxs-report',
+                    'color' => 'purple',
+                    'title' => 'Performance Tracking',
+                    'description' => 'Monitor academic progress and generate detailed performance reports.'
+                ]
+            ];
+            @endphp
+
+            @foreach ($features as $feature)
+            <div class="group bg-white/50 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300">
+                <div class="bg-gradient-to-r from-{{ $feature['color'] }}-500 to-{{ $feature['color'] }}-600 w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <i class="bx {{ $feature['icon'] }} text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-blue-900 mb-2">{{ $feature['title'] }}</h3>
+                <p class="text-gray-600">{{ $feature['description'] }}</p>
+            </div>
+            @endforeach
+        </div>
+
+        <!-- Stats Section -->
+        <div class="bg-white/50 backdrop-blur-lg rounded-2xl p-8 shadow-lg mb-16">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                @php
+                $stats = [
+                    ['number' => '1000+', 'label' => 'Students', 'icon' => 'bxs-group', 'color' => 'blue'],
+                    ['number' => '50+', 'label' => 'Teachers', 'icon' => 'bxs-user-detail', 'color' => 'indigo'],
+                    ['number' => '30+', 'label' => 'Courses', 'icon' => 'bxs-book', 'color' => 'purple'],
+                    ['number' => '95%', 'label' => 'Success Rate', 'icon' => 'bxs-badge-check', 'color' => 'green']
+                ];
+                @endphp
+
+                @foreach ($stats as $stat)
+                <div class="text-center group">
+                    <div class="inline-block bg-{{ $stat['color'] }}-100 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <i class="bx {{ $stat['icon'] }} text-3xl text-{{ $stat['color'] }}-600"></i>
+                    </div>
+                    <h4 class="text-3xl font-bold text-{{ $stat['color'] }}-600 mb-2">{{ $stat['number'] }}</h4>
+                    <p class="text-gray-600">{{ $stat['label'] }}</p>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="text-center">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 shadow-lg transform hover:scale-105 transition-all duration-300">
+                <h2 class="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
+                <p class="text-blue-100 mb-6">Join our platform and experience the future of education management</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="{{ route('login') }}" class="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                        Login
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="relative z-10 bg-white/50 backdrop-blur-lg border-t border-gray-200 py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-600">© {{ date('Y') }} School Management System. All rights reserved.</p>
+        </div>
+    </footer>
+</div>
+
+<style>
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fade-in 1s ease-out;
+    }
+</style>
+@endsection

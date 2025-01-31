@@ -6,86 +6,173 @@
     <title>Login - Sistem Absensi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <style>
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        .animated-bg {
+            background: linear-gradient(-45deg, #4F46E5, #60A5FA, #818CF8, #3B82F6);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen flex items-center justify-center">
-    <div 
-        data-aos="zoom-in" 
-        class="w-full max-w-md bg-white shadow-2xl rounded-2xl overflow-hidden">
-        <div class="bg-blue-600 p-6 text-center">
-            <h2 class="text-3xl font-bold text-white">Login</h2>
+<body class="animated-bg min-h-screen flex items-center justify-center p-4">
+    <!-- Decorative Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 -left-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div class="absolute top-0 -right-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <div class="container mx-auto flex flex-col lg:flex-row items-center justify-center gap-12 relative z-10">
+        <!-- Left Side - Welcome Section -->
+        <div class="w-full lg:w-1/2 text-center lg:text-left" data-aos="fade-right">
+            <div class="floating">
+                <div class="bg-white/30 backdrop-blur-lg rounded-2xl p-8 shadow-2xl">
+                    <div class="flex justify-center lg:justify-start">
+                        <div class="bg-blue-600 p-4 rounded-2xl shadow-lg mb-6">
+                            <i class='bx bxs-graduation text-4xl text-white'></i>
+                        </div>
+                    </div>
+                    <h1 class="text-4xl font-bold text-white mb-4">Welcome Back!</h1>
+                    <p class="text-blue-100 text-lg mb-6">Manage your school activities efficiently with our comprehensive system.</p>
+                    <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto lg:mx-0">
+                        <div class="bg-white/20 backdrop-blur-md rounded-xl p-4">
+                            <i class='bx bxs-user-check text-2xl text-white mb-2'></i>
+                            <p class="text-white font-medium">Easy Tracking</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-md rounded-xl p-4">
+                            <i class='bx bxs-time-five text-2xl text-white mb-2'></i>
+                            <p class="text-white font-medium">Real-time Data</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <form 
-            method="POST" 
-            action="{{ route('login') }}" 
-            class="p-8 space-y-6">
-            @csrf
-            
-            <div>
-                <label class="block text-blue-700 font-semibold mb-2">Email</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                        <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                    </span>
-                    <input 
-                        type="email" 
-                        name="email" 
-                        required 
-                        class="w-full pl-10 pr-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:border-blue-500 transition duration-300"
-                        placeholder="Masukkan email anda"
-                    >
+
+        <!-- Right Side - Login Form -->
+        <div class="w-full lg:w-1/2 max-w-md" data-aos="fade-left">
+            <div class="glass-effect rounded-2xl shadow-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-center">
+                    <h2 class="text-3xl font-bold text-white">Login to Your Account</h2>
+                    <p class="text-blue-100 mt-2">Please enter your credentials</p>
                 </div>
-            </div>
 
-            <div>
-                <label class="block text-blue-700 font-semibold mb-2">Password</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                        <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                    </span>
-                    <input 
-                        type="password" 
-                        name="password" 
-                        required 
-                        class="w-full pl-10 pr-4 py-2 border-2 border-blue-200 rounded-lg focus:outline-none focus:border-blue-500 transition duration-300"
-                        placeholder="Masukkan password anda"
-                    >
-                </div>
-            </div>
+                <form method="POST" action="{{ route('login') }}" class="p-8 space-y-6">
+                    @csrf
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-blue-900 font-semibold mb-2">Email Address</label>
+                            <div class="relative group">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-blue-500 group-hover:text-blue-600">
+                                    <i class='bx bxs-envelope text-xl'></i>
+                                </span>
+                                <input type="email" 
+                                       name="email" 
+                                       required 
+                                       class="w-full pl-10 pr-4 py-3 border-2 border-blue-100 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                                       placeholder="Enter your email">
+                            </div>
+                        </div>
 
-            <div class="flex items-center justify-between">
-                <label class="flex items-center">
-                    <input 
-                        type="checkbox" 
-                        class="form-checkbox h-4 w-4 text-blue-600"
-                    >
-                    <span class="ml-2 text-gray-700">Ingat Saya</span>
-                </label>
-                <a href="#" class="text-blue-500 hover:text-blue-700 transition">Lupa Password?</a>
-            </div>
+                        <div>
+                            <label class="block text-blue-900 font-semibold mb-2">Password</label>
+                            <div class="relative group">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-blue-500 group-hover:text-blue-600">
+                                    <i class='bx bxs-lock-alt text-xl'></i>
+                                </span>
+                                <input type="password" 
+                                       name="password" 
+                                       required 
+                                       class="w-full pl-10 pr-4 py-3 border-2 border-blue-100 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                                       placeholder="Enter your password">
+                            </div>
+                        </div>
+                    </div>
 
-            <button 
-                type="submit" 
-                class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 shadow-lg"
-            >
-                Login
-            </button>
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center">
+                            <input type="checkbox" 
+                                   class="w-4 h-4 border-2 border-blue-500 rounded text-blue-600 focus:ring-blue-500 transition-colors duration-200">
+                            <span class="ml-2 text-blue-900">Remember me</span>
+                        </label>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                            Forgot Password?
+                        </a>
+                    </div>
 
-            <div class="text-center mt-4">
-                <p class="text-gray-600">
-                    Belum punya akun? 
-                    <a href="#" class="text-blue-500 hover:text-blue-700">Daftar Sekarang</a>
-                </p>
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl
+                                   hover:from-blue-700 hover:to-indigo-700 transform hover:scale-[1.02] 
+                                   active:scale-[0.98] transition-all duration-200 font-semibold shadow-lg 
+                                   hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Sign in to Account
+                    </button>
+
+                    <div class="relative my-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button type="button" 
+                                class="flex items-center justify-center px-4 py-2 border-2 border-gray-200 
+                                       rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-200">
+                            <i class='bx bxl-google text-xl mr-2 text-red-500'></i>
+                            Google
+                        </button>
+                        <button type="button" 
+                                class="flex items-center justify-center px-4 py-2 border-2 border-gray-200 
+                                       rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-200">
+                            <i class='bx bxl-microsoft text-xl mr-2 text-blue-500'></i>
+                            Microsoft
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-6">
+                        <p class="text-gray-600">
+                            Don't have an account? 
+                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
+                                Register Now
+                            </a>
+                        </p>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 
     <script>
-        AOS.init();
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
     </script>
 </body>
 </html>
