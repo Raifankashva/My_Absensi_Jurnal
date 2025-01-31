@@ -21,15 +21,7 @@
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Sekolah</label>
-                    <select name="sekolah_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
-                        @foreach($sekolahs as $sekolah)
-                            <option value="{{ $sekolah->id }}">{{ $sekolah->nama_sekolah }}</option>
-                        @endforeach
-                    </select>
-                    @error('sekolah_id')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
+                    
                 </div>
 
                 <div>

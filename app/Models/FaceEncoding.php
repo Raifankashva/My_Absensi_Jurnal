@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FaceData extends Model
+class FaceEncoding extends Model
 {
     protected $fillable = [
         'data_siswa_id',
-        'face_encoding',
-        'foto_wajah',
+        'encoding_data',
+        'foto_referensi',
         'is_active'
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active' => 'boolean'
     ];
 
     public function siswa()

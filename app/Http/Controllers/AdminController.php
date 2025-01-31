@@ -14,6 +14,13 @@ class AdminController extends Controller
         $this->middleware(['auth', 'role:admin']);
     }
 
+    /**
+     * Halaman dashboard untuk admin.
+     *
+     * Menampilkan data total sekolah, total guru, total siswa, dan 5 pengguna terbaru.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function dashboard()
     {
         $sekolah = Sekolah::all();

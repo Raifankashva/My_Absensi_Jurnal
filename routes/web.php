@@ -20,6 +20,8 @@ use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\ScheduleTemplateController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AbsensiSiswaController;
+use App\Http\Controllers\SchoolAttendanceSettingController;
+use App\Http\Controllers\SchoolHolidayController;
 
 Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
 Route::get('getdistricts/{city}', [SekolahController::class, 'getDistricts']);
@@ -50,55 +52,25 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
 Route::get('api/get-kelas/{sekolah_id}', [DataSiswaController::class, 'getKelasBySekolah'])->name('api.kelas.by.sekolah');
     Route::resource('kelas', KelasController::class);
-
-    Route::prefix('pengaturan-absensi')->name('pengaturan-absensi.')->group(function () {
-        Route::get('/', [PengaturanAbsensiController::class, 'index'])->name('index');
-        Route::get('/create', [PengaturanAbsensiController::class, 'create'])->name('create');
-        Route::post('/', [PengaturanAbsensiController::class, 'store'])->name('store');
-        Route::get('/{sekolahId}', [PengaturanAbsensiController::class, 'show'])->name('show');
-        Route::get('/{sekolahId}/edit', [PengaturanAbsensiController::class, 'edit'])->name('edit');
-        Route::put('/{sekolahId}', [PengaturanAbsensiController::class, 'update'])->name('update');
-        Route::delete('/{sekolahId}', [PengaturanAbsensiController::class, 'destroy'])->name('destroy');
-    });
     Route::prefix('attendance')->name('attendance.')->group(function () {
-        // Dashboard & Scan Routes
-        Route::get('/', [AttendanceController::class, 'index'])->name('index');
+        // School Attendance Settings
+        Route::resource('settings', SchoolAttendanceSettingController::class);
+        
+        // School Holidays
+        Route::resource('holidays', SchoolHolidayController::class);
+        
+        // Attendance Process
+        Route::get('/select-school', [AttendanceController::class, 'selectSchool'])->name('select-school');
+        Route::post('/verify-token', [AttendanceController::class, 'verifyToken'])->name('verify-token');
         Route::get('/scan', [AttendanceController::class, 'scan'])->name('scan');
         Route::post('/process', [AttendanceController::class, 'process'])->name('process');
-        Route::get('/report', [AttendanceController::class, 'report'])->name('report');
         
-        // Settings Routes
-        Route::get('/settings', [AttendanceSettingController::class, 'index'])->name('settings.index');
-        Route::post('/settings', [AttendanceSettingController::class, 'store'])->name('settings.store');
+        // Reports
+        Route::get('/report', [AttendanceController::class, 'report'])->name('report');
+        Route::get('/report/generate', [AttendanceController::class, 'generateReport'])->name('report.generate');
     });
-
-    // Face Data Routes
-    Route::prefix('face')->name('face.')->group(function () {
-        Route::get('/', [FaceDataController::class, 'index'])->name('index');
-        Route::get('/create/{student}', [FaceDataController::class, 'create'])->name('create');
-        Route::post('/store/{student}', [FaceDataController::class, 'store'])->name('store');
-        Route::delete('/{faceData}', [FaceDataController::class, 'destroy'])->name('destroy');
-    });
-
-    // Schedule Template Routes
-    Route::prefix('schedule')->name('schedule.')->group(function () {
-        Route::get('/', [ScheduleTemplateController::class, 'index'])->name('index');
-        Route::get('/create', [ScheduleTemplateController::class, 'create'])->name('create');
-        Route::post('/', [ScheduleTemplateController::class, 'store'])->name('store');
-        Route::get('/{template}/edit', [ScheduleTemplateController::class, 'edit'])->name('edit');
-        Route::put('/{template}', [ScheduleTemplateController::class, 'update'])->name('update');
-        Route::delete('/{template}', [ScheduleTemplateController::class, 'destroy'])->name('destroy');
-    });
-
-    // Holiday Routes
-    Route::prefix('holiday')->name('holiday.')->group(function () {
-        Route::get('/', [HolidayController::class, 'index'])->name('index');
-        Route::get('/create', [HolidayController::class, 'create'])->name('create');
-        Route::post('/', [HolidayController::class, 'store'])->name('store');
-        Route::get('/{holiday}/edit', [HolidayController::class, 'edit'])->name('edit');
-        Route::put('/{holiday}', [HolidayController::class, 'update'])->name('update');
-        Route::delete('/{holiday}', [HolidayController::class, 'destroy'])->name('destroy');
-    });
+    
+    
 });
 
 // Routes untuk Guru

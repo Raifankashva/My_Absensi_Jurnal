@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AttendanceSetting extends Model
+class SchoolHoliday extends Model
 {
     protected $fillable = [
         'sekolah_id',
-        'jam_masuk',
-        'batas_telat',
-        'jam_pulang'
+        'tanggal',
+        'keterangan'
+    ];
+
+    protected $casts = [
+        'tanggal' => 'date'
     ];
 
     public function sekolah()

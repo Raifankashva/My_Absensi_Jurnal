@@ -5,19 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Holiday extends Model
+class SchoolAttendanceSetting extends Model
 {
     protected $fillable = [
         'sekolah_id',
-        'nama_libur',
-        'tanggal_mulai',
-        'tanggal_selesai',
-        'keterangan'
+        'token',
+        'jam_masuk',
+        'batas_telat',
+        'jam_pulang',
+        'hari_aktif',
+        'is_active'
     ];
 
     protected $casts = [
-        'tanggal_mulai' => 'date',
-        'tanggal_selesai' => 'date',
+        'hari_aktif' => 'array',
+        'is_active' => 'boolean'
     ];
 
     public function sekolah()
