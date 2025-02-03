@@ -37,17 +37,24 @@
             @endif
             
             <!-- QR Code Section -->
-            <div class="p-4 flex justify-center">
-                {!! QrCode::size(200)
-                           ->backgroundColor(255,255,255)
-                           ->color(0,0,0)
-                           ->generate($dataSiswa->id) !!}
+            <div class="card">
+    <div class="card-header">
+
+    </div>
+    <div class="card-body text-center">
+        @if(isset($qrCodeUrl))
+            <img src="{{ $qrCodeUrl }}" alt="QR Code" class="img-fluid mb-3" style="max-width: 300px;">
+            <div>
+                <a href="{{ route('adminsiswa.download-qr', $dataSiswa->id) }}" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Download QR Code
+                </a>
             </div>
+        @else
+            <p>QR Code tidak tersedia</p>
+        @endif
+    </div>
+</div>
         </div>
-        <a href="{{ route('siswa.download-qr', $dataSiswa->id) }}" 
-   class="btn btn-primary">
-   Download QR Code
-</a>
     </div>
 </div>
 

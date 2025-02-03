@@ -49,28 +49,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::resource('adminguru', DataGuruController::class);
     Route::resource('adminsiswa', DataSiswaController::class);
     Route::get('/siswa/{id}/download-qr', [DataSiswaController::class, 'downloadQrCode'])->name('siswa.download-qr');
-
+    Route::get('adminsiswa/{id}/download-qr', [DataSiswaController::class, 'downloadQRCode'])
+    ->name('adminsiswa.download-qr');
 Route::get('api/get-kelas/{sekolah_id}', [DataSiswaController::class, 'getKelasBySekolah'])->name('api.kelas.by.sekolah');
     Route::resource('kelas', KelasController::class);
-    Route::prefix('attendance')->name('attendance.')->group(function () {
-        // School Attendance Settings
-        Route::resource('settings', SchoolAttendanceSettingController::class);
-        
-        // School Holidays
-        Route::resource('holidays', SchoolHolidayController::class);
-        
-        // Attendance Process
-        Route::get('/select-school', [AttendanceController::class, 'selectSchool'])->name('select-school');
-        Route::post('/verify-token', [AttendanceController::class, 'verifyToken'])->name('verify-token');
-        Route::get('/scan', [AttendanceController::class, 'scan'])->name('scan');
-        Route::post('/process', [AttendanceController::class, 'process'])->name('process');
-        
-        // Reports
-        Route::get('/report', [AttendanceController::class, 'report'])->name('report');
-        Route::get('/report/generate', [AttendanceController::class, 'generateReport'])->name('report.generate');
-    });
-    
-    
+
+Route::get('/siswa/export', [DataSiswaController::class, 'export'])->name('siswa.export');
 });
 
 // Routes untuk Guru

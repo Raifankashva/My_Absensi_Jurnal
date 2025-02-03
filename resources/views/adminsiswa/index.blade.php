@@ -11,6 +11,9 @@
 
     {{-- Filter Section with Enhanced Design --}}
     <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6">
+    <a href="{{ route('siswa.export') }}" class="btn btn-success">
+    Export Data Siswa
+</a>
         <form action="{{ route('adminsiswa.index') }}" method="GET" class="grid grid-cols-3 gap-4">
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Sekolah</label>
@@ -84,7 +87,7 @@
                             <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ $siswa->nama_lengkap }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 text-xs rounded-full 
-                                    {{ $siswa->jenis_kelamin == 'Laki-laki' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800' }}">
+                                    {{ $siswa->jenis_kelamin == 'laki-laki' ? 'bg-pink-100 text-pink-800' : 'bg-blue-100 text-blue-800' }}">
                                     {{ $siswa->jenis_kelamin }}
                                 </span>
                             </td>

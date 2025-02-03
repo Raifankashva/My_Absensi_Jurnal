@@ -81,9 +81,9 @@
                         <input type="text" name="tmp_lahir" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                        <input type="date" name="tgl_lahir" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
-                    </div>
+    <label class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
+    <input type="date" name="tgl_lahir" id="tgl_lahir" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+</div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">kode Pos</label>
                         <input type="text" name="kode_pos" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
@@ -328,5 +328,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputDate = document.getElementById("tgl_lahir");
+        const today = new Date();
+        today.setFullYear(today.getFullYear() - 6); // Kurangi 6 tahun dari hari ini
+        const maxDate = today.toISOString().split("T")[0]; // Format YYYY-MM-DD
+        inputDate.setAttribute("max", maxDate);
+    });
 </script>
 @endsection

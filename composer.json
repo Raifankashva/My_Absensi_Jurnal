@@ -7,6 +7,7 @@
     "require": {
         "php": "^7.3|^8.0",
         "azishapidin/indoregion": "^3.0",
+        "endroid/qr-code": "^4.6",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "intervention/image": "^2.7",
@@ -14,6 +15,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravolt/indonesia": "^0.35.0",
+        "maatwebsite/excel": "^3.1",
         "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {

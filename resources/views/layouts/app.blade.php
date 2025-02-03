@@ -110,7 +110,6 @@
                             {!! renderSidebarLink(route('kelas.index'), 'bx-chalkboard', 'Kelas') !!}
                             {!! renderSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
                             {!! renderSidebarLink(route('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
-                            {!! renderSidebarLink(route('attendance.settings.index'), 'bxs-cog', 'Atur Waktu Absensi') !!}
                         </div>
                     @elseif (auth()->user()->role == 'guru')
                         <div class="mb-4">
