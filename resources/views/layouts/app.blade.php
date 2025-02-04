@@ -30,6 +30,8 @@
             width: 100%;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen">
     <!-- Mobile Menu Toggle -->

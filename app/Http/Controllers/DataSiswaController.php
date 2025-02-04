@@ -321,4 +321,72 @@ public function downloadQRCode($id)
     
         return Excel::download(new DataSiswaExport, 'data_siswa.xlsx');
     }
+
+    public function downloadSelectedQRCodes(Request $request)
+{
+    // Validate the request
+    $request->validate([
+        'selected_students' => 'required|array',
+        'selected_students.*' => 'exists:data_siswa,id'
+    ]);
+
+    // Check if no students were selected
+    if (empty($request->selected_students)) {
+        return redirect()->back()->with('error', 'Pilih minimal satu siswa untuk di-download QR Code-nya.');
+    }
+
+    // If only one student is selected, download individual QR
+    if (count($request->selected_students) == 1) {
+        $studentId = $request->selected_students[0];
+        return $this->downloadQRCode($studentId);
+    }
+
+    // Multiple students - create a zip file
+    $zip = new \ZipArchive();
+    $zipFileName = 'selected_students_qrcodes_' . now()->format('YmdHis') . '.zip';
+    $zipFilePath = storage_path('app/public/qrcodes/' . $zipFileName);
+
+    // Ensure the directory exists
+    Storage::makeDirectory('public/qrcodes');
+
+    if ($zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
+        foreach ($request->selected_students as $studentId) {
+            $dataSiswa = DataSiswa::findOrFail($studentId);
+            
+            // Generate QR Code
+            $writer = new PngWriter();
+            $qrCode = QrCode::create($this->generateQRContent($dataSiswa))
+                ->setEncoding(new Encoding('UTF-8'))
+                ->setErrorCorrectionLevel(new ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
+                ->setSize(300)
+                ->setMargin(10)
+                ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
+                ->setForegroundColor(new Color(0, 0, 0))
+                ->setBackgroundColor(new Color(255, 255, 255));
+
+            // Add Logo to QR Code (optional)
+            $logoPath = public_path('images/logo.png');
+            if (file_exists($logoPath)) {
+                $logo = Logo::create($logoPath)->setResizeToWidth(50);
+                $qrCode = $qrCode->setLogo($logo);
+            }
+
+            $result = $writer->write($qrCode);
+            
+            // Generate filename
+            $filename = 'qrcode_' . $dataSiswa->nisn . '_' . $dataSiswa->nama_lengkap . '.png';
+            
+            // Add QR code to zip
+            $zip->addFromString($filename, $result->getString());
+        }
+
+        $zip->close();
+
+        // Download the zip file
+        return response()->download($zipFilePath, $zipFileName)->deleteFileAfterSend(true);
+    }
+
+    // If zip creation fails
+    return redirect()->back()->with('error', 'Gagal membuat file download QR Code.');
+}
 }

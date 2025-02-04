@@ -58,9 +58,20 @@
         <div class="p-6">
             <h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Kelas: {{ $kelas->nama_kelas }}</h3>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
+            <form action="{{ route('adminsiswa.download-qrcodes') }}" method="POST">
+    @csrf
+    <div class="mb-4">
+        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+            Download Selected QR Codes
+        </button>
+    </div>
+
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead>
+            <tr>
+                <th class="px-6 py-3">
+                    <input type="checkbox" id="select-all" class="form-checkbox">
+                </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NISN</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
@@ -69,10 +80,12 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($kelas->siswa as $siswa)
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                    <tbody>
+            @foreach($kelas->siswa as $siswa)
+            <tr>
+                <td class="px-6 py-4">
+                    <input type="checkbox" name="selected_students[]" value="{{ $siswa->id }}" class="form-checkbox student-checkbox">
+                </td>        <td class="px-6 py-4 whitespace-nowrap">
                                 @if($siswa->foto)
                                     <img src="{{ Storage::url(''.$siswa->foto) }}" 
                                          alt="Foto {{ $siswa->nama_lengkap }}"
@@ -87,7 +100,7 @@
                             <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ $siswa->nama_lengkap }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 text-xs rounded-full 
-                                    {{ $siswa->jenis_kelamin == 'laki-laki' ? 'bg-pink-100 text-pink-800' : 'bg-blue-100 text-blue-800' }}">
+                                    {{ $siswa->jenis_kelamin == 'laki-laki' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800' }}">
                                     {{ $siswa->jenis_kelamin }}
                                 </span>
                             </td>
@@ -96,6 +109,7 @@
                                 {{ $siswa->district->name }}, 
                                 {{ $siswa->city->name }}
                             </td>
+                            </form>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
                                     <a href="{{ route('adminsiswa.show', $siswa->id) }}" class="text-blue-600 hover:text-blue-900 transition-colors">
@@ -118,6 +132,76 @@
                     </tbody>
                 </table>
             </div>
+            <div class="sm:hidden">
+        @foreach($kelas->siswa as $siswa)
+        <div x-data="{ open: false }" class="mb-4 bg-white rounded-lg shadow">
+            {{-- Mobile Header - Always visible --}}
+            <div @click="open = !open" class="p-4 flex items-center justify-between cursor-pointer">
+                <div class="flex items-center space-x-3">
+                    @if($siswa->foto)
+                        <img src="{{ Storage::url(''.$siswa->foto) }}" 
+                             alt="Foto {{ $siswa->nama_lengkap }}"
+                             class="h-10 w-10 rounded-full object-cover border-2 border-blue-200 shadow-sm">
+                    @else
+                        <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    @endif
+                    <span class="font-medium text-gray-900">{{ $siswa->nama_lengkap }}</span>
+                </div>
+                <i class="fas" :class="{ 'fa-chevron-down': !open, 'fa-chevron-up': open }"></i>
+            </div>
+
+            {{-- Mobile Details - Expandable content --}}
+            <div x-show="open" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 transform scale-95"
+                 x-transition:enter-end="opacity-100 transform scale-100"
+                 x-transition:leave="transition ease-in duration-100"
+                 x-transition:leave-start="opacity-100 transform scale-100"
+                 x-transition:leave-end="opacity-0 transform scale-95"
+                 class="border-t border-gray-200">
+                <div class="p-4 space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">NISN</span>
+                        <span class="text-sm text-gray-900">{{ $siswa->nisn }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">Jenis Kelamin</span>
+                        <span class="px-2 py-1 text-xs rounded-full 
+                            {{ $siswa->jenis_kelamin == 'laki-laki' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800' }}">
+                            {{ $siswa->jenis_kelamin }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-500">Alamat</span>
+                        <span class="text-sm text-gray-900 text-right">
+                            {{ $siswa->village->name }}, 
+                            {{ $siswa->district->name }}, 
+                            {{ $siswa->city->name }}
+                        </span>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <a href="{{ route('adminsiswa.show', $siswa->id) }}" class="text-blue-600 hover:text-blue-900">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ route('adminsiswa.edit', $siswa->id) }}" class="text-yellow-600 hover:text-yellow-900">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ route('adminsiswa.destroy', $siswa->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:text-red-900" 
+                                    onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
         </div>
         @endif
         @endforeach
@@ -131,5 +215,17 @@
     </div>
     @endforelse
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAll = document.getElementById('select-all');
+    const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+
+    selectAll.addEventListener('change', function() {
+        studentCheckboxes.forEach(checkbox => {
+            checkbox.checked = selectAll.checked;
+        });
+    });
+});
+</script>
 @endsection
 
