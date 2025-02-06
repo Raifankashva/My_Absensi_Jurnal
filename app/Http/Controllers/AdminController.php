@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Sekolah;
+use App\Models\Task;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -28,7 +29,12 @@ class AdminController extends Controller
         $totalGuru = User::where('role', 'guru')->count();
         $totalSiswa = User::where('role', 'siswa')->count();
         $latestUsers = User::latest()->take(5)->get();
-
-        return view('admin.dashboard', compact('totalGuru', 'totalSiswa', 'latestUsers', 'totalSekolah', 'sekolah'));
+    
+        // Ambil tugas yang belum lebih dari 7 hari setelah due_date
+        $tasks = Task::where('due_date', '>=', now()->subDays(7))->get();
+    
+        return view('admin.dashboard', compact('totalGuru', 'totalSiswa', 'latestUsers', 'totalSekolah', 'sekolah', 'tasks'));
     }
+    
+
 }

@@ -131,38 +131,6 @@
                         Sign in to Account
                     </button>
 
-                    <div class="relative my-6">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white text-gray-500">Or continue with</span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <button type="button" 
-                                class="flex items-center justify-center px-4 py-2 border-2 border-gray-200 
-                                       rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-200">
-                            <i class='bx bxl-google text-xl mr-2 text-red-500'></i>
-                            Google
-                        </button>
-                        <button type="button" 
-                                class="flex items-center justify-center px-4 py-2 border-2 border-gray-200 
-                                       rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all duration-200">
-                            <i class='bx bxl-microsoft text-xl mr-2 text-blue-500'></i>
-                            Microsoft
-                        </button>
-                    </div>
-
-                    <div class="text-center mt-6">
-                        <p class="text-gray-600">
-                            Don't have an account? 
-                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
-                                Register Now
-                            </a>
-                        </p>
-                    </div>
                 </form>
             </div>
         </div>

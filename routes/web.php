@@ -16,13 +16,17 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\FaceDataController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\AttendanceSettingsController;
+use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\ScheduleTemplateController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AbsensiSiswaController;
 use App\Http\Controllers\SchoolAttendanceSettingController;
 use App\Http\Controllers\SchoolHolidayController;
 use Dflydev\DotAccessData\Data;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\PublicAttendanceController;
+
+
 
 
 Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
@@ -41,11 +45,24 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/public/attendance', [PublicAttendanceController::class, 'view'])
+    ->name('attendance.public.view');
+Route::get('/public/attendance/export', [PublicAttendanceController::class, 'export'])
+    ->middleware('verify.school.token')
+    ->name('attendance.public.export');
+
 // Routes untuk Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::get('/tasks/{id}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+    Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+    
     Route::resource('sekolahs', SekolahController::class);
 
     Route::resource('adminguru', DataGuruController::class);
@@ -59,44 +76,19 @@ Route::get('api/get-kelas/{sekolah_id}', [DataSiswaController::class, 'getKelasB
 Route::get('/siswa/export', [DataSiswaController::class, 'export'])->name('siswa.export');
 Route::post('/admin/siswa/download-qrcodes', [DataSiswaController::class, 'downloadSelectedQRCodes'])
     ->name('adminsiswa.download-qrcodes');
-    Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check-in');
-    Route::post('/attendance/manual-check-in', [AttendanceController::class, 'manualCheckIn'])->name('attendance.manual-check-in');
-    Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
-    Route::get('/attendance/{id}/detail', [AttendanceController::class, 'getAttendanceDetail']);
-    Route::post('/attendance/{id}/validate', [AttendanceController::class, 'validateAttendance']);
-    Route::get('/attendance/summary', [AttendanceController::class, 'getSummary']);
-    Route::get('/attendance/export/pdf', [AttendanceController::class, 'exportPdf'])->name('attendance.export.pdf');
-    Route::get('/attendance/export/excel', [AttendanceController::class, 'exportExcel'])->name('attendance.export.excel');
-    Route::prefix('attendance/settings')->name('attendance.settings.')->middleware(['web', 'auth'])->group(function () {
-        // Display attendance settings form
-        Route::get('/', [AttendanceSettingsController::class, 'index'])
-            ->name('index');
-    
-        // Update attendance settings
-        Route::put('/update', [AttendanceSettingsController::class, 'update'])
-            ->name('update');
-    
-        // Generate new attendance token (can be a POST or GET route depending on your preference)
-        Route::post('/generate-token', [AttendanceSettingsController::class, 'generateToken'])
-            ->name('generate.token');
-    
-        // Deactivate attendance settings
-        Route::post('/deactivate', [AttendanceSettingsController::class, 'deactivate'])
-            ->name('deactivate');
-            
-    });
-    Route::prefix('attendance')->name('attendance.')->middleware(['web', 'auth'])->group(function () {
-        // Token entry routes
-        Route::get('/token', [AttendanceController::class, 'showTokenForm'])
-            ->name('token');
-        
-        Route::post('/validate-token', [AttendanceController::class, 'validateToken'])
-            ->name('validate.token');
-        
-        // Scanning route
-        Route::get('/scan', [AttendanceController::class, 'scanAttendance'])
-            ->name('scan');
-    });
+    Route::get('/attendance/settings', [AttendanceSettingController::class, 'index'])
+    ->name('attendance.settings');
+Route::post('/attendance/settings', [AttendanceSettingController::class, 'store'])
+    ->name('attendance.settings.store');
+
+Route::get('/attendance', [AttendanceController::class, 'index'])
+    ->name('attendance.index');
+Route::get('/attendance/scan', [AttendanceController::class, 'scanPage'])
+    ->name('attendance.scan');
+Route::post('/attendance/process-qr', [AttendanceController::class, 'processQr'])
+    ->name('attendance.process-qr');
+Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendance'])
+    ->name('attendance.manual');
 });
 
 // Routes untuk Guru

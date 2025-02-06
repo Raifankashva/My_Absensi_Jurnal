@@ -61,6 +61,28 @@
             --bg-primary: #1a1a1a;
             --text-primary: #ffffff;
         }
+        .task-card {
+    @apply p-4 rounded-lg shadow-sm transition-all duration-300;
+}
+
+.task-card.due {
+    @apply bg-red-50 border-red-200;
+    animation: pulse 2s infinite;
+}
+
+.task-card.upcoming {
+    @apply bg-yellow-50 border-yellow-200;
+}
+
+.task-card.normal {
+    @apply bg-white border-gray-200;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
     </style>
     <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
 </head>
@@ -240,11 +262,7 @@
                             Quick Actions
                         </h2>
                         <div class="grid grid-cols-2 gap-2 p-2">
-                            <button class="p-3 rounded-xl bg-blue-700/50 hover:bg-blue-600/50 
-                                         transition-all duration-300 text-white text-sm">
-                                <i class='bx bx-plus mb-1'></i>
-                                <span class="block">New Task</span>
-                            </button>
+                        <x-task-modal />
                             <button class="p-3 rounded-xl bg-blue-700/50 hover:bg-blue-600/50 
                                          transition-all duration-300 text-white text-sm">
                                 <i class='bx bx-calendar mb-1'></i>
