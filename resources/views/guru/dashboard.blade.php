@@ -1,46 +1,41 @@
 @extends('layouts.app')
-
 @section('title', 'Guru Dashboard')
 
 @section('content')
-<div class="row">
-    <div class="col-md-12 mb-4">
-        <h2>Guru Dashboard</h2>
+<div class="container mx-auto p-4">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Guru Dashboard</h2>
     </div>
-    
-    <div class="col-md-4">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <h5 class="card-title">Total Siswa</h5>
-                <p class="card-text display-4">{{ $totalSiswa }}</p>
-            </div>
+
+    <!-- Cards Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-blue-500 text-white rounded-lg shadow-md p-6">
+            <h5 class="text-lg font-semibold">Total Siswa</h5>
+            <p class="text-4xl font-bold">{{ $totalSiswa }}</p>
+        </div>
+        <div class="bg-green-500 text-white rounded-lg shadow-md p-6">
+            <h5 class="text-lg font-semibold">Total Guru</h5>
+            <p class="text-4xl font-bold">{{ $totalGuru }}</p>
+        </div>
+        <div class="bg-yellow-500 text-white rounded-lg shadow-md p-6">
+            <h5 class="text-lg font-semibold">Total Sekolah</h5>
+            <p class="text-4xl font-bold">{{ $totalSekolah }}</p>
         </div>
     </div>
 
-    <div class="col-md-12 mt-4">
-        <div class="card">
-            <div class="card-header">
-                Quick Actions
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="d-grid">
-                            <button class="btn btn-primary mb-2">Input Nilai</button>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="d-grid">
-                            <button class="btn btn-success mb-2">Absensi</button>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="d-grid">
-                            <button class="btn btn-info mb-2">Jadwal Mengajar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Quick Actions Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                Input Nilai
+            </button>
+            <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                Absensi
+            </button>
+            <button class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded">
+                Jadwal Mengajar
+            </button>
         </div>
     </div>
 </div>

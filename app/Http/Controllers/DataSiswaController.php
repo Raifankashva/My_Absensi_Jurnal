@@ -20,6 +20,8 @@ use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\Label\Label;
+
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use App\Exports\DataSiswaExport;
@@ -309,7 +311,6 @@ public function downloadQRCode($id)
             $logoPath = public_path('images/logo.png');
             if (file_exists($logoPath)) {
                 $logo = Logo::create($logoPath)->setResizeToWidth(50);
-                $qrCode = $qrCode->setLogo($logo);
             }
     
             $result = $writer->write($qrCode);

@@ -289,7 +289,97 @@
     </div>
 </div>
 
+{{-- Add this section to your admin.dashboard.blade.php --}}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Today's Schedule Card -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    Today's Schedule
+                </h2>
+                <span class="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">
+                    {{ Carbon\Carbon::now()->format('l, d M Y') }}
+                </span>
+            </div>
+            
+            @if($todaySchedules->count() > 0)
+                <div class="space-y-4">
+                    @foreach($todaySchedules as $schedule)
+                        <div class="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg 
+                                  {{ Carbon\Carbon::parse($schedule->time)->format('H:i') == Carbon\Carbon::now()->format('H:i') 
+                                     ? 'ring-2 ring-blue-500' : '' }}">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class='bx bx-time text-2xl text-blue-600'></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h3 class="text-sm font-semibold text-gray-800">{{ $schedule->title }}</h3>
+                                <p class="text-sm text-gray-600">{{ Carbon\Carbon::parse($schedule->time)->format('H:i') }}</p>
+                                @if($schedule->description)
+                                    <p class="text-xs text-gray-500 mt-1">{{ $schedule->description }}</p>
+                                @endif
+                            </div>
+                            @if(Carbon\Carbon::parse($schedule->time)->format('H:i') == Carbon\Carbon::now()->format('H:i'))
+                                <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-full">
+                                    Now
+                                </span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class='bx bx-calendar text-3xl text-blue-500'></i>
+                    </div>
+                    <p class="text-gray-500">No schedules for today</p>
+                </div>
+            @endif
+        </div>
+    </div>
 
+    <!-- Upcoming Schedule Card -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    Upcoming Schedule
+                </h2>
+                <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    <x-schedule-create />
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                @forelse($upcomingSchedules as $day => $schedules)
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-600 mb-3">{{ $day }}</h3>
+                        <div class="space-y-3">
+                            @foreach($schedules as $schedule)
+                                <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class='bx bx-time text-xl text-blue-600'></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-800">{{ $schedule->title }}</h4>
+                                        <p class="text-xs text-gray-500">{{ Carbon\Carbon::parse($schedule->time)->format('H:i') }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class='bx bx-calendar text-3xl text-gray-400'></i>
+                        </div>
+                        <p class="text-gray-500">No upcoming schedules</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+</div>
         <!-- Latest Users and Schools -->
         <div class="grid md:grid-cols-2 gap-8">
             <!-- Latest Users -->

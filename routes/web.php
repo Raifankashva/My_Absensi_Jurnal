@@ -2,27 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GuruController;
-use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SekolahController;
 use App\Http\Controllers\DataGuruController;
 use App\Http\Controllers\DataSiswaController;
 use App\Http\Controllers\KelasController;
-use App\Models\DataSiswa;
-use App\Http\Controllers\PengaturanAbsensiController;
-use App\Http\Controllers\JadwalAbsensiController;
-use App\Http\Controllers\LocationController;
-use App\Http\Controllers\FaceDataController;
-use App\Http\Controllers\HolidayController;
+use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceSettingController;
-use App\Http\Controllers\ScheduleTemplateController;
-use App\Http\Controllers\AbsensiController;
-use App\Http\Controllers\AbsensiSiswaController;
-use App\Http\Controllers\SchoolAttendanceSettingController;
-use App\Http\Controllers\SchoolHolidayController;
-use Dflydev\DotAccessData\Data;
+
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\PublicAttendanceController;
 
@@ -89,13 +77,14 @@ Route::post('/attendance/process-qr', [AttendanceController::class, 'processQr']
     ->name('attendance.process-qr');
 Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendance'])
     ->name('attendance.manual');
+
+    Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
 });
 
 // Routes untuk Guru
+
 Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('guru.dashboard');
-    })->name('guru.dashboard');
+    Route::get('/dashboard', [GuruController::class, 'dashboard'])->name('guru.dashboard');
 });
 
 // Routes untuk Siswa
@@ -104,31 +93,6 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
         return view('siswa.dashboard');
     })->name('siswa.dashboard');
 });
-
-// Routes untuk Admin
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-});
-
-// Routes untuk Guru
-Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
-    Route::get('/dashboard', [GuruController::class, 'dashboard'])->name('guru.dashboard');
-});
-
-// Routes untuk Siswa
-Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
-    Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('siswa.dashboard');
-});
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 
 Route::get('/', function () {
     return view('welcome');

@@ -263,12 +263,8 @@
                         </h2>
                         <div class="grid grid-cols-2 gap-2 p-2">
                         <x-task-modal />
-                            <button class="p-3 rounded-xl bg-blue-700/50 hover:bg-blue-600/50 
-                                         transition-all duration-300 text-white text-sm">
-                                <i class='bx bx-calendar mb-1'></i>
-                                <span class="block">Schedule</span>
-                            </button>
-                        </div>
+                        <x-schedule-create />                        
+                    </div>
                     </div>
                 </div>
             </div>
