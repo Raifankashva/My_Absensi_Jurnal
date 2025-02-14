@@ -3,6 +3,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
 
 class DataSiswa extends Model
 {
@@ -136,5 +138,22 @@ class DataSiswa extends Model
     public function getFotoUrlAttribute(): ?string
     {
         return $this->foto ? asset('storage/' . $this->foto) : null;
+    }
+    public function downloadQRCodes()
+    {
+        // Pastikan ID siswa tersedia
+        if (!$this->id) {
+            throw new \Exception("ID Siswa tidak ditemukan.");
+        }
+    
+        // Generate QR code dengan ID siswa
+        $qrCode = QrCode::format('png')->size(300)->generate((string) $this->id);
+        $fileName = "qrcodes/siswa_{$this->id}.png";
+    
+        // Simpan QR Code ke dalam storage
+        Storage::put($fileName, $qrCode);
+    
+        // Download file QR Code
+        return response()->download(storage_path("app/$fileName"));
     }
 }

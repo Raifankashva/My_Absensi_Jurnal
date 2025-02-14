@@ -10,12 +10,12 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceSettingController;
-
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\PublicAttendanceController;
-
-
-
+use App\Http\Controllers\API\AbsensiController;
+use App\Models\DataSiswa;
+use App\Http\Controllers\JurnalGuruController;
 
 Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
 Route::get('getdistricts/{city}', [SekolahController::class, 'getDistricts']);
@@ -41,9 +41,7 @@ Route::get('/public/attendance/export', [PublicAttendanceController::class, 'exp
 
 // Routes untuk Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
@@ -79,12 +77,20 @@ Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendanc
     ->name('attendance.manual');
 
     Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
+
+    Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
+    Route::post('adminsiswa/download-qrcodes', [DataSiswa::class, 'downloadQRCodes'])->name('adminsiswa.download-qrcodes');
+
+
 });
 
 // Routes untuk Guru
 
 Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
     Route::get('/dashboard', [GuruController::class, 'dashboard'])->name('guru.dashboard');
+    Route::resource('jurnal', JurnalGuruController::class);
+    Route::get('jurnal/export/{jurnal}', [JurnalGuruController::class, 'export'])->name('jurnal.export');
+    Route::post('jurnal/{jurnal}/verify', [JurnalGuruController::class, 'verify'])->name('jurnal.verify');
 });
 
 // Routes untuk Siswa
@@ -92,6 +98,8 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
     Route::get('/dashboard', function () {
         return view('siswa.dashboard');
     })->name('siswa.dashboard');
+    Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
+
 });
 
 Route::get('/', function () {

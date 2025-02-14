@@ -31,23 +31,48 @@ use Maatwebsite\Excel\Facades\Excel;
 class DataSiswaController extends Controller
 {
     public function index(Request $request)
-{
-    $dataSiswa = DataSiswa::with(['user', 'sekolah', 'kelas', 'province', 'city', 'district', 'village'])
-        ->latest()
-        ->paginate(10);
-
-    $sekolahs = Sekolah::all(); 
-    $allKelas = Kelas::all();   
-
-    // Optionally filter based on request inputs
-    $groupedStudents = Sekolah::with(['kelas.siswa' => function ($query) use ($request) {
-        if ($request->filled('kelas_id')) {
-            $query->where('kelas_id', $request->kelas_id);
+    {
+        $dataSiswa = DataSiswa::with(['user', 'sekolah', 'kelas', 'province', 'city', 'district', 'village'])
+            ->latest()
+            ->paginate(10);
+    
+        $sekolahs = Sekolah::all();
+        $allKelas = Kelas::all();
+    
+        // Optionally filter based on request inputs
+        $groupedStudents = Sekolah::with(['kelas.siswa' => function ($query) use ($request) {
+            if ($request->filled('kelas_id')) {
+                $query->where('kelas_id', $request->kelas_id);
+            }
+        }])->get();
+    
+        // Buat QR Code untuk setiap siswa dalam hasil paginasi
+        $writer = new PngWriter();
+        $qrCodeUrls = [];
+    
+        foreach ($dataSiswa as $siswa) {
+            $qrCode = QrCode::create($this->generateQRContent($siswa))
+                ->setEncoding(new Encoding('UTF-8'))
+                ->setErrorCorrectionLevel(new ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
+                ->setSize(300)
+                ->setMargin(10)
+                ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
+                ->setForegroundColor(new Color(0, 0, 0))
+                ->setBackgroundColor(new Color(255, 255, 255));
+    
+            $result = $writer->write($qrCode);
+    
+            // Simpan QR code dengan nama unik berdasarkan ID siswa
+            $qrCodePath = 'public/qrcodes/siswa-' . $siswa->id . '.png';
+            Storage::put($qrCodePath, $result->getString());
+    
+            // Simpan URL QR Code dalam array
+            $qrCodeUrls[$siswa->id] = Storage::url('qrcodes/siswa-' . $siswa->id . '.png');
         }
-    }])->get();
-
-    return view('adminsiswa.index', compact('dataSiswa', 'sekolahs', 'allKelas', 'groupedStudents'));
-}
+    
+        return view('adminsiswa.index', compact('dataSiswa', 'sekolahs', 'allKelas', 'groupedStudents', 'qrCodeUrls'));
+    }
+    
 
 
     public function create()
@@ -122,7 +147,8 @@ public function store(Request $request)
         'kph' => 'nullable|string',
         'kip' => 'nullable|string',
         'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        'email' => 'required|email|unique:users,email',  // Ensure email is validated
+        'email' => 'required|email|unique:users,email',  
+        'alamat' => 'required|string',
     ]);
     
     try {
@@ -131,10 +157,10 @@ public function store(Request $request)
         // Proses pembuatan data user
         $user = User::create([
             'name' => $request->nama_lengkap,
-            'email' => $request->email . '@student.sch.id',  // Ensure email is constructed and saved
+            'email' => $request->email ,  // Ensure email is constructed and saved
             'password' => bcrypt($request->password),
             'role' => 'siswa',
-            'alamat' => $request->alamat ?? '-',  // Ensure alamat is passed
+            'alamat' => $request->alamat ,  // Ensure alamat is passed
             'no_hp' => $request->hp ?? '-'
         ]);
 
@@ -221,12 +247,7 @@ public function show($id)
         ->setForegroundColor(new Color(0, 0, 0))
         ->setBackgroundColor(new Color(255, 255, 255));
 
-    // Add Logo to QR Code
-    $logoPath = public_path('images/logo.png'); // Sesuaikan path logo Anda
-    if (file_exists($logoPath)) {
-        $logo = Logo::create($logoPath)->setResizeToWidth(50);
-        $qrCode = $qrCode->setLogo($logo);
-    }
+
 
     $result = $writer->write($qrCode);
     
@@ -390,4 +411,38 @@ public function downloadQRCode($id)
     // If zip creation fails
     return redirect()->back()->with('error', 'Gagal membuat file download QR Code.');
 }
+
+
+    public function downloadQRCodes(Request $request)
+    {
+        $selectedStudents = $request->input('selected_students', []);
+        
+        if (empty($selectedStudents)) {
+            return back()->with('error', 'Pilih minimal satu siswa untuk mengunduh QR Code.');
+        }
+
+        // Create a temporary zip file
+        $zipFileName = 'qrcodes_' . time() . '.zip';
+        $zipPath = storage_path('app/public/temp/' . $zipFileName);
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE) === TRUE) {
+            foreach ($selectedStudents as $studentId) {
+                $student = DataSiswa::find($studentId);
+                if ($student) {
+                    $qrCodePath = storage_path('app/public/qrcodes/siswa-' . $studentId . '.png');
+                    if (file_exists($qrCodePath)) {
+                        // Add file to zip with student name
+                        $zip->addFile($qrCodePath, 'qrcode_' . $student->nama_lengkap . '.png');
+                    }
+                }
+            }
+            $zip->close();
+
+            // Download zip file and then delete it
+            return response()->download($zipPath)->deleteFileAfterSend(true);
+        }
+
+        return back()->with('error', 'Gagal membuat file zip QR Code.');
+    }
 }

@@ -38,6 +38,16 @@
     </style>
 </head>
 <body class="animated-bg min-h-screen flex items-center justify-center p-4">
+@if ($errors->any())
+<div class="bg-red-500 text-white px-4 py-3 rounded-lg mb-4 flex items-center shadow-lg">
+            <i class='bx bxs-error text-2xl mr-2'></i>
+            <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+        </div>
+    @endif
     <!-- Decorative Elements -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
         <div class="absolute top-0 -left-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>

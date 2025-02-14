@@ -45,4 +45,8 @@ class User extends Authenticatable
 {
     return $this->hasMany(Task::class);
 }
+public function guru()
+    {
+        return $this->hasOne(DataGuru::class, 'user_id');
+    }
 }

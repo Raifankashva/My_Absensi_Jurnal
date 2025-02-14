@@ -19,17 +19,9 @@ use App\Http\Controllers\JadwalAbsensiController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::prefix('absensi')->group(function () {
-    // Pengaturan Absensi
-    Route::get('pengaturan/{sekolahId}', [PengaturanAbsensiController::class, 'show']);
-    Route::post('pengaturan', [PengaturanAbsensiController::class, 'store']);
-    Route::put('pengaturan/{sekolahId}', [PengaturanAbsensiController::class, 'update']);
-    Route::delete('pengaturan/{sekolahId}', [PengaturanAbsensiController::class, 'destroy']);
+use App\Http\Controllers\API\AbsensiController;
 
-    // Jadwal Absensi
-    Route::get('jadwal/{sekolahId}', [JadwalAbsensiController::class, 'index']);
-    Route::post('jadwal', [JadwalAbsensiController::class, 'store']);
-    Route::put('jadwal/{id}', [JadwalAbsensiController::class, 'update']);
-    Route::delete('jadwal/{id}', [JadwalAbsensiController::class, 'destroy']);
-    Route::get('jadwal/libur/{sekolahId}', [JadwalAbsensiController::class, 'getHariLibur']);
+Route::middleware(['auth:sanctum', 'check.sekolah'])->group(function () {
+    Route::post('/absensi/check-in', [AbsensiController::class, 'checkIn']);
+    Route::post('/absensi/check-out', [AbsensiController::class, 'checkOut']);
 });

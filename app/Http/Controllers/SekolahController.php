@@ -48,6 +48,9 @@ class SekolahController extends Controller
         if ($request->filled('village')) {
             $query->where('village_id', $request->village);
         }
+        if ($request->filled('search')) {
+            $query->where('nama_sekolah', 'like', '%' . $request->search . '%');
+        }
 
         $sekolahs = $query->latest()->paginate(10);
         $provinces = Province::all(); // Get all provinces
