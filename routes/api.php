@@ -2,9 +2,12 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DataGuruController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PengaturanAbsensiController;
 use App\Http\Controllers\JadwalAbsensiController;
+use App\Http\Controllers\JadwalPelajaranController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -24,4 +27,7 @@ use App\Http\Controllers\API\AbsensiController;
 Route::middleware(['auth:sanctum', 'check.sekolah'])->group(function () {
     Route::post('/absensi/check-in', [AbsensiController::class, 'checkIn']);
     Route::post('/absensi/check-out', [AbsensiController::class, 'checkOut']);
+
+    Route::get('/jadwal-pelajaran/guru/{guruId}', [JadwalPelajaranController::class, 'getJadwalByGuru']);
+    Route::get('/jadwal-pelajaran/hari-ini/{guruId}', [JadwalPelajaranController::class, 'getJadwalHariIni']);
 });

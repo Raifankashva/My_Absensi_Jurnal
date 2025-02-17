@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,16 +11,28 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        [x-cloak] { display: none !important; }
-        
+        [x-cloak] {
+            display: none !important;
+        }
+
         @keyframes slideIn {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
+            from {
+                transform: translateX(-100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .menu-item-hover {
@@ -61,31 +74,70 @@
             --bg-primary: #1a1a1a;
             --text-primary: #ffffff;
         }
+
         .task-card {
-    @apply p-4 rounded-lg shadow-sm transition-all duration-300;
-}
+            @apply p-4 rounded-lg shadow-sm transition-all duration-300;
+        }
 
-.task-card.due {
-    @apply bg-red-50 border-red-200;
-    animation: pulse 2s infinite;
-}
+        .task-card.due {
+            @apply bg-red-50 border-red-200;
+            animation: pulse 2s infinite;
+        }
 
-.task-card.upcoming {
-    @apply bg-yellow-50 border-yellow-200;
-}
+        .task-card.upcoming {
+            @apply bg-yellow-50 border-yellow-200;
+        }
 
-.task-card.normal {
-    @apply bg-white border-gray-200;
-}
+        .task-card.normal {
+            @apply bg-white border-gray-200;
+        }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
-}
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .loading-dots {
+            display: inline-block;
+            animation: dotAnimation 1.5s infinite;
+        }
+
+        @keyframes dotAnimation {
+            0% {
+                opacity: 0.2;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            60% {
+                opacity: 0.2;
+            }
+
+            100% {
+                opacity: 0.2;
+            }
+        }
+
+        /* Loader Fade Out Animation */
+        .loader-fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
     <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
 </head>
+
 <body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen" x-data="{ 
     darkMode: false,
     sidebarOpen: window.innerWidth >= 768,
@@ -97,26 +149,43 @@
         }
     }
 }" x-init="initTheme()">
+    <div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 transition-opacity duration-500">
+        <div class="relative w-24 h-24 mb-6">
+            <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 border-r-blue-400 border-b-blue-300 border-l-blue-500 animate-spin"></div>
+
+            <div class="absolute inset-[6px] rounded-full bg-blue-600/20 animate-pulse flex items-center justify-center">
+                <i class='bx bxs-school text-3xl text-blue-600'></i>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <h2 class="text-xl font-bold text-blue-900 mb-2 relative overflow-hidden">
+                Memuat Sistem Sekolah
+                <span class="loading-dots">...</span>
+            </h2>
+            <p class="text-sm text-blue-700/70">Harap tunggu sementara kami menyiapkan</p>
+        </div>
+    </div>
     <!-- Theme Toggle -->
-    
+
     <!-- Notification Center -->
     <div x-data="{ showNotifications: false }" class="fixed top-4 right-36 z-50">
-        <button 
+        <button
             @click="showNotifications = !showNotifications"
             class="p-2 rounded-lg shadow-lg transition transform hover:scale-105 glass-morphism"
             :class="darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'">
             <i class="bx bx-bell"></i>
         </button>
-        
-        <div x-show="showNotifications" 
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 transform scale-95"
-             x-transition:enter-end="opacity-100 transform scale-100"
-             x-transition:leave="transition ease-in duration-100"
-             x-transition:leave-start="opacity-100 transform scale-100"
-             x-transition:leave-end="opacity-0 transform scale-95"
-             class="absolute right-0 mt-2 w-80 rounded-lg shadow-lg glass-morphism"
-             @click.away="showNotifications = false">
+
+        <div x-show="showNotifications"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-100"
+            x-transition:leave-start="opacity-100 transform scale-100"
+            x-transition:leave-end="opacity-0 transform scale-95"
+            class="absolute right-0 mt-2 w-80 rounded-lg shadow-lg glass-morphism"
+            @click.away="showNotifications = false">
             <div class="p-4">
                 <h3 class="text-lg font-semibold mb-2">Notifications</h3>
                 <template x-if="notifications.length === 0">
@@ -132,7 +201,7 @@
     </div>
 
     <!-- Mobile Menu Toggle -->
-    <button 
+    <button
         @click="sidebarOpen = !sidebarOpen"
         class="md:hidden fixed top-4 right-4 z-50 bg-blue-600 text-white p-2 rounded-lg shadow-lg 
                transition transform hover:scale-105 hover:bg-blue-700 active:scale-95">
@@ -140,7 +209,7 @@
     </button>
 
     <!-- Sidebar -->
-    <aside 
+    <aside
         x-cloak
         :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
         class="fixed inset-y-0 left-0 w-72 bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900 
@@ -156,13 +225,13 @@
                     <p class="text-xs text-blue-200">Management System</p>
                 </div>
             </div>
-            <button 
+            <button
                 @click="sidebarOpen = false"
                 class="md:hidden ml-auto text-white hover:text-blue-200 transition">
                 <i class='bx bx-x text-2xl'></i>
             </button>
         </div>
-        
+
         <!-- Navigation -->
         <nav class="p-4 overflow-y-auto h-[calc(100vh-4rem)]">
             @if (auth()->check())
@@ -194,39 +263,39 @@
                 <div class="space-y-1">
                     @php
                     function renderSidebarLink($route, $icon, $label, $badge = null) {
-                        $isActive = request()->routeIs($route);
-                        $activeClass = $isActive ? 'bg-blue-600/50 text-white shadow-lg' : 'text-blue-100 hover:bg-blue-700/50';
-                        $badgeHtml = $badge ? "<span class='px-2 py-1 bg-red-500 rounded-full text-xs text-white'>{$badge}</span>" : '';
-                        
-                        return <<< HTML
-                        <a href="{$route}" 
-                           class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {$activeClass}
+                    $isActive = request()->routeIs($route);
+                    $activeClass = $isActive ? 'bg-blue-600/50 text-white shadow-lg' : 'text-blue-100 hover:bg-blue-700/50';
+                    $badgeHtml = $badge ? "<span class='px-2 py-1 bg-red-500 rounded-full text-xs text-white'>{$badge}</span>" : '';
+
+                    return <<< HTML
+                        <a href="{$route}"
+                        class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {$activeClass}
                                   hover:text-white group relative overflow-hidden hover:shadow-md">
-                            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent 
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent 
                                       opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div class="bg-blue-800/50 p-2 rounded-lg shadow-inner mr-3 
+                        <div class="bg-blue-800/50 p-2 rounded-lg shadow-inner mr-3 
                                       group-hover:scale-110 transition-transform duration-300">
-                                <i class='bx {$icon} text-xl'></i>
-                            </div>
-                            <span class="font-medium">{$label}</span>
-                            {$badgeHtml}
-                            <div class="ml-auto opacity-0 transform translate-x-2 
+                            <i class='bx {$icon} text-xl'></i>
+                        </div>
+                        <span class="font-medium">{$label}</span>
+                        {$badgeHtml}
+                        <div class="ml-auto opacity-0 transform translate-x-2 
                                       group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                                <i class='bx bx-chevron-right'></i>
-                            </div>
+                            <i class='bx bx-chevron-right'></i>
+                        </div>
                         </a>
                         HTML;
-                    }
-                    @endphp
+                        }
+                        @endphp
 
-                    @if (auth()->user()->role == 'admin')
+                        @if (auth()->user()->role == 'admin')
                         <div class="mb-4">
                             <h2 class="px-4 text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">
                                 Main Menu
                             </h2>
                             {!! renderSidebarLink(route('admin.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
                         </div>
-                        
+
                         <div class="mb-4">
                             <h2 class="px-4 text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">
                                 Management
@@ -236,7 +305,7 @@
                             {!! renderSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
                             {!! renderSidebarLink(route('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
                         </div>
-                    @elseif (auth()->user()->role == 'guru')
+                        @elseif (auth()->user()->role == 'guru')
                         <div class="mb-4">
                             <h2 class="px-4 text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">
                                 Teacher Menu
@@ -245,7 +314,7 @@
                             {!! renderSidebarLink('#', 'bx-book', 'Mata Pelajaran', '3') !!}
                             {!! renderSidebarLink('#', 'bx-notepad', 'Nilai') !!}
                         </div>
-                    @elseif (auth()->user()->role == 'siswa')
+                        @elseif (auth()->user()->role == 'siswa')
                         <div class="mb-4">
                             <h2 class="px-4 text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">
                                 Student Menu
@@ -254,18 +323,18 @@
                             {!! renderSidebarLink('#', 'bx-book', 'Jadwal') !!}
                             {!! renderSidebarLink('#', 'bx-notepad', 'Nilai', '2') !!}
                         </div>
-                    @endif
+                        @endif
 
-                    <!-- Quick Actions -->
-                    <div class="mt-8">
-                        <h2 class="px-4 text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">
-                            Quick Actions
-                        </h2>
-                        <div class="grid grid-cols-2 gap-2 p-2">
-                        <x-task-modal />
-                        <x-schedule-create />                        
-                    </div>
-                    </div>
+                        <!-- Quick Actions -->
+                        <div class="mt-8">
+                            <h2 class="px-4 text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">
+                                Quick Actions
+                            </h2>
+                            <div class="grid grid-cols-2 gap-2 p-2">
+                                <x-task-modal />
+                                <x-schedule-create />
+                            </div>
+                        </div>
                 </div>
             </div>
             @endif
@@ -273,22 +342,22 @@
     </aside>
 
     <!-- Main Content -->
-    <div :class="{'md:ml-72': sidebarOpen, 'ml-0': !sidebarOpen}" 
-         class="transition-all duration-300 ease-in-out">
+    <div :class="{'md:ml-72': sidebarOpen, 'ml-0': !sidebarOpen}"
+        class="transition-all duration-300 ease-in-out">
         <!-- Top Navigation -->
         <header class="h-16 glass-morphism border-b border-blue-100 flex items-center 
                        justify-between px-6 shadow-sm sticky top-0 z-30">
             <div class="flex items-center space-x-4">
                 <span class="text-xl font-semibold text-blue-900">@yield('title')</span>
             </div>
-            
+
             @if (auth()->check())
             <div class="flex items-center space-x-4">
                 <!-- Search Bar -->
                 <div class="relative hidden md:block">
-                    <input type="text" 
-                           placeholder="Search..." 
-                           class="w-64 px-4 py-2 rounded-lg bg-white/50 border border-blue-100 
+                    <input type="text"
+                        placeholder="Search..."
+                        class="w-64 px-4 py-2 rounded-lg bg-white/50 border border-blue-100 
                                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white">
                     <i class="bx bx-search absolute right-3 top-2.5 text-gray-400"></i>
                 </div>
@@ -296,19 +365,19 @@
                 <!-- Quick Actions Dropdown -->
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open"
-                            class="p-2 rounded-lg hover:bg-blue-50 transition">
+                        class="p-2 rounded-lg hover:bg-blue-50 transition">
                         <i class="bx bx-grid-alt text-xl text-blue-600"></i>
                     </button>
-                    
-                    <div x-show="open" 
-                         @click.away="open = false"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 transform scale-95"
-                         x-transition:enter-end="opacity-100 transform scale-100"
-                         x-transition:leave="transition ease-in duration-100"
-                         x-transition:leave-start="opacity-100 transform scale-100"
-                         x-transition:leave-end="opacity-0 transform scale-95"
-                         class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg glass-morphism">
+
+                    <div x-show="open"
+                        @click.away="open = false"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 transform scale-100"
+                        x-transition:leave-end="opacity-0 transform scale-95"
+                        class="absolute right-0 mt-2 w-48 rounded-lg shadow-lg glass-morphism">
                         <div class="p-2">
                             <a href="#" class="block px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-blue-50">
                                 <i class="bx bx-user mr-2"></i> Profile
@@ -326,8 +395,8 @@
                 <!-- Logout Button -->
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" 
-                            class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg 
+                    <button type="submit"
+                        class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg 
                                    transition transform hover:scale-105 focus:outline-none focus:ring-2 
                                    focus:ring-red-500 focus:ring-opacity-50 active:scale-95">
                         <i class='bx bx-log-out mr-2'></i>
@@ -381,9 +450,9 @@
     </div>
 
     <!-- Toast Notifications -->
-    <div id="toast-container" 
-         class="fixed bottom-4 right-4 z-50 space-y-2"
-         x-data="{ 
+    <div id="toast-container"
+        class="fixed bottom-4 right-4 z-50 space-y-2"
+        x-data="{ 
              showToast(message, type = 'success') {
                  const toast = document.createElement('div');
                  toast.className = `p-4 rounded-lg shadow-lg glass-morphism transform translate-y-0 opacity-100 
@@ -430,5 +499,23 @@
             Alpine.evaluate(document.getElementById('toast-container'), 'showToast')(message, type);
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading time (you can remove this setTimeout in production)
+            setTimeout(function() {
+                // Get the loader element
+                const loader = document.getElementById('page-loader');
+
+                // Add the fade-out class
+                loader.classList.add('loader-fade-out');
+
+                // Remove the loader from DOM after transition completes
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }, 1500); // Adjust this value for desired loading time
+        });
+    </script>
 </body>
+
 </html>

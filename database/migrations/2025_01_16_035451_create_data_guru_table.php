@@ -13,7 +13,7 @@ class CreateDataGuruTable extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('sekolah_id')->constrained('sekolahs')->onDelete('cascade');
             $table->string('nip', 18)->unique()->nullable();
-            $table->string('nuptk', 16)->unique()->nullable(); // Nomor Unik Pendidik dan Tenaga Kependidikan
+            $table->string('nuptk', 16)->unique()->nullable(); 
             $table->string('nama_lengkap');
             $table->enum('jenis_kelamin', ['L', 'P']);
             $table->string('tempat_lahir');
@@ -24,8 +24,8 @@ class CreateDataGuruTable extends Migration
             $table->string('jurusan_pendidikan');
             $table->string('alamat');
             $table->string('no_hp');
-            $table->date('tmt_kerja'); // Terhitung Mulai Tanggal Kerja
-            $table->json('mata_pelajaran'); // Array mata pelajaran yang diampu
+            $table->date('tmt_kerja'); 
+            $table->json('mata_pelajaran'); 
             $table->timestamps();
         });
     }

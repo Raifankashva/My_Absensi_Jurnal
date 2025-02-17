@@ -3,126 +3,183 @@
 namespace App\Http\Controllers;
 
 use App\Models\JurnalGuru;
+use App\Models\JadwalPelajaran;
 use App\Models\Kelas;
+use App\Models\DataGuru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class JurnalGuruController extends Controller
 {
     public function index()
     {
-        $guru_id = Auth::user()->guru->id;
-        $jurnals = JurnalGuru::with(['kelas'])
-            ->where('guru_id', $guru_id)
+        $user = Auth::user();
+        $guru = DataGuru::where('user_id', $user->id)->first();
+        
+        if (!$guru) {
+            return redirect()->back()->with('error', 'Data guru tidak ditemukan.');
+        }
+        
+        $jurnalGuru = JurnalGuru::where('guru_id', $guru->id)
+            ->with(['jadwalPelajaran', 'kelas'])
             ->orderBy('tanggal', 'desc')
             ->paginate(10);
-
-        return view('jurnal.index', compact('jurnals'));
+            
+        return view('jurnal_guru.index', compact('jurnalGuru', 'guru'));
     }
-
+    
     public function create()
     {
-        $guru = Auth::user()->guru;
-        $kelas = Kelas::where('sekolah_id', $guru->sekolah_id)->get();
+        $user = Auth::user();
+        $guru = DataGuru::where('user_id', $user->id)->first();
         
-        return view('jurnal.create', compact('kelas'));
+        if (!$guru) {
+            return redirect()->back()->with('error', 'Data guru tidak ditemukan.');
+        }
+        
+        $hariIni = Carbon::now()->locale('id')->isoFormat('dddd');
+        $jadwalHariIni = JadwalPelajaran::where('guru_id', $guru->id)
+            ->where('hari', $hariIni)
+            ->with('kelas')
+            ->orderBy('jam_mulai')
+            ->get();
+            
+        return view('jurnal_guru.create', compact('jadwalHariIni', 'guru'));
     }
-
+    
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'kelas_id' => 'required|exists:kelas,id',
+        $request->validate([
+            'jadwal_pelajaran_id' => 'required|exists:jadwal_pelajaran,id',
             'tanggal' => 'required|date',
-            'waktu_mulai' => 'required',
-            'waktu_selesai' => 'required|after:waktu_mulai',
-            'mata_pelajaran' => 'required|string',
-            'materi_pembelajaran' => 'required|string',
-            'catatan_kegiatan' => 'required|string',
-            'capaian_pembelajaran' => 'nullable|string',
+            'materi_yang_disampaikan' => 'required|string',
             'jumlah_siswa_hadir' => 'required|integer|min:0',
             'jumlah_siswa_tidak_hadir' => 'required|integer|min:0',
-            'keterangan_ketidakhadiran' => 'nullable|string',
-            'rencana_pembelajaran_selanjutnya' => 'nullable|string',
-            'tanda_tangan' => 'required|image|max:2048', // Max 2MB
+            'data_siswa_tidak_hadir' => 'nullable|array',
+            'status_pertemuan' => 'required|in:Terlaksana,Diganti,Dibatalkan',
+            'catatan_pembelajaran' => 'nullable|string',
         ]);
-
-        // Handle tanda tangan upload
-        if ($request->hasFile('tanda_tangan')) {
-            $path = $request->file('tanda_tangan')->store('tanda-tangan', 'public');
-            $validated['tanda_tangan'] = $path;
+        
+        $jadwalPelajaran = JadwalPelajaran::findOrFail($request->jadwal_pelajaran_id);
+        
+        $jurnalGuru = new JurnalGuru();
+        $jurnalGuru->jadwal_pelajaran_id = $request->jadwal_pelajaran_id;
+        $jurnalGuru->guru_id = $jadwalPelajaran->guru_id;
+        $jurnalGuru->kelas_id = $jadwalPelajaran->kelas_id;
+        $jurnalGuru->tanggal = $request->tanggal;
+        $jurnalGuru->materi_yang_disampaikan = $request->materi_yang_disampaikan;
+        $jurnalGuru->catatan_pembelajaran = $request->catatan_pembelajaran;
+        $jurnalGuru->jumlah_siswa_hadir = $request->jumlah_siswa_hadir;
+        $jurnalGuru->jumlah_siswa_tidak_hadir = $request->jumlah_siswa_tidak_hadir;
+        $jurnalGuru->data_siswa_tidak_hadir = $request->data_siswa_tidak_hadir;
+        $jurnalGuru->status_pertemuan = $request->status_pertemuan;
+        $jurnalGuru->save();
+        
+        return redirect()->route('jurnal-guru.index')
+            ->with('success', 'Jurnal pembelajaran berhasil disimpan.');
+    }
+    
+    public function show($id)
+    {
+        $jurnal = JurnalGuru::with(['jadwalPelajaran', 'kelas', 'guru'])->findOrFail($id);
+        return view('jurnal_guru.show', compact('jurnal'));
+    }
+    
+    public function edit($id)
+    {
+        $user = Auth::user();
+        $guru = DataGuru::where('user_id', $user->id)->first();
+        
+        if (!$guru) {
+            return redirect()->back()->with('error', 'Data guru tidak ditemukan.');
         }
-
-        $validated['guru_id'] = Auth::user()->guru->id;
-        $validated['status'] = 'submitted';
-        $validated['waktu_submit'] = now();
-
-        JurnalGuru::create($validated);
-
-        return redirect()->route('jurnal.index')
-            ->with('success', 'Jurnal berhasil disimpan!');
-    }
-
-    public function show(JurnalGuru $jurnal)
-    {
-        $this->authorize('view', $jurnal);
-        return view('jurnal.show', compact('jurnal'));
-    }
-
-    public function edit(JurnalGuru $jurnal)
-    {
-        $this->authorize('update', $jurnal);
-        $kelas = Kelas::where('sekolah_id', Auth::user()->guru->sekolah_id)->get();
         
-        return view('jurnal.edit', compact('jurnal', 'kelas'));
-    }
-
-    public function update(Request $request, JurnalGuru $jurnal)
-    {
-        $this->authorize('update', $jurnal);
+        $jurnal = JurnalGuru::findOrFail($id);
         
-        $validated = $request->validate([
-            'kelas_id' => 'required|exists:kelas,id',
+        // Cek apakah jurnal ini milik guru yang sedang login
+        if ($jurnal->guru_id != $guru->id) {
+            return redirect()->back()->with('error', 'Anda tidak berhak mengedit jurnal ini.');
+        }
+        
+        $jadwalPelajaran = JadwalPelajaran::where('guru_id', $guru->id)
+            ->with('kelas')
+            ->get();
+            
+        return view('jurnal_guru.edit', compact('jurnal', 'jadwalPelajaran'));
+    }
+    
+    public function update(Request $request, $id)
+    {
+        $jurnal = JurnalGuru::findOrFail($id);
+        
+        $request->validate([
+            'jadwal_pelajaran_id' => 'required|exists:jadwal_pelajaran,id',
             'tanggal' => 'required|date',
-            'waktu_mulai' => 'required',
-            'waktu_selesai' => 'required|after:waktu_mulai',
-            'mata_pelajaran' => 'required|string',
-            'materi_pembelajaran' => 'required|string',
-            'catatan_kegiatan' => 'required|string',
-            'capaian_pembelajaran' => 'nullable|string',
+            'materi_yang_disampaikan' => 'required|string',
             'jumlah_siswa_hadir' => 'required|integer|min:0',
             'jumlah_siswa_tidak_hadir' => 'required|integer|min:0',
-            'keterangan_ketidakhadiran' => 'nullable|string',
-            'rencana_pembelajaran_selanjutnya' => 'nullable|string',
-            'tanda_tangan' => 'nullable|image|max:2048',
+            'data_siswa_tidak_hadir' => 'nullable|array',
+            'status_pertemuan' => 'required|in:Terlaksana,Diganti,Dibatalkan',
+            'catatan_pembelajaran' => 'nullable|string',
         ]);
-
-        if ($request->hasFile('tanda_tangan')) {
-            // Delete old signature if exists
-            if ($jurnal->tanda_tangan) {
-                Storage::disk('public')->delete($jurnal->tanda_tangan);
-            }
-            $path = $request->file('tanda_tangan')->store('tanda-tangan', 'public');
-            $validated['tanda_tangan'] = $path;
-        }
-
-        $jurnal->update($validated);
-
-        return redirect()->route('jurnal.index')
-            ->with('success', 'Jurnal berhasil diperbarui!');
+        
+        $jadwalPelajaran = JadwalPelajaran::findOrFail($request->jadwal_pelajaran_id);
+        
+        $jurnal->jadwal_pelajaran_id = $request->jadwal_pelajaran_id;
+        $jurnal->kelas_id = $jadwalPelajaran->kelas_id;
+        $jurnal->tanggal = $request->tanggal;
+        $jurnal->materi_yang_disampaikan = $request->materi_yang_disampaikan;
+        $jurnal->catatan_pembelajaran = $request->catatan_pembelajaran;
+        $jurnal->jumlah_siswa_hadir = $request->jumlah_siswa_hadir;
+        $jurnal->jumlah_siswa_tidak_hadir = $request->jumlah_siswa_tidak_hadir;
+        $jurnal->data_siswa_tidak_hadir = $request->data_siswa_tidak_hadir;
+        $jurnal->status_pertemuan = $request->status_pertemuan;
+        $jurnal->save();
+        
+        return redirect()->route('jurnal-guru.index')
+            ->with('success', 'Jurnal pembelajaran berhasil diperbarui.');
     }
-
-    public function destroy(JurnalGuru $jurnal)
+    
+    public function destroy($id)
     {
-        $this->authorize('delete', $jurnal);
-
-        if ($jurnal->tanda_tangan) {
-            Storage::disk('public')->delete($jurnal->tanda_tangan);
-        }
-
+        $jurnal = JurnalGuru::findOrFail($id);
         $jurnal->delete();
-
-        return redirect()->route('jurnal.index')
-            ->with('success', 'Jurnal berhasil dihapus!');
+        
+        return redirect()->route('jurnal-guru.index')
+            ->with('success', 'Jurnal pembelajaran berhasil dihapus.');
+    }
+    
+    public function laporanJurnal(Request $request)
+    {
+        $user = Auth::user();
+        $guru = DataGuru::where('user_id', $user->id)->first();
+        
+        $tanggalMulai = $request->input('tanggal_mulai');
+        $tanggalSelesai = $request->input('tanggal_selesai');
+        $kelasId = $request->input('kelas_id');
+        
+        $query = JurnalGuru::query();
+        
+        if ($guru && !Auth::user()->hasRole('admin')) {
+            $query->where('guru_id', $guru->id);
+        }
+        
+        if ($tanggalMulai && $tanggalSelesai) {
+            $query->whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai]);
+        }
+        
+        if ($kelasId) {
+            $query->where('kelas_id', $kelasId);
+        }
+        
+        $jurnals = $query->with(['jadwalPelajaran', 'kelas', 'guru'])
+                        ->orderBy('tanggal', 'desc')
+                        ->paginate(15);
+                        
+        $kelas = Kelas::all();
+        $allGuru = DataGuru::all();
+        
+        return view('jurnal_guru.laporan', compact('jurnals', 'kelas', 'guru', 'allGuru', 'tanggalMulai', 'tanggalSelesai', 'kelasId'));
     }
 }

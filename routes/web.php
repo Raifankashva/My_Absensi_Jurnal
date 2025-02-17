@@ -16,7 +16,18 @@ use App\Http\Controllers\PublicAttendanceController;
 use App\Http\Controllers\API\AbsensiController;
 use App\Models\DataSiswa;
 use App\Http\Controllers\JurnalGuruController;
+use App\Http\Controllers\JadwalPelajaranController;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
 Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
 Route::get('getdistricts/{city}', [SekolahController::class, 'getDistricts']);
 Route::get('getvillages/{district}', [SekolahController::class, 'getVillages']);
@@ -81,6 +92,16 @@ Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendanc
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
     Route::post('adminsiswa/download-qrcodes', [DataSiswa::class, 'downloadQRCodes'])->name('adminsiswa.download-qrcodes');
 
+    Route::get('/jadwal-pelajaran', [JadwalPelajaranController::class, 'index'])->name('jadwal-pelajaran.index');
+    Route::get('/jadwal-pelajaran/create', [JadwalPelajaranController::class, 'create'])->name('jadwal-pelajaran.create');
+    Route::post('/jadwal-pelajaran', [JadwalPelajaranController::class, 'store'])->name('jadwal-pelajaran.store');
+    Route::get('/jadwal-pelajaran/{id}/edit', [JadwalPelajaranController::class, 'edit'])->name('jadwal-pelajaran.edit');
+    Route::put('/jadwal-pelajaran/{id}', [JadwalPelajaranController::class, 'update'])->name('jadwal-pelajaran.update');
+    Route::delete('/jadwal-pelajaran/{id}', [JadwalPelajaranController::class, 'destroy'])->name('jadwal-pelajaran.destroy');
+
+    // API routes for fetching schedule data
+    Route::get('/jadwal-pelajaran/guru/{guruId}', [JadwalPelajaranController::class, 'getJadwalByGuru'])->name('jadwal-pelajaran.by-guru');
+    Route::get('/jadwal-pelajaran/hari-ini/{guruId}', [JadwalPelajaranController::class, 'getJadwalHariIni'])->name('jadwal-pelajaran.hari-ini');
 
 });
 
@@ -88,9 +109,17 @@ Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendanc
 
 Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
     Route::get('/dashboard', [GuruController::class, 'dashboard'])->name('guru.dashboard');
-    Route::resource('jurnal', JurnalGuruController::class);
-    Route::get('jurnal/export/{jurnal}', [JurnalGuruController::class, 'export'])->name('jurnal.export');
-    Route::post('jurnal/{jurnal}/verify', [JurnalGuruController::class, 'verify'])->name('jurnal.verify');
+    Route::get('/jurnal-guru', [JurnalGuruController::class, 'index'])->name('jurnal-guru.index');
+    Route::get('/jurnal-guru/create', [JurnalGuruController::class, 'create'])->name('jurnal-guru.create');
+    Route::post('/jurnal-guru', [JurnalGuruController::class, 'store'])->name('jurnal-guru.store');
+    Route::get('/jurnal-guru/{id}', [JurnalGuruController::class, 'show'])->name('jurnal-guru.show');
+    Route::get('/jurnal-guru/{id}/edit', [JurnalGuruController::class, 'edit'])->name('jurnal-guru.edit');
+    Route::put('/jurnal-guru/{id}', [JurnalGuruController::class, 'update'])->name('jurnal-guru.update');
+    Route::delete('/jurnal-guru/{id}', [JurnalGuruController::class, 'destroy'])->name('jurnal-guru.destroy');
+    
+    // Rute untuk laporan jurnal
+    Route::get('/jurnal-guru/laporan', [JurnalGuruController::class, 'laporanJurnal'])->name('jurnal-guru.laporan');
+
 });
 
 // Routes untuk Siswa
