@@ -56,7 +56,7 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($guru->foto)
-                                    <img src="{{ Storage::url('foto/guru/'.$guru->foto) }}" 
+                                    <img src="{{ Storage::url('guru-photos/'.$guru->foto) }}" 
                                          alt="Foto {{ $guru->nama_lengkap }}"
                                          class="h-12 w-12 rounded-full object-cover border-2 border-blue-200 shadow-md">
                                 @else

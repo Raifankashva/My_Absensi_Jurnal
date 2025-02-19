@@ -63,6 +63,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::resource('sekolahs', SekolahController::class);
 
     Route::resource('adminguru', DataGuruController::class);
+    Route::get('adminguru/{guru}/detail', [DataGuruController::class, 'show'])->name('adminguru.detail');
+
     Route::resource('adminsiswa', DataSiswaController::class);
     Route::get('/siswa/{id}/download-qr', [DataSiswaController::class, 'downloadQrCode'])->name('siswa.download-qr');
     Route::get('adminsiswa/{id}/download-qr', [DataSiswaController::class, 'downloadQRCode'])

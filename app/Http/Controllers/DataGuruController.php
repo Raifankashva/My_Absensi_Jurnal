@@ -10,18 +10,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-
 class DataGuruController extends Controller
 {
     public function index()
-{
-    $guru = DataGuru::with(['user', 'sekolah'])
-        ->latest()
-        ->paginate(10); // Tetap gunakan paginate di sini
-
-    return view('adminguru.index', compact('guru'));
-}
-
+    {
+        $guru = DataGuru::with(['user', 'sekolah'])
+            ->latest()
+            ->paginate(10);
+        return view('adminguru.index', compact('guru'));
+    }
 
     public function create()
     {
@@ -49,8 +46,7 @@ class DataGuruController extends Controller
             'mata_pelajaran' => 'required|array',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
-    
-        // Create user account
+
         $user = User::create([
             'name' => $request->nama_lengkap,
             'email' => $request->email,
@@ -59,30 +55,29 @@ class DataGuruController extends Controller
             'alamat' => $request->alamat,
             'no_hp' => $request->no_hp,
         ]);
-    
-        // Handle foto upload
+
         $guruData = $request->except(['email', 'password', 'foto']);
-        $fotoPath = null;
+        $guruData['user_id'] = $user->id;
+        $guruData['mata_pelajaran'] = json_encode($request->mata_pelajaran);
+
         if ($request->hasFile('foto')) {
             $foto = $request->file('foto');
             $fotoName = Str::slug($request->nama_lengkap) . '-' . time() . '.' . $foto->getClientOriginalExtension();
             $fotoPath = $foto->storeAs('public/guru-photos', $fotoName);
+            $guruData['foto'] = $fotoName;
         }
-    
-        $guruData['user_id'] = $user->id;
-    
-        // Store the guru data in the database
+
         DataGuru::create($guruData);
-    
+
         return redirect()->route('adminguru.index')->with('success', 'Data guru berhasil ditambahkan');
     }
-    
 
-    public function show(DataGuru $guru)
-    {
-        $guru->load('user', 'sekolah');
-        return view('adminguru.show', compact('guru'));
-    }
+    public function show($id)
+{
+    $guru = DataGuru::with(['user', 'sekolah'])->findOrFail($id);
+    return view('adminguru.show', compact('guru'));
+}
+
 
     public function edit(DataGuru $guru)
     {
@@ -111,40 +106,39 @@ class DataGuruController extends Controller
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Update user name if changed
         if ($guru->nama_lengkap !== $request->nama_lengkap) {
             $guru->user->update(['name' => $request->nama_lengkap]);
         }
 
         $guruData = $request->except(['foto']);
-    
-        // Handle foto upload
+        $guruData['mata_pelajaran'] = json_encode($request->mata_pelajaran);
+
         if ($request->hasFile('foto')) {
-            // Delete old photo if exists
             if ($guru->foto) {
-                Storage::delete('public/foto/guru/' . $guru->foto);
+                Storage::delete('public/guru-photos/' . $guru->foto);
             }
-            
+
             $foto = $request->file('foto');
-            $filename = 'guru_' . time() . '.' . $foto->getClientOriginalExtension();
-            $foto->storeAs('public/foto/guru', $filename);
-            $guruData['foto'] = $filename;
+            $fotoName = 'guru_' . time() . '.' . $foto->getClientOriginalExtension();
+            $foto->storeAs('public/guru-photos', $fotoName);
+            $guruData['foto'] = $fotoName;
         }
 
-        $guru->update($request->all());
+        $guru->update($guruData);
         return redirect()->route('adminguru.index')->with('success', 'Data guru berhasil diperbarui');
     }
 
     public function destroy(DataGuru $guru)
     {
-        // Check if the user associated with the guru exists
+        if ($guru->foto) {
+            Storage::delete('public/guru-photos/' . $guru->foto);
+        }
+
         if ($guru->user) {
             $guru->user->delete();
-        } else {
-            return redirect()->route('adminguru.index')->with('error', 'Guru does not have an associated user.');
         }
-        
+
+        $guru->delete();
         return redirect()->route('adminguru.index')->with('success', 'Data guru berhasil dihapus');
     }
-    
 }
