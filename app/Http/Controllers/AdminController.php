@@ -25,41 +25,113 @@ class AdminController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function dashboard()
-    {
-        $sekolah = Sekolah::all();
-        $totalSekolah = Sekolah::count();
-        $totalGuru = User::where('role', 'guru')->count();
-        $totalSiswa = User::where('role', 'siswa')->count();
-        $latestUsers = User::latest()->take(5)->get();
+{
+    $sekolah = Sekolah::all();
+    // Get current and previous month dates
+    $currentMonth = now();
+    $lastMonth = now()->subMonth();
     
-        // Ambil tugas yang belum lebih dari 7 hari setelah due_date
-        $tasks = Task::where('due_date', '>=', now()->subDays(7))->get();
+    // Calculate total schools and trends
+    $totalSekolah = Sekolah::count();
+    $lastMonthSekolah = Sekolah::where('created_at', '<', $lastMonth->endOfMonth())->count();
+    $sekolahTrend = $lastMonthSekolah > 0 
+        ? round((($totalSekolah - $lastMonthSekolah) / $lastMonthSekolah) * 100, 1)
+        : 0;
+    
+    // Calculate total teachers and trends
+    $totalGuru = User::where('role', 'guru')->count();
+    $lastMonthGuru = User::where('role', 'guru')
+        ->where('created_at', '<', $lastMonth->endOfMonth())
+        ->count();
+    $guruTrend = $lastMonthGuru > 0
+        ? round((($totalGuru - $lastMonthGuru) / $lastMonthGuru) * 100, 1)
+        : 0;
+    
+    // Calculate total students and trends
+    $totalSiswa = User::where('role', 'siswa')->count();
+    $lastMonthSiswa = User::where('role', 'siswa')
+        ->where('created_at', '<', $lastMonth->endOfMonth())
+        ->count();
+    $siswaTrend = $lastMonthSiswa > 0
+        ? round((($totalSiswa - $lastMonthSiswa) / $lastMonthSiswa) * 100, 1)
+        : 0;
+    
+    // Calculate total users and trends
+    $totalUsers = User::count();
+    $lastMonthUsers = User::where('created_at', '<', $lastMonth->endOfMonth())->count();
+    $usersTrend = $lastMonthUsers > 0
+        ? round((($totalUsers - $lastMonthUsers) / $lastMonthUsers) * 100, 1)
+        : 0;
 
-        // Get today's schedules
-        $todaySchedules = Schedule::where('day', Carbon::now()->format('l'))
-            ->orderBy('time')
-            ->get();
-        
-        // Get upcoming schedules for the next 7 days
-        $upcomingSchedules = Schedule::whereIn('day', collect(range(0, 6))->map(function($day) {
-                return Carbon::now()->addDays($day)->format('l');
-            }))
-            ->orderBy('day')
-            ->orderBy('time')
-            ->get()
-            ->groupBy('day');
+    $latestUsers = User::latest()->take(5)->get();
     
-        return view('admin.dashboard', compact(
-            'totalGuru', 
-            'totalSiswa', 
-            'latestUsers', 
-            'totalSekolah', 
-            'sekolah', 
-            'tasks',
-            'todaySchedules',
-            'upcomingSchedules'
-        ));
-    }
+    // Define cards array with real trend data
+    $cards = [
+        [
+            'color' => 'blue',
+            'gradient' => 'from-blue-600 to-blue-400',
+            'icon' => 'bxs-school',
+            'title' => 'Total Sekolah',
+            'count' => $totalSekolah,
+            'trend' => ($sekolahTrend >= 0 ? '+' : '') . $sekolahTrend . '%',
+            'trend_text' => 'dari bulan lalu'
+        ],
+        [
+            'color' => 'emerald',
+            'gradient' => 'from-emerald-600 to-emerald-400',
+            'icon' => 'bxs-user-detail',
+            'title' => 'Total Guru',
+            'count' => $totalGuru,
+            'trend' => ($guruTrend >= 0 ? '+' : '') . $guruTrend . '%',
+            'trend_text' => 'dari bulan lalu'
+        ],
+        [
+            'color' => 'purple',
+            'gradient' => 'from-purple-600 to-purple-400',
+            'icon' => 'bxs-group',
+            'title' => 'Total Siswa',
+            'count' => $totalSiswa,
+            'trend' => ($siswaTrend >= 0 ? '+' : '') . $siswaTrend . '%',
+            'trend_text' => 'dari bulan lalu'
+        ],
+        [
+            'color' => 'rose',
+            'gradient' => 'from-rose-600 to-rose-400',
+            'icon' => 'bxs-user-pin',
+            'title' => 'Total Pengguna',
+            'count' => $totalUsers,
+            'trend' => ($usersTrend >= 0 ? '+' : '') . $usersTrend . '%',
+            'trend_text' => 'dari bulan lalu'
+        ]
+    ];
+
+    // Get tasks and schedules
+    $tasks = Task::where('due_date', '>=', now()->subDays(7))->get();
+    
+    $todaySchedules = Schedule::where('day', Carbon::now()->format('l'))
+        ->orderBy('time')
+        ->get();
+    
+    $upcomingSchedules = Schedule::whereIn('day', collect(range(0, 6))->map(function($day) {
+            return Carbon::now()->addDays($day)->format('l');
+        }))
+        ->orderBy('day')
+        ->orderBy('time')
+        ->get()
+        ->groupBy('day');
+
+    return view('admin.dashboard', compact(
+        'cards',
+        'totalGuru', 
+        'totalSiswa', 
+        'latestUsers', 
+        'totalSekolah', 
+        'tasks',
+        'todaySchedules',
+        'upcomingSchedules',
+        'sekolah', 
+    ));
+}
     
 
 }

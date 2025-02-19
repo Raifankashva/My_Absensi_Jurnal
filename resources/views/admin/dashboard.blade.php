@@ -36,70 +36,29 @@
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            @php
-            $cards = [
-            [
-            'color' => 'blue',
-            'gradient' => 'from-blue-600 to-blue-400',
-            'icon' => 'bxs-school',
-            'title' => 'Total Sekolah',
-            'count' => $totalSekolah,
-            'trend' => '+2.5%',
-            'trend_text' => 'dari bulan lalu'
-            ],
-            [
-            'color' => 'emerald',
-            'gradient' => 'from-emerald-600 to-emerald-400',
-            'icon' => 'bxs-user-detail',
-            'title' => 'Total Guru',
-            'count' => $totalGuru,
-            'trend' => '+3.2%',
-            'trend_text' => 'dari bulan lalu'
-            ],
-            [
-            'color' => 'purple',
-            'gradient' => 'from-purple-600 to-purple-400',
-            'icon' => 'bxs-group',
-            'title' => 'Total Siswa',
-            'count' => $totalSiswa,
-            'trend' => '+5.1%',
-            'trend_text' => 'dari bulan lalu'
-            ],
-            [
-            'color' => 'rose',
-            'gradient' => 'from-rose-600 to-rose-400',
-            'icon' => 'bxs-user-pin',
-            'title' => 'Total Pengguna',
-            'count' => $latestUsers->count(),
-            'trend' => '+1.8%',
-            'trend_text' => 'dari bulan lalu'
-            ]
-            ];
-            @endphp
-
-            @foreach($cards as $card)
-            <div class="relative group">
-                <div class="absolute inset-0 bg-gradient-to-r {{ $card['gradient'] }} rounded-xl transform transition-all duration-300 group-hover:scale-105 group-hover:rotate-1"></div>
-                <div class="relative bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 group-hover:-translate-y-1 group-hover:-translate-x-1">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="text-sm font-medium text-gray-600 mb-2">{{ $card['title'] }}</h3>
-                                <p class="text-3xl font-bold text-gray-900">{{ number_format($card['count']) }}</p>
-                                <div class="flex items-center mt-2">
-                                    <span class="text-emerald-500 text-sm font-medium">{{ $card['trend'] }}</span>
-                                    <span class="text-gray-500 text-xs ml-1">{{ $card['trend_text'] }}</span>
-                                </div>
-                            </div>
-                            <div class="bg-{{ $card['color'] }}-100 rounded-lg p-3">
-                                <i class="bx {{ $card['icon'] }} text-2xl text-{{ $card['color'] }}-600"></i>
-                            </div>
+    @foreach($cards as $card)
+    <div class="relative group">
+        <div class="absolute inset-0 bg-gradient-to-r {{ $card['gradient'] }} rounded-xl transform transition-all duration-300 group-hover:scale-105 group-hover:rotate-1"></div>
+        <div class="relative bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 group-hover:-translate-y-1 group-hover:-translate-x-1">
+            <div class="p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-600 mb-2">{{ $card['title'] }}</h3>
+                        <p class="text-3xl font-bold text-gray-900">{{ number_format($card['count']) }}</p>
+                        <div class="flex items-center mt-2">
+                            <span class="text-{{ $card['trend'][0] === '+' ? 'emerald' : 'red' }}-500 text-sm font-medium">{{ $card['trend'] }}</span>
+                            <span class="text-gray-500 text-xs ml-1">{{ $card['trend_text'] }}</span>
                         </div>
+                    </div>
+                    <div class="bg-{{ $card['color'] }}-100 rounded-lg p-3">
+                        <i class="bx {{ $card['icon'] }} text-2xl text-{{ $card['color'] }}-600"></i>
                     </div>
                 </div>
             </div>
-            @endforeach
         </div>
+    </div>
+    @endforeach
+</div>
 
         <!-- Attendance Overview -->
         <div class="mb-8">
