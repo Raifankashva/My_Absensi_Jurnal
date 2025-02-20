@@ -1,100 +1,62 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Jurnal Pembelajaran</h5>
-                    <div>
-                        <a href="{{ route('jurnal-guru.create') }}" class="btn btn-primary btn-sm me-2">
-                            <i class="fas fa-plus"></i> Isi Jurnal Hari Ini
-                        </a>
-                        <a href="{{ route('jurnal-guru.laporan') }}" class="btn btn-info btn-sm">
-                            <i class="fas fa-file-alt"></i> Laporan
-                        </a>
-                    </div>
-                </div>
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Daftar Jurnal Guru</h1>
 
-                <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Tanggal</th>
-                                    <th>Kelas</th>
-                                    <th>Mata Pelajaran</th>
-                                    <th>Materi</th>
-                                    <th>Hadir/Tidak Hadir</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($jurnalGuru as $index => $jurnal)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $jurnal->tanggal->format('d-m-Y') }}</td>
-                                    <td>{{ $jurnal->kelas->nama_kelas }}</td>
-                                    <td>{{ $jurnal->jadwalPelajaran->mata_pelajaran }}</td>
-                                    <td>{{ Str::limit($jurnal->materi_yang_disampaikan, 50) }}</td>
-                                    <td>{{ $jurnal->jumlah_siswa_hadir }}/{{ $jurnal->jumlah_siswa_tidak_hadir }}</td>
-                                    <td>
-                                        @if($jurnal->status_pertemuan == 'Terlaksana')
-                                            <span class="badge bg-success">Terlaksana</span>
-                                        @elseif($jurnal->status_pertemuan == 'Diganti')
-                                            <span class="badge bg-warning">Diganti</span>
-                                        @else
-                                            <span class="badge bg-danger">Dibatalkan</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('jurnal-guru.show', $jurnal->id) }}" class="btn btn-info btn-sm" title="Detail">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('jurnal-guru.edit', $jurnal->id) }}" class="btn btn-warning btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <form action="{{ route('jurnal-guru.destroy', $jurnal->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jurnal ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="8" class="text-center">Tidak ada data jurnal</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="d-flex justify-content-center mt-3">
-                        {{ $jurnalGuru->links() }}
-                    </div>
-                </div>
-            </div>
+    @if(session('success'))
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+            {{ session('success') }}
         </div>
+    @endif
+
+    @if(session('error'))
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <div class="mb-4">
+        <a href="{{ route('jurnal-guru.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Tambah Jurnal
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-300">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border-b">Tanggal</th>
+                    <th class="py-2 px-4 border-b">Kelas</th>
+                    <th class="py-2 px-4 border-b">Materi</th>
+                    <th class="py-2 px-4 border-b">Status</th>
+                    <th class="py-2 px-4 border-b">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($jurnalGuru as $jurnal)
+                <tr>
+                    <td class="py-2 px-4 border-b">{{ $jurnal->tanggal }}</td>
+                    <td class="py-2 px-4 border-b">{{ $jurnal->kelas->nama_kelas ?? '-' }}</td>
+                    <td class="py-2 px-4 border-b">{{ $jurnal->materi_yang_disampaikan }}</td>
+                    <td class="py-2 px-4 border-b">{{ $jurnal->status_pertemuan }}</td>
+                    <td class="py-2 px-4 border-b">
+                        <a href="{{ route('jurnal-guru.show', $jurnal->id) }}" class="text-blue-500 hover:text-blue-700">Lihat</a>
+                        <a href="{{ route('jurnal-guru.edit', $jurnal->id) }}" class="ml-2 text-green-500 hover:text-green-700">Edit</a>
+                        <form action="{{ route('jurnal-guru.destroy', $jurnal->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="ml-2 text-red-500 hover:text-red-700" onclick="return confirm('Apakah Anda yakin ingin menghapus?')">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        {{ $jurnalGuru->links() }}
     </div>
 </div>
 @endsection

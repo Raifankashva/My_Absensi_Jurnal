@@ -1,180 +1,151 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4">
-    <h1 class="text-2xl font-bold mb-4">Tambah Data Guru</h1>
-
+<div class="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-6">Edit Data Guru</h1>
     @if ($errors->any())
-    <div class="bg-red-100 text-red-800 p-4 rounded mb-4">
-        <ul>
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
+        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
-    <form action="{{ route('adminguru.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+    <form action="{{ route('adminguru.update', $guru->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
+        @method('PUT')
 
         <!-- Sekolah -->
         <div>
-            <label for="sekolah_id" class="block font-medium">Sekolah</label>
-            <select name="sekolah_id" id="sekolah_id"
-                class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-                <option value="">Pilih Sekolah</option>
-                @foreach($sekolahs as $sekolah)
-                <option value="{{ $sekolah->id }}" {{ old('sekolah_id') == $sekolah->id ? 'selected' : '' }}>
-                    {{ $sekolah->nama_sekolah }}
-                </option>
+            <label for="sekolah_id" class="block font-medium text-gray-700">Sekolah</label>
+            <select id="sekolah_id" name="sekolah_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                @foreach ($sekolahs as $sekolah)
+                    <option value="{{ $sekolah->id }}" {{ $guru->sekolah_id == $sekolah->id ? 'selected' : '' }}>
+                        {{ $sekolah->nama_sekolah }}
+                    </option>
                 @endforeach
             </select>
         </div>
 
-        <!-- NIP, NUPTK, Nama Lengkap -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label for="nip" class="block font-medium">NIP</label>
-                <input type="text" name="nip" id="nip" value="{{ old('nip') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
+        <!-- NIP -->
+        <div>
+            <label for="nip" class="block font-medium text-gray-700">NIP</label>
+            <input type="text" id="nip" name="nip" value="{{ old('nip', $guru->nip) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan NIP (18 digit)" maxlength="18">
+        </div>
 
-            <div>
-                <label for="nuptk" class="block font-medium">NUPTK</label>
-                <input type="text" name="nuptk" id="nuptk" value="{{ old('nuptk') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
+        <!-- NUPTK -->
+        <div>
+            <label for="nuptk" class="block font-medium text-gray-700">NUPTK</label>
+            <input type="text" id="nuptk" name="nuptk" value="{{ old('nuptk', $guru->nuptk) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan NUPTK (16 digit)" maxlength="16">
+        </div>
 
-            <div>
-                <label for="nama_lengkap" class="block font-medium">Nama Lengkap</label>
-                <input type="text" name="nama_lengkap" id="nama_lengkap" value="{{ old('nama_lengkap') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
+        <!-- Nama Lengkap -->
+        <div>
+            <label for="nama_lengkap" class="block font-medium text-gray-700">Nama Lengkap</label>
+            <input type="text" id="nama_lengkap" name="nama_lengkap" value="{{ old('nama_lengkap', $guru->nama_lengkap) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+
+        <!-- Jenis Kelamin -->
+        <div>
+            <label class="block font-medium text-gray-700">Jenis Kelamin</label>
+            <div class="mt-2 flex space-x-4">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="jenis_kelamin" value="L" {{ $guru->jenis_kelamin == 'L' ? 'checked' : '' }} class="form-radio text-blue-600" required>
+                    <span class="ml-2">Laki-Laki</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="jenis_kelamin" value="P" {{ $guru->jenis_kelamin == 'P' ? 'checked' : '' }} class="form-radio text-blue-600" required>
+                    <span class="ml-2">Perempuan</span>
+                </label>
             </div>
         </div>
 
-        <!-- Email dan Password -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label for="email" class="block font-medium">Email</label>
-                <input type="email" name="email" id="email" value="{{ old('email') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="password" class="block font-medium">Password</label>
-                <input type="password" name="password" id="password"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
+        <!-- Tempat Lahir -->
+        <div>
+            <label for="tempat_lahir" class="block font-medium text-gray-700">Tempat Lahir</label>
+            <input type="text" id="tempat_lahir" name="tempat_lahir" value="{{ old('tempat_lahir', $guru->tempat_lahir) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
         </div>
 
-        <!-- Jenis Kelamin, Tempat Lahir, Tanggal Lahir -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label for="jenis_kelamin" class="block font-medium">Jenis Kelamin</label>
-                <select name="jenis_kelamin" id="jenis_kelamin"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-                    <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-Laki</option>
-                    <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="tempat_lahir" class="block font-medium">Tempat Lahir</label>
-                <input type="text" name="tempat_lahir" id="tempat_lahir" value="{{ old('tempat_lahir') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="tanggal_lahir" class="block font-medium">Tanggal Lahir</label>
-                <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
+        <!-- Tanggal Lahir -->
+        <div>
+            <label for="tanggal_lahir" class="block font-medium text-gray-700">Tanggal Lahir</label>
+            <input type="date" id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir', $guru->tanggal_lahir) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
         </div>
 
-        <!-- NIK, Status Kepegawaian -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label for="nik" class="block font-medium">NIK</label>
-                <input type="text" name="nik" id="nik" value="{{ old('nik') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
+        <!-- NIK -->
+        <div>
+            <label for="nik" class="block font-medium text-gray-700">NIK</label>
+            <input type="text" id="nik" name="nik" value="{{ old('nik', $guru->nik) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan NIK (16 digit)" required maxlength="16">
+        </div>
 
-            <div>
-                <label for="status_kepegawaian" class="block font-medium">Status Kepegawaian</label>
-                <select name="status_kepegawaian" id="status_kepegawaian"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-                    <option value="PNS" {{ old('status_kepegawaian') == 'PNS' ? 'selected' : '' }}>PNS</option>
-                    <option value="PPPK" {{ old('status_kepegawaian') == 'PPPK' ? 'selected' : '' }}>PPPK</option>
-                    <option value="Honorer" {{ old('status_kepegawaian') == 'Honorer' ? 'selected' : '' }}>Honorer
+        <!-- Alamat -->
+        <div>
+            <label for="alamat" class="block font-medium text-gray-700">Alamat</label>
+            <input type="text" id="alamat" name="alamat" value="{{ old('alamat', $guru->alamat) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+
+        <!-- no_hp -->
+        <div>
+            <label for="no_hp" class="block font-medium text-gray-700">No HP</label>
+            <input type="text" id="no_hp" name="no_hp" value="{{ old('no_hp', $guru->no_hp) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
+
+        <!-- Status Kepegawaian -->
+        <div>
+            <label for="status_kepegawaian" class="block font-medium text-gray-700">Status Kepegawaian</label>
+            <select id="status_kepegawaian" name="status_kepegawaian" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                @foreach(['PNS', 'PPPK', 'Honorer', 'GTY', 'GTT'] as $status)
+                    <option value="{{ $status }}" {{ $guru->status_kepegawaian == $status ? 'selected' : '' }}>
+                        {{ $status }}
                     </option>
-                    <option value="GTY" {{ old('status_kepegawaian') == 'GTY' ? 'selected' : '' }}>GTY</option>
-                    <option value="GTT" {{ old('status_kepegawaian') == 'GTT' ? 'selected' : '' }}>GTT</option>
-                </select>
-            </div>
+                @endforeach
+            </select>
         </div>
 
-        <!-- Pendidikan Terakhir, Jurusan Pendidikan -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label for="pendidikan_terakhir" class="block font-medium">Pendidikan Terakhir</label>
-                <input type="text" name="pendidikan_terakhir" id="pendidikan_terakhir" value="{{ old('pendidikan_terakhir') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="jurusan_pendidikan" class="block font-medium">Jurusan Pendidikan</label>
-                <input type="text" name="jurusan_pendidikan" id="jurusan_pendidikan" value="{{ old('jurusan_pendidikan') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
+        <!-- Pendidikan Terakhir -->
+        <div>
+            <label for="pendidikan_terakhir" class="block font-medium text-gray-700">Pendidikan Terakhir</label>
+            <input type="text" id="pendidikan_terakhir" name="pendidikan_terakhir" value="{{ old('pendidikan_terakhir', $guru->pendidikan_terakhir) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
         </div>
 
-        <!-- Alamat dan No HP -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label for="alamat" class="block font-medium">Alamat</label>
-                <textarea name="alamat" id="alamat" rows="3"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">{{ old('alamat') }}</textarea>
-            </div>
-
-            <div>
-                <label for="no_hp" class="block font-medium">No HP</label>
-                <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
+        <!-- Jurusan Pendidikan -->
+        <div>
+            <label for="jurusan_pendidikan" class="block font-medium text-gray-700">Jurusan Pendidikan</label>
+            <input type="text" id="jurusan_pendidikan" name="jurusan_pendidikan" value="{{ old('jurusan_pendidikan', $guru->jurusan_pendidikan) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
         </div>
 
-        <!-- TMT Kerja dan Mata Pelajaran -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label for="tmt_kerja" class="block font-medium">TMT Kerja</label>
-                <input type="date" name="tmt_kerja" id="tmt_kerja" value="{{ old('tmt_kerja') }}"
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-            </div>
+        <!-- TMT Kerja -->
+        <div>
+            <label for="tmt_kerja" class="block font-medium text-gray-700">TMT Kerja</label>
+            <input type="date" id="tmt_kerja" name="tmt_kerja" value="{{ old('tmt_kerja', $guru->tmt_kerja) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+        </div>
 
-            <div>
-                <label for="mata_pelajaran" class="block font-medium">Mata Pelajaran</label>
-                <select name="mata_pelajaran[]" id="mata_pelajaran" multiple
-                    class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
-                    <option value="Matematika" {{ in_array('Matematika', old('mata_pelajaran', [])) ? 'selected' : '' }}>Matematika</option>
-                    <option value="IPA" {{ in_array('IPA', old('mata_pelajaran', [])) ? 'selected' : '' }}>IPA</option>
-                    <option value="Bahasa Indonesia" {{ in_array('Bahasa Indonesia', old('mata_pelajaran', [])) ? 'selected' : '' }}>Bahasa Indonesia</option>
-                    <!-- Tambahkan mata pelajaran lainnya -->
-                </select>
-            </div>
+        <!-- Mata Pelajaran -->
+        <div>
+            <label for="mata_pelajaran" class="block font-medium text-gray-700">Mata Pelajaran</label>
+            <input type="text" id="mata_pelajaran" name="mata_pelajaran[]" value="{{ implode(', ', json_decode($guru->mata_pelajaran, true) ?? []) }}" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan Mata Pelajaran (Pisahkan dengan koma)" required>
         </div>
 
         <!-- Foto -->
         <div>
-            <label for="foto" class="block font-medium">Foto</label>
-            <input type="file" name="foto" id="foto"
-                class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-500">
+            <label for="foto" class="block font-medium text-gray-700">Foto</label>
+            @if($guru->foto)
+                <div class="mb-2">
+                    <img src="{{ Storage::url('guru-photos/' . $guru->foto) }}" alt="Foto Guru" class="h-32 w-32 object-cover rounded">
+                </div>
+            @endif
+            <input type="file" id="foto" name="foto" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
         </div>
 
-        <!-- Tombol Simpan -->
-        <div class="text-right">
-            <button type="submit"
-                class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-500">
-                Simpan
+        <!-- Submit Button -->
+        <div class="flex justify-between">
+            <a href="{{ route('adminguru.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-md shadow hover:bg-gray-600">
+                Kembali
+            </a>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700">
+                Update
             </button>
         </div>
     </form>

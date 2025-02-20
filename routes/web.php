@@ -17,6 +17,7 @@ use App\Http\Controllers\API\AbsensiController;
 use App\Models\DataSiswa;
 use App\Http\Controllers\JurnalGuruController;
 use App\Http\Controllers\JadwalPelajaranController;
+use App\Http\Controllers\SiswaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,8 +63,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     
     Route::resource('sekolahs', SekolahController::class);
 
-    Route::resource('adminguru', DataGuruController::class);
-    Route::get('adminguru/{guru}/detail', [DataGuruController::class, 'show'])->name('adminguru.detail');
+    Route::prefix('adminguru')->name('adminguru.')->group(function () {
+        Route::get('/', [DataGuruController::class, 'index'])->name('index');
+        Route::get('/create', [DataGuruController::class, 'create'])->name('create');
+        Route::post('/store', [DataGuruController::class, 'store'])->name('store');
+        Route::get('/{guru}', [DataGuruController::class, 'show'])->name('show');
+        Route::get('/{guru}/edit', [DataGuruController::class, 'edit'])->name('edit');
+        Route::put('/{guru}', [DataGuruController::class, 'update'])->name('update');
+        Route::delete('/{guru}', [DataGuruController::class, 'destroy'])->name('destroy');
+    });
+        Route::get('adminguru/{guru}/detail', [DataGuruController::class, 'show'])->name('adminguru.detail');
 
     Route::resource('adminsiswa', DataSiswaController::class);
     Route::get('/siswa/{id}/download-qr', [DataSiswaController::class, 'downloadQrCode'])->name('siswa.download-qr');
@@ -104,7 +113,7 @@ Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendanc
     // API routes for fetching schedule data
     Route::get('/jadwal-pelajaran/guru/{guruId}', [JadwalPelajaranController::class, 'getJadwalByGuru'])->name('jadwal-pelajaran.by-guru');
     Route::get('/jadwal-pelajaran/hari-ini/{guruId}', [JadwalPelajaranController::class, 'getJadwalHariIni'])->name('jadwal-pelajaran.hari-ini');
-
+    Route::post('/check-jadwal-bentrok', [JadwalPelajaranController::class, 'checkJadwalBentrok']);
 });
 
 // Routes untuk Guru
@@ -126,9 +135,7 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
 
 // Routes untuk Siswa
 Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('siswa.dashboard');
-    })->name('siswa.dashboard');
+    Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('siswa.dashboard');
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
 
 });
