@@ -39,4 +39,8 @@ class Kelas extends Model
         $this->sisa_kapasitas = $this->kapasitas - $this->siswa()->count();
         $this->save();
     }
+    public function jadwalPelajaran()
+    {
+        return $this->hasMany(JadwalPelajaran::class, 'kelas_id', 'id');
+    }
 }

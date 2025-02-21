@@ -79,9 +79,21 @@ class DataSiswa extends Model
     /**
      * Get the class that the student belongs to.
      */
-    public function kelas(): BelongsTo
+    public function kelas()
     {
-        return $this->belongsTo(Kelas::class);
+        return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    public function jadwalPelajaran()
+    {
+        return $this->hasManyThrough(
+            JadwalPelajaran::class,
+            Kelas::class,
+            'id', // Foreign key on kelas table
+            'kelas_id', // Foreign key on jadwal_pelajaran table
+            'kelas_id', // Local key on data_siswa table
+            'id' // Local key on kelas table
+        );
     }
 
     /**

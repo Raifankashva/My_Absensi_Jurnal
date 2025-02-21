@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Models\User; // Ensure this is imported
+
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class SiswaController extends Controller
 {
@@ -12,8 +16,35 @@ class SiswaController extends Controller
     }
 
     public function dashboard()
-    {
-        $user = auth()->user();
-        return view('siswa.dashboard', compact('user'));
-    }
+{
+    $user = User::find(auth()->id())->load([
+        'dataSiswa.kelas' => function($query) {
+            $query->with(['jadwalPelajaran' => function($q) {
+                $q->with('guru')
+                  ->orderBy('hari')
+                  ->orderBy('jam_mulai');
+            }]);
+        },
+        'dataSiswa.sekolah'
+    ]);
+
+    return view('siswa.dashboard', compact('user'));
+}
+    
+public function jadwal()
+{
+    $user = User::find(auth()->id())->load([
+        'dataSiswa.kelas' => function($query) {
+            $query->with(['jadwalPelajaran' => function($q) {
+                $q->with('guru')
+                  ->orderBy('hari')
+                  ->orderBy('jam_mulai');
+            }]);
+        }
+    ]);
+
+    $jadwalPerHari = $user->dataSiswa->kelas->jadwalPelajaran->groupBy('hari');
+    
+    return view('siswa.jadwal', compact('jadwalPerHari'));
+}   
 }

@@ -137,7 +137,7 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
 Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
     Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('siswa.dashboard');
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
-
+    Route::get('/siswa/jadwal', [SiswaController::class, 'jadwal'])->name('siswa.jadwal');
 });
 
 Route::get('/', function () {

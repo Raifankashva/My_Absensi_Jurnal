@@ -304,6 +304,7 @@
                             {!! renderSidebarLink(route('kelas.index'), 'bx-chalkboard', 'Kelas') !!}
                             {!! renderSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
                             {!! renderSidebarLink(route('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
+                            {!! renderSidebarLink(route('jadwal-pelajaran.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
                         </div>
                         @elseif (auth()->user()->role == 'guru')
                         <div class="mb-4">

@@ -39,7 +39,7 @@
     @foreach($cards as $card)
     <div class="relative group">
         <div class="absolute inset-0 bg-gradient-to-r {{ $card['gradient'] }} rounded-xl transform transition-all duration-300 group-hover:scale-105 group-hover:rotate-1"></div>
-        <div class="relative bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 group-hover:-translate-y-1 group-hover:-translate-x-1">
+        <div class="border border-yellow-200   relative bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 group-hover:-translate-y-1 group-hover:-translate-x-1">
             <div class="p-6">
                 <div class="flex justify-between items-start">
                     <div>
