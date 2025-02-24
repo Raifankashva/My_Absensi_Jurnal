@@ -109,7 +109,6 @@
                 </div>
             </div>
         </div>
-        <!-- resources/views/components/task-modal.blade.php -->
 
         <div x-data="{ open: false }" @keydown.escape.window="open = false" @task-list-modal.window="open = true">
             <!-- Task List Button Trigger -->

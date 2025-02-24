@@ -27,8 +27,9 @@ class SiswaController extends Controller
         },
         'dataSiswa.sekolah'
     ]);
+    $jadwalPerHari = $user->dataSiswa->kelas->jadwalPelajaran->groupBy('hari');
 
-    return view('siswa.dashboard', compact('user'));
+    return view('siswa.dashboard', compact('user', 'jadwalPerHari'));
 }
     
 public function jadwal()

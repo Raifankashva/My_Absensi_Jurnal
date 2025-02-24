@@ -93,113 +93,164 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm text-gray-500 font-medium">Hari Ini</p>
-                        <h3 class="text-lg font-semibold text-gray-800 mt-1">{{ now()->isoFormat('dddd') }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mt-1">{{ now()->isoFormat('dddd') }} {{ now()->format('H:i') }}</h3>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Today's Schedule -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-100">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-semibold text-gray-800">Jadwal Hari Ini</h3>
-                            <a href="{{ route('siswa.jadwal') }}" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                                Lihat Semua →
-                            </a>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        @php
-                            $today = strtolower(now()->isoFormat('dddd'));
-                            $todaySchedule = $user->dataSiswa->kelas->jadwalPelajaran
-                                ->where('hari', $today)
-                                ->sortBy('jam_mulai');
-                        @endphp
 
-                        @if($todaySchedule->count() > 0)
-                            <div class="space-y-4">
-                                @foreach($todaySchedule as $jadwal)
-                                    <div class="flex items-center p-4 bg-gray-50 rounded-lg">
-                                        <div class="flex-shrink-0 w-16 text-center">
-                                            <p class="text-sm font-semibold text-gray-600">{{ substr($jadwal->jam_mulai, 0, 5) }}</p>
-                                            <p class="text-xs text-gray-400">{{ substr($jadwal->jam_selesai, 0, 5) }}</p>
-                                        </div>
-                                        <div class="ml-4 flex-1">
-                                            <h4 class="text-base font-semibold text-gray-800">{{ $jadwal->mata_pelajaran }}</h4>
-                                            @if($jadwal->guru)
-                                                <p class="text-sm text-gray-500">{{ $jadwal->guru->nama }}</p>
-                                            @endif
-                                        </div>
-                                        <div class="ml-4">
-                                            <span class="px-3 py-1 rounded-full text-sm font-medium {{ now()->between($jadwal->jam_mulai, $jadwal->jam_selesai) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600' }}">
-                                                {{ now()->between($jadwal->jam_mulai, $jadwal->jam_selesai) ? 'Sedang Berlangsung' : 'Jadwal' }}
-                                            </span>
-                                        </div>
-                                    </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header Section -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Jadwal Pelajaran</h1>
+        <p class="mt-2 text-sm text-gray-600">
+            Semester {{ $user->dataSiswa->semester_aktif ?? 'Ganjil' }} Tahun Ajaran {{ $user->dataSiswa->tahun_ajaran ?? '2024/2025' }}
+        </p>
+    </div>
+
+    <!-- Schedule Card -->
+    <div class="bg-white shadow-xl rounded-xl overflow-hidden">
+        <!-- Day Tabs -->
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex" aria-label="Tabs" x-data="{ activeDay: '{{ now()->format('l') }}' }">
+                @php
+                    $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                    $currentDay = now()->locale('id')->dayName;
+                @endphp
+
+                @foreach($days as $hari)
+                    <button 
+                        onclick="showSchedule('{{ $hari }}')"
+                        class="tab-btn flex-1 py-4 px-1 text-center border-b-2 transition-colors duration-200 text-sm font-medium
+                            {{ $hari === $currentDay ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}"
+                        id="tab-{{ $hari }}"
+                    >
+                        <span class="inline-flex items-center">
+                            @if($hari === $currentDay)
+                                <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                            @endif
+                            {{ $hari }}
+                        </span>
+                    </button>
+                @endforeach
+            </nav>
+        </div>
+
+        <!-- Schedule Content -->
+        @foreach($days as $hari)
+            <div 
+                id="schedule-{{ $hari }}" 
+                class="schedule-content {{ $hari !== $currentDay ? 'hidden' : '' }}"
+            >
+                @if(isset($jadwalPerHari[$hari]) && $jadwalPerHari[$hari]->count() > 0)
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Waktu</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/6">Mata Pelajaran</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/6">Guru</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Ruangan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($jadwalPerHari[$hari]->sortBy('waktu_mulai') as $jadwal)
+                                    @php
+                                        $isCurrentClass = Carbon\Carbon::now()->format('l') == $hari && 
+                                            Carbon\Carbon::now()->between(
+                                                Carbon\Carbon::parse($jadwal->waktu_mulai),
+                                                Carbon\Carbon::parse($jadwal->waktu_selesai)
+                                            );
+                                    @endphp
+                                    <tr class="{{ $isCurrentClass ? 'bg-green-50 border-l-4 border-green-500' : '' }}">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium {{ $isCurrentClass ? 'text-green-700' : 'text-gray-900' }}">
+                                                {{ Carbon\Carbon::parse($jadwal->waktu_mulai)->format('H:i') }} - 
+                                                {{ Carbon\Carbon::parse($jadwal->waktu_selesai)->format('H:i') }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm font-medium {{ $isCurrentClass ? 'text-green-700' : 'text-gray-900' }}">
+                                                {{ $jadwal->mata_pelajaran }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm {{ $isCurrentClass ? 'text-green-700' : 'text-gray-900' }}">
+                                                {{ $jadwal->guru->nama_lengkap }}
+                                            </div>
+                                            <div class="text-xs {{ $isCurrentClass ? 'text-green-600' : 'text-gray-500' }}">
+                                                {{ $jadwal->guru->nip }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm {{ $isCurrentClass ? 'text-green-700' : 'text-gray-900' }}">
+                                                {{ $jadwal->ruangan ?? 'Default' }}
+                                            </div>
+                                        </td>
+                                    </tr>
                                 @endforeach
-                            </div>
-                        @else
-                            <div class="text-center py-8">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak Ada Jadwal</h3>
-                                <p class="mt-1 text-sm text-gray-500">Tidak ada jadwal pelajaran untuk hari ini.</p>
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <p class="text-gray-500">Tidak ada jadwal pelajaran untuk hari {{ $hari }}</p>
+                    </div>
+                @endif
+            </div>
+        @endforeach
+    </div>
+
+    <!-- Profile Section -->
+    <div class="mt-8 bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-800">Data Pribadi</h3>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Tempat, Tanggal Lahir</p>
+                    <p class="mt-1 text-sm text-gray-900">{{ $user->dataSiswa->tmp_lahir }}, {{ $user->dataSiswa->tgl_lahir }}</p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Jenis Kelamin</p>
+                    <p class="mt-1 text-sm text-gray-900">{{ $user->dataSiswa->jenis_kelamin }}</p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Agama</p>
+                    <p class="mt-1 text-sm text-gray-900">{{ $user->dataSiswa->agama }}</p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">No. Telepon</p>
+                    <p class="mt-1 text-sm text-gray-900">{{ $user->dataSiswa->hp ?? '-' }}</p>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="pb-4">
+                    <p class="text-sm font-medium text-gray-500">Data Orang Tua</p>
+                    <div class="mt-3 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Ayah</span>
+                            <span class="text-sm font-medium text-gray-900">{{ $user->dataSiswa->ayah ?? '-' }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Ibu</span>
+                            <span class="text-sm font-medium text-gray-900">{{ $user->dataSiswa->ibu ?? '-' }}</span>
+                        </div>
+                        @if($user->dataSiswa->wali)
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Wali</span>
+                                <span class="text-sm font-medium text-gray-900">{{ $user->dataSiswa->wali }}</span>
                             </div>
                         @endif
                     </div>
                 </div>
             </div>
-
-            <!-- Profile Quick View -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-800">Data Pribadi</h3>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div class="space-y-3">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Tempat, Tanggal Lahir</p>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->dataSiswa->tmp_lahir }}, {{ $user->dataSiswa->tgl_lahir }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Jenis Kelamin</p>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->dataSiswa->jenis_kelamin }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Agama</p>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->dataSiswa->agama }}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">No. Telepon</p>
-                            <p class="mt-1 text-sm text-gray-900">{{ $user->dataSiswa->hp ?? '-' }}</p>
-                            </div>
-                        <div class="pt-4 border-t border-gray-100">
-                            <p class="text-sm font-medium text-gray-500">Data Orang Tua</p>
-                            <div class="mt-2 space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-500">Ayah</span>
-                                    <span class="text-sm font-medium text-gray-900">{{ $user->dataSiswa->ayah ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-500">Ibu</span>
-                                    <span class="text-sm font-medium text-gray-900">{{ $user->dataSiswa->ibu ?? '-' }}</span>
-                                </div>
-                                @if($user->dataSiswa->wali)
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-500">Wali</span>
-                                    <span class="text-sm font-medium text-gray-900">{{ $user->dataSiswa->wali }}</span>
-                                </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
+    </div>
+</div>
 
         <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -261,4 +312,54 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get current day in Indonesian
+    const days = {
+        'Sunday': 'Minggu',
+        'Monday': 'Senin',
+        'Tuesday': 'Selasa',
+        'Wednesday': 'Rabu',
+        'Thursday': 'Kamis',
+        'Friday': 'Jumat',
+        'Saturday': 'Sabtu'
+    };
+    
+    const today = days[new Date().toLocaleString('en-US', {weekday: 'long'})];
+    
+    // Show current day's schedule by default
+    if (today !== 'Minggu') {
+        showSchedule(today);
+    } else {
+        showSchedule('Senin'); // Default to Monday if it's Sunday
+    }
+});
+
+function showSchedule(day) {
+    // Hide all schedule contents
+    document.querySelectorAll('.schedule-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    // Remove active state from all tabs
+    document.querySelectorAll('.tab-btn').forEach(tab => {
+        tab.classList.remove('border-blue-500', 'text-blue-600', 'bg-blue-50');
+        tab.classList.add('border-transparent', 'text-gray-500');
+    });
+    
+    // Show selected schedule
+    const scheduleContent = document.getElementById(`schedule-${day}`);
+    if (scheduleContent) {
+        scheduleContent.classList.remove('hidden');
+    }
+    
+    // Activate selected tab
+    const selectedTab = document.getElementById(`tab-${day}`);
+    if (selectedTab) {
+        selectedTab.classList.remove('border-transparent', 'text-gray-500');
+        selectedTab.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
+    }
+}
+</script>
 @endsection

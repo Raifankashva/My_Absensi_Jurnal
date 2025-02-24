@@ -13,7 +13,7 @@ use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\PublicAttendanceController;
-use App\Http\Controllers\API\AbsensiController;
+use App\Http\Controllers\AbsensiController;
 use App\Models\DataSiswa;
 use App\Http\Controllers\JurnalGuruController;
 use App\Http\Controllers\JadwalPelajaranController;
@@ -143,3 +143,17 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
 Route::get('/', function () {
     return view('welcome');
 });
+Route::middleware(['auth'])->group(function () {
+    Route::get('/attendance/settings', [AttendanceController::class, 'settings'])->name('attendance.settings');
+    Route::put('/attendance/settings/{setting}', [AttendanceController::class, 'updateSettings'])->name('attendance.settings.update');
+    Route::get('/attendance/qrcode/{siswa}', [AttendanceController::class, 'generateQrCode'])->name('attendance.qrcode');
+    Route::post('/attendance/scan', [AttendanceController::class, 'scanQrCode'])->name('attendance.scan');
+});
+
+use App\Http\Controllers\SettingController;
+
+Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
+
+Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
+Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');

@@ -7,17 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class AttendanceSetting extends Model
 {
     protected $fillable = [
-        'sekolah_id', 
-        'start_time', 
-        'end_time', 
-        'late_threshold',
-        'is_active', 
-        'attendance_token',
-        'attendance_type'
+        'sekolah_id',
+        'jam_masuk',
+        'batas_telat',
+        'jam_pulang'
     ];
 
     public function sekolah()
     {
         return $this->belongsTo(Sekolah::class);
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'setting_id');
     }
 }
