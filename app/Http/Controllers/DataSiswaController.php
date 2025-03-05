@@ -67,7 +67,7 @@ class DataSiswaController extends Controller
             Storage::put($qrCodePath, $result->getString());
     
             // Simpan URL QR Code dalam array
-            $qrCodeUrls[$siswa->id] = Storage::url('qrcodes/siswa-' . $siswa->id . '.png');
+            $qrCodeUrls[$siswa->id] = Storage::url('qrcodes/' . $siswa->id . '.png');
         }
     
         return view('adminsiswa.index', compact('dataSiswa', 'sekolahs', 'allKelas', 'groupedStudents', 'qrCodeUrls'));
@@ -270,7 +270,13 @@ private function generateQRContent($dataSiswa)
         'sekolah' => $dataSiswa->sekolah->nama_sekolah ?? '',
     ]);
 }
-
+public function showQR($id)
+    {
+        $dataSiswa = DataSiswa::findOrFail($id);
+        $qrContent = $this->generateQRContent($dataSiswa);
+        
+        return view('adminsiswa.qr-code', compact('dataSiswa', 'qrContent'));
+    }
 public function downloadQRCode($id)
 {
     $dataSiswa = DataSiswa::findOrFail($id);

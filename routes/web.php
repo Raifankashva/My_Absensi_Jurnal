@@ -155,5 +155,12 @@ use App\Http\Controllers\SettingController;
 Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
 Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
 
+
+
+// Data Siswa routes
+Route::get('/siswa/{id}/qr', [DataSiswaController::class, 'showQR'])->name('siswa.qr');
+
+// Absensi routes
 Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
+Route::get('/absensi/scan', [AbsensiController::class, 'scanQR'])->name('absensi.scan');
 Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');

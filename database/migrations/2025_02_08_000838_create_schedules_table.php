@@ -1,23 +1,25 @@
 <?php
 
-namespace App\Http\Controllers;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use App\Models\Schedule;
-use Illuminate\Http\Request;
-
-class ScheduleController extends Controller
+class CreateSchedulesTable extends Migration
 {
-    public function store(Request $request)
+    public function up()
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'day' => 'required|string|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
-            'time' => 'required|date_format:H:i',
-            'description' => 'nullable|string',
-        ]);
+        Schema::create('schedules', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('day');
+            $table->time('time');
+            $table->text('description')->nullable();
+            $table->timestamps();
+        });
+    }
 
-        Schedule::create($validated);
-
-        return redirect()->back()->with('success', 'Schedule created successfully!');
+    public function down()
+    {
+        Schema::dropIfExists('schedules');
     }
 }
