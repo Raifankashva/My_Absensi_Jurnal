@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use PDF;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AbsensiExport;
+use App\Models\SettingAbsensi;
+use Illuminate\Support\Facades\Hash;
 
 class AbsensiController extends Controller
 {
@@ -84,11 +86,165 @@ class AbsensiController extends Controller
         return redirect()->back()->with('success', 'Absensi berhasil dicatat');
     }
     
-    public function scanQR()
+    public function scanQR(Request $request)
     {
-        return view('absensi.scan');
+        // If no sekolah_id is provided, show the school selection page
+        if (!$request->has('sekolah_id') && !session()->has('scan_sekolah_id')) {
+            $sekolah = Sekolah::all();
+            return view('absensi.select_school', compact('sekolah'));
+        }
+        
+        // Get sekolah_id from request or session
+        $sekolah_id = $request->sekolah_id ?? session('scan_sekolah_id');
+        
+        // Store sekolah_id in session
+        session(['scan_sekolah_id' => $sekolah_id]);
+        
+        // Get token from database for this school
+        $tokenSetting = SettingAbsensi::where('sekolah_id', $sekolah_id)
+                                    ->where('key', 'scan_access_token')
+                                    ->first();
+        
+        if (!$tokenSetting) {
+            return redirect()->route('absensi.token.management')
+                ->with('error', 'Token akses belum dibuat untuk sekolah ini.');
+        }
+        
+        $validToken = $tokenSetting->value;
+        $sekolah = Sekolah::findOrFail($sekolah_id);
+        
+        // Check if token is provided in the request
+        if ($request->has('token')) {
+            $providedToken = $request->token;
+            
+            // Validate the token
+            if ($providedToken !== $validToken) {
+                return redirect()->route('absensi.scan.auth')
+                    ->with('error', 'Token akses tidak valid');
+            }
+            
+            // If token is valid, store it in session to maintain access
+            session(['scan_access_token_' . $sekolah_id => $providedToken]);
+            
+            return view('absensi.scan', compact('sekolah'));
+        }
+        
+        // Check if token is already in session
+        if (session()->has('scan_access_token_' . $sekolah_id)) {
+            $sessionToken = session('scan_access_token_' . $sekolah_id);
+            
+            if ($sessionToken === $validToken) {
+                return view('absensi.scan', compact('sekolah'));
+            }
+        }
+        
+        // If no token or invalid token, redirect to auth page
+        return redirect()->route('absensi.scan.auth');
+    }
+
+    public function scanAuth()
+    {
+        $sekolah_id = session('scan_sekolah_id');
+        if (!$sekolah_id) {
+            return redirect()->route('absensi.scan')->with('error', 'Silakan pilih sekolah terlebih dahulu');
+        }
+        
+        $sekolah = Sekolah::findOrFail($sekolah_id);
+        return view('absensi.scan_auth', compact('sekolah'));
+    }
+
+    public function tokenManagement(Request $request)
+    {
+        // Admin should select a school first if not already in session
+        if (!$request->has('sekolah_id') && !session()->has('token_sekolah_id')) {
+            $sekolah = Sekolah::all();
+            return view('absensi.select_school_token', compact('sekolah'));
+        }
+        
+        $sekolah_id = $request->sekolah_id ?? session('token_sekolah_id');
+        session(['token_sekolah_id' => $sekolah_id]);
+        
+        $sekolah = Sekolah::findOrFail($sekolah_id);
+        $tokenExists = SettingAbsensi::where('sekolah_id', $sekolah_id)
+                                    ->where('key', 'scan_access_token')
+                                    ->exists();
+        
+        return view('absensi.token_management', compact('sekolah', 'tokenExists'));
+    }
+
+    public function createToken(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string|min:8',
+            'admin_password' => 'required',
+            'sekolah_id' => 'required|exists:sekolah,id'
+        ]);
+        
+        // Get admin password from settings
+        $adminPasswordSetting = SettingAbsensi::where('key', 'admin_password')->first();
+        
+        if (!$adminPasswordSetting || !Hash::check($request->admin_password, $adminPasswordSetting->value)) {
+            return redirect()->back()->with('error', 'Password admin tidak valid');
+        }
+        
+        // Check if token already exists for this school
+        if (SettingAbsensi::where('sekolah_id', $request->sekolah_id)
+                        ->where('key', 'scan_access_token')
+                        ->exists()) {
+            return redirect()->back()->with('error', 'Token sudah ada untuk sekolah ini. Gunakan fungsi update token.');
+        }
+        
+        // Create new token
+        SettingAbsensi::create([
+            'sekolah_id' => $request->sekolah_id,
+            'key' => 'scan_access_token',
+            'value' => $request->token,
+            'description' => 'Token untuk akses fitur scan QR'
+        ]);
+        
+        return redirect()->back()->with('success', 'Token berhasil dibuat');
+    }
+
+    public function updateToken(Request $request)
+    {
+        $request->validate([
+            'current_token' => 'required|string',
+            'new_token' => 'required|string|min:8|different:current_token',
+            'sekolah_id' => 'required|exists:sekolah,id'
+        ]);
+        
+        // Get current token from database
+        $tokenSetting = SettingAbsensi::where('sekolah_id', $request->sekolah_id)
+                                    ->where('key', 'scan_access_token')
+                                    ->first();
+        
+        if (!$tokenSetting) {
+            return redirect()->back()->with('error', 'Token belum dibuat untuk sekolah ini. Gunakan fungsi create token.');
+        }
+        
+        // Verify current token
+        if ($request->current_token !== $tokenSetting->value) {
+            return redirect()->back()->with('error', 'Token saat ini tidak valid');
+        }
+        
+        // Update token
+        $tokenSetting->value = $request->new_token;
+        $tokenSetting->save();
+        
+        // Update session if user is using this token
+        if (session('scan_access_token_' . $request->sekolah_id) === $request->current_token) {
+            session(['scan_access_token_' . $request->sekolah_id => $request->new_token]);
+        }
+        
+        return redirect()->back()->with('success', 'Token berhasil diperbarui');
     }
     
+    public function selectSchool()
+    {
+        $sekolah = Sekolah::all();
+        return view('absensi.select_school', compact('sekolah'));
+    }
+
     public function exportPDF(Request $request)
     {
         $sekolah_id = $request->sekolah_id;

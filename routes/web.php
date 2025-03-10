@@ -164,3 +164,9 @@ Route::get('/siswa/{id}/qr', [DataSiswaController::class, 'showQR'])->name('sisw
 Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
 Route::get('/absensi/scan', [AbsensiController::class, 'scanQR'])->name('absensi.scan');
 Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
+// Absensi token routes
+Route::get('/absensi/scan/auth', [AbsensiController::class, 'scanAuth'])->name('absensi.scan.auth');
+Route::get('/absensi/token/management', [AbsensiController::class, 'tokenManagement'])->name('absensi.token.management');
+Route::post('/absensi/token/create', [AbsensiController::class, 'createToken'])->name('absensi.token.create');
+Route::post('/absensi/token/update', [AbsensiController::class, 'updateToken'])->name('absensi.token.update');
+Route::get('/absensi/select-school', [AbsensiController::class, 'selectSchool'])->name('absensi.select.school');
