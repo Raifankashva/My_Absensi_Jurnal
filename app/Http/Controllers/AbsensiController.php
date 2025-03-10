@@ -14,6 +14,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AbsensiExport;
 use App\Models\SettingAbsensi;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AbsensiNotification;
 
 class AbsensiController extends Controller
 {
@@ -47,44 +49,63 @@ class AbsensiController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $siswa = DataSiswa::where('nisn', $request->nisn)->first();
-        if (!$siswa) {
-            return redirect()->back()->with('error', 'Siswa tidak ditemukan');
-        }
-
-        $setting = Setting::where('sekolah_id', $siswa->sekolah_id)->first();
-        if (!$setting) {
-            return redirect()->back()->with('error', 'Pengaturan sekolah tidak ditemukan');
-        }
-        
-        // Check if student already has attendance for today
-        $today = Carbon::now()->format('Y-m-d');
-        $alreadyPresent = Absensi::where('siswa_id', $siswa->id)
-            ->whereDate('waktu_scan', $today)
-            ->exists();
-            
-        if ($alreadyPresent) {
-            return redirect()->back()->with('error', 'Siswa sudah melakukan absensi hari ini');
-        }
-
-        $waktu_scan = Carbon::now();
-        $status = 'Tidak Hadir';
-
-        if ($waktu_scan->format('H:i:s') <= $setting->jam_masuk) {
-            $status = 'Hadir';
-        } elseif ($waktu_scan->format('H:i:s') <= $setting->batas_terlambat) {
-            $status = 'Terlambat';
-        }
-
-        Absensi::create([
-            'siswa_id' => $siswa->id,
-            'waktu_scan' => $waktu_scan,
-            'status' => $status
-        ]);
-
-        return redirect()->back()->with('success', 'Absensi berhasil dicatat');
+{
+    $siswa = DataSiswa::where('nisn', $request->nisn)->first();
+    if (!$siswa) {
+        return redirect()->back()->with('error', 'Siswa tidak ditemukan');
     }
+
+    $setting = Setting::where('sekolah_id', $siswa->sekolah_id)->first();
+    if (!$setting) {
+        return redirect()->back()->with('error', 'Pengaturan sekolah tidak ditemukan');
+    }
+
+    // Check if student already has attendance for today
+    $today = Carbon::now()->format('Y-m-d');
+    $alreadyPresent = Absensi::where('siswa_id', $siswa->id)
+        ->whereDate('waktu_scan', $today)
+        ->exists();
+        
+    if ($alreadyPresent) {
+        return redirect()->back()->with('error', 'Siswa sudah melakukan absensi hari ini');
+    }
+
+    $waktu_scan = Carbon::now();
+    $status = 'Tidak Hadir';
+
+    if ($waktu_scan->format('H:i:s') <= $setting->jam_masuk) {
+        $status = 'Hadir';
+    } elseif ($waktu_scan->format('H:i:s') <= $setting->batas_terlambat) {
+        $status = 'Terlambat';
+    }
+
+    Absensi::create([
+        'siswa_id' => $siswa->id,
+        'waktu_scan' => $waktu_scan,
+        'status' => $status
+    ]);
+
+    // Kirim Email ke Ayah, Ibu, dan Wali (jika ada emailnya)
+    $emailRecipients = [];
+
+    if (!empty($siswa->email_ayah)) {
+        $emailRecipients[] = $siswa->email_ayah;
+    }
+
+    if (!empty($siswa->email_ibu)) {
+        $emailRecipients[] = $siswa->email_ibu;
+    }
+
+    if (!empty($siswa->email_wali)) {
+        $emailRecipients[] = $siswa->email_wali;
+    }
+
+    if (!empty($emailRecipients)) {
+        Mail::to($emailRecipients)->send(new AbsensiNotification($siswa, $status, $waktu_scan));
+    }
+
+    return redirect()->back()->with('success', 'Absensi berhasil dicatat dan notifikasi telah dikirim ke email orang tua/wali.');
+}
     
     public function scanQR(Request $request)
     {

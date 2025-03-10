@@ -16,21 +16,28 @@ class SiswaController extends Controller
     }
 
     public function dashboard()
-{
-    $user = User::find(auth()->id())->load([
-        'dataSiswa.kelas' => function($query) {
-            $query->with(['jadwalPelajaran' => function($q) {
-                $q->with('guru')
-                  ->orderBy('hari')
-                  ->orderBy('jam_mulai');
-            }]);
-        },
-        'dataSiswa.sekolah'
-    ]);
-    $jadwalPerHari = $user->dataSiswa->kelas->jadwalPelajaran->groupBy('hari');
-
-    return view('siswa.dashboard', compact('user', 'jadwalPerHari'));
-}
+    {
+        $user = User::find(auth()->id())->load([
+            'dataSiswa.kelas' => function($query) {
+                $query->with(['jadwalPelajaran' => function($q) {
+                    $q->with('guru')
+                      ->orderBy('hari')
+                      ->orderBy('jam_mulai');
+                }]);
+            },
+            'dataSiswa.sekolah',
+            'dataSiswa.absensi' // Tambahkan relasi absensi
+        ]);
+    
+        // Ambil data absensi siswa yang login
+        $absensi = $user->dataSiswa->absensi->sortByDesc('waktu_scan');
+    
+        // Kelompokkan jadwal berdasarkan hari
+        $jadwalPerHari = $user->dataSiswa->kelas->jadwalPelajaran->groupBy('hari');
+    
+        return view('siswa.dashboard', compact('user', 'jadwalPerHari', 'absensi'));
+    }
+    
     
 public function jadwal()
 {

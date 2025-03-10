@@ -201,7 +201,38 @@
             </div>
         @endforeach
     </div>
+    <h2 class="text-lg font-semibold mt-4">Riwayat Absensi</h2>
 
+<table class="w-full border-collapse border border-gray-300 mt-2">
+    <thead>
+        <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2">Tanggal</th>
+            <th class="border border-gray-300 px-4 py-2">Waktu Scan</th>
+            <th class="border border-gray-300 px-4 py-2">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($absensi as $data)
+            <tr class="text-center">
+                <td class="border border-gray-300 px-4 py-2">{{ \Carbon\Carbon::parse($data->waktu_scan)->format('d-m-Y') }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ \Carbon\Carbon::parse($data->waktu_scan)->format('H:i:s') }}</td>
+                <td class="border border-gray-300 px-4 py-2">
+                    @if($data->status == 'Hadir')
+                        <span class="text-green-600 font-bold">{{ $data->status }}</span>
+                    @elseif($data->status == 'Terlambat')
+                        <span class="text-yellow-600 font-bold">{{ $data->status }}</span>
+                    @else
+                        <span class="text-red-600 font-bold">{{ $data->status }}</span>
+                    @endif
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="3" class="text-center border border-gray-300 px-4 py-2">Belum ada data absensi</td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
     <!-- Profile Section -->
     <div class="mt-8 bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">

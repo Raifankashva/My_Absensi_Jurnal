@@ -168,4 +168,9 @@ class DataSiswa extends Model
         // Download file QR Code
         return response()->download(storage_path("app/$fileName"));
     }
+    public function absensi()
+{
+    return $this->hasMany(Absensi::class, 'siswa_id');
+}
+
 }
