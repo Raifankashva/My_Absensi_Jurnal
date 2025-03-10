@@ -342,4 +342,6 @@ document.addEventListener('DOMContentLoaded', function() {
         inputDate.setAttribute("max", maxDate);
     });
 </script>
+
+
 @endsection

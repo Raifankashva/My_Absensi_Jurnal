@@ -26,10 +26,17 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use App\Exports\DataSiswaExport;
 use Maatwebsite\Excel\Facades\Excel;
-
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use App\Exports\UserCredentialsExport;
+use App\Imports\DataSiswaImport;
+use App\Exports\TemplateExport;
 
 class DataSiswaController extends Controller
 {
+
+    
     public function index(Request $request)
     {
         $dataSiswa = DataSiswa::with(['user', 'sekolah', 'kelas', 'province', 'city', 'district', 'village'])
@@ -230,6 +237,216 @@ public function store(Request $request)
             ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
 }
+
+public function storeFromExcel(Request $request)
+{
+    $request->validate([
+        'excel_file' => 'required|file|mimes:xlsx,xls|max:10240',
+        'sekolah_id' => 'required|exists:sekolahs,id',
+        'kelas_id' => 'required|exists:kelas,id',
+    ]);
+
+    try {
+        DB::beginTransaction();
+
+        $file = $request->file('excel_file');
+        $import = new DataSiswaImport($request->sekolah_id, $request->kelas_id);
+        
+        Excel::import($import, $file);
+        
+        $stats = $import->getStats();
+        
+        DB::commit();
+
+        return redirect()
+            ->route('adminsiswa.index')
+            ->with('success', "Berhasil mengimpor {$stats['success']} data siswa. {$stats['failed']} data gagal diimpor.");
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        // Log the error
+        Log::error('Error importing student data from Excel', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return redirect()
+            ->back()
+            ->withInput()
+            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
+}
+
+public function showImportForm()
+    {
+        $sekolahs = Sekolah::all();
+        $kelas = Kelas::all();
+        return view('adminsiswa.import', compact('sekolahs', 'kelas'));
+    }
+
+    // Process Excel import
+    public function import(Request $request)
+    {
+        $request->validate([
+            'excel_file' => 'required|file|mimes:xlsx,xls|max:10240',
+            'sekolah_id' => 'required|exists:sekolahs,id',
+            'kelas_id' => 'required|exists:kelas,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $file = $request->file('excel_file');
+            $import = new DataSiswaImport($request->sekolah_id, $request->kelas_id);
+            
+            Excel::import($import, $file);
+            
+            $stats = $import->getStats();
+            $newUsers = $import->getNewUsers();
+            $failedImports = $import->getFailedImports();
+            
+            // Store the generated credentials in session for display
+            session(['import_results' => [
+                'stats' => $stats,
+                'newUsers' => $newUsers,
+                'failedImports' => $failedImports
+            ]]);
+            
+            DB::commit();
+
+            return redirect()->route('adminsiswa.import.results');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Error importing student data from Excel', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    // Display import results
+    public function showImportResults()
+    {
+        if (!session('import_results')) {
+            return redirect()->route('adminsiswa.import.show')
+                ->with('error', 'Tidak ada hasil import yang tersedia.');
+        }
+
+        $results = session('import_results');
+        $stats = $results['stats'];
+        $newUsers = $results['newUsers'];
+        $failedImports = $results['failedImports'];
+
+        return view('adminsiswa.import_results', compact('stats', 'newUsers', 'failedImports'));
+    }
+
+    // Generate Excel template for import
+    public function downloadTemplate()
+{
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    
+    // Define the column headers
+    $headers = [
+        'nisn', 'nis', 'nik', 'nama_lengkap', 'jenis_kelamin', 'tmp_lahir', 
+        'tgl_lahir', 'agama', 'province_id', 'city_id', 'district_id', 
+        'village_id', 'kode_pos', 'tinggal', 'transport', 'hp', 
+        'ayah', 'kerja_ayah', 'ibu', 'kerja_ibu', 'wali', 
+        'kerja_wali', 'tb', 'bb', 'kks', 'kph', 'kip', 'email', 'alamat'
+    ];
+    
+    // Set headers in the first row
+    foreach ($headers as $index => $header) {
+        $col = Coordinate::stringFromColumnIndex($index + 1);
+        $sheet->setCellValue($col . '1', $header);
+        $sheet->getStyle($col . '1')->getFont()->setBold(true);
+    }
+    
+    // Add sample data in the second row
+    $sampleData = [
+        '1234567890', '987654321', '1234567890123456', 'Nama Siswa', 'laki-laki', 'Jakarta',
+        '2000-01-01', 'Islam', '1', '1', '1', '1', '12345', 'Ortu', 'Sepeda', '081234567890',
+        'Nama Ayah', 'PNS', 'Nama Ibu', 'Ibu Rumah Tangga', 'Nama Wali', 'Wiraswasta',
+        '170', '65', 'KKS12345', 'KPH12345', 'KIP12345', 'email@example.com', 'Jalan Contoh No. 123'
+    ];
+    
+    foreach ($sampleData as $index => $value) {
+        $col = Coordinate::stringFromColumnIndex($index + 1);
+        $sheet->setCellValue($col . '2', $value);
+    }
+    
+    // Add dropdown for jenis_kelamin
+    $jenis_kelamin_col = Coordinate::stringFromColumnIndex(array_search('jenis_kelamin', $headers) + 1);
+    $validation = $sheet->getCell($jenis_kelamin_col . '2')->getDataValidation();
+    $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+    $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+    $validation->setAllowBlank(false);
+    $validation->setShowInputMessage(true);
+    $validation->setShowErrorMessage(true);
+    $validation->setShowDropDown(true);
+    $validation->setFormula1('"laki-laki,perempuan"');
+    
+    // Add dropdown for agama
+    $agama_col = Coordinate::stringFromColumnIndex(array_search('agama', $headers) + 1);
+    $validation = $sheet->getCell($agama_col . '2')->getDataValidation();
+    $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+    $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+    $validation->setAllowBlank(false);
+    $validation->setShowInputMessage(true);
+    $validation->setShowErrorMessage(true);
+    $validation->setShowDropDown(true);
+    $validation->setFormula1('"Islam,Kristen,Katolik,Hindu,Buddha,Konghucu"');
+    
+    // Add dropdown for tinggal
+    $tinggal_col = Coordinate::stringFromColumnIndex(array_search('tinggal', $headers) + 1);
+    $validation = $sheet->getCell($tinggal_col . '2')->getDataValidation();
+    $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+    $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+    $validation->setAllowBlank(false);
+    $validation->setShowInputMessage(true);
+    $validation->setShowErrorMessage(true);
+    $validation->setShowDropDown(true);
+    $validation->setFormula1('"Ortu,Wali,Kost,Asrama,Panti"');
+    
+    // Format all columns to auto-width
+    foreach ($headers as $index => $header) {
+        $col = Coordinate::stringFromColumnIndex($index + 1);
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
+    
+    // Create the Excel file
+    $writer = new Xlsx($spreadsheet);
+    $filename = 'template_import_siswa.xlsx';
+    $path = storage_path('app/public/' . $filename);
+    
+    // Save the Excel file
+    $writer->save($path);
+    
+    // Return the file as a download
+    return response()->download($path, $filename)->deleteFileAfterSend(true);
+}
+
+    // Export created user credentials
+    public function exportCredentials()
+    {
+        if (!session('import_results') || empty(session('import_results')['newUsers'])) {
+            return redirect()->route('adminsiswa.index')
+                ->with('error', 'Tidak ada kredensial yang tersedia untuk diunduh.');
+        }
+        
+        $newUsers = session('import_results')['newUsers'];
+        
+        return Excel::download(new UserCredentialsExport($newUsers), 'kredensial_siswa.xlsx');
+    }
+
 
 public function show($id)
 {

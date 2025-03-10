@@ -164,3 +164,14 @@ Route::get('/siswa/{id}/qr', [DataSiswaController::class, 'showQR'])->name('sisw
 Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
 Route::get('/absensi/scan', [AbsensiController::class, 'scanQR'])->name('absensi.scan');
 Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
+
+Route::post('/admin/siswa/import', [DataSiswaController::class, 'storeFromExcel'])->name('adminsiswa.import');
+
+Route::prefix('admin/siswa')->name('adminsiswa.')->group(function () {
+    Route::get('/', [DataSiswaController::class, 'index'])->name('index');
+    Route::get('/import', [DataSiswaController::class, 'showImportForm'])->name('import');
+    Route::post('/import', [DataSiswaController::class, 'import'])->name('import.process');
+    Route::get('/import/results', [DataSiswaController::class, 'showImportResults'])->name('import.results');
+    Route::get('/download-template', [DataSiswaController::class, 'downloadTemplate'])->name('template');
+    Route::get('/export-credentials', [DataSiswaController::class, 'exportCredentials'])->name('export.credentials');
+});
