@@ -33,10 +33,13 @@ class CreateDataSiswaTable extends Migration
             
             // Data Orang Tua/Wali
             $table->string('ayah');
+            $table->string('email_ayah')->nullable(); // Email Ayah
             $table->string('kerja_ayah')->nullable();
             $table->string('ibu');
+            $table->string('email_ibu')->nullable(); // Email Ibu
             $table->string('kerja_ibu')->nullable();
             $table->string('wali')->nullable();
+            $table->string('email_wali')->nullable(); // Email Wali
             $table->string('kerja_wali')->nullable();
 
             // Data Tambahan

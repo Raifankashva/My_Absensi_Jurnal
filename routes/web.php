@@ -175,3 +175,10 @@ Route::prefix('admin/siswa')->name('adminsiswa.')->group(function () {
     Route::get('/download-template', [DataSiswaController::class, 'downloadTemplate'])->name('template');
     Route::get('/export-credentials', [DataSiswaController::class, 'exportCredentials'])->name('export.credentials');
 });
+
+// Absensi token routes
+Route::get('/absensi/scan/auth', [AbsensiController::class, 'scanAuth'])->name('absensi.scan.auth');
+Route::get('/absensi/token/management', [AbsensiController::class, 'tokenManagement'])->name('absensi.token.management');
+Route::post('/absensi/token/create', [AbsensiController::class, 'createToken'])->name('absensi.token.create');
+Route::post('/absensi/token/update', [AbsensiController::class, 'updateToken'])->name('absensi.token.update');
+Route::get('/absensi/select-school', [AbsensiController::class, 'selectSchool'])->name('absensi.select.school');
