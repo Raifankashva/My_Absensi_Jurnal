@@ -159,7 +159,6 @@ class AbsensiController extends Controller
             }
         }
         
-        // If no token or invalid token, redirect to auth page
         return redirect()->route('absensi.scan.auth');
     }
 
@@ -198,24 +197,21 @@ class AbsensiController extends Controller
         $request->validate([
             'token' => 'required|string|min:8',
             'admin_password' => 'required',
-            'sekolah_id' => 'required|exists:sekolah,id'
+            'sekolah_id' => 'required|exists:sekolahs,id'
         ]);
         
-        // Get admin password from settings
         $adminPasswordSetting = SettingAbsensi::where('key', 'admin_password')->first();
         
         if (!$adminPasswordSetting || !Hash::check($request->admin_password, $adminPasswordSetting->value)) {
             return redirect()->back()->with('error', 'Password admin tidak valid');
         }
         
-        // Check if token already exists for this school
         if (SettingAbsensi::where('sekolah_id', $request->sekolah_id)
                         ->where('key', 'scan_access_token')
                         ->exists()) {
             return redirect()->back()->with('error', 'Token sudah ada untuk sekolah ini. Gunakan fungsi update token.');
         }
         
-        // Create new token
         SettingAbsensi::create([
             'sekolah_id' => $request->sekolah_id,
             'key' => 'scan_access_token',
@@ -231,10 +227,9 @@ class AbsensiController extends Controller
         $request->validate([
             'current_token' => 'required|string',
             'new_token' => 'required|string|min:8|different:current_token',
-            'sekolah_id' => 'required|exists:sekolah,id'
+            'sekolah_id' => 'required|exists:sekolahs,id'
         ]);
         
-        // Get current token from database
         $tokenSetting = SettingAbsensi::where('sekolah_id', $request->sekolah_id)
                                     ->where('key', 'scan_access_token')
                                     ->first();
@@ -243,16 +238,13 @@ class AbsensiController extends Controller
             return redirect()->back()->with('error', 'Token belum dibuat untuk sekolah ini. Gunakan fungsi create token.');
         }
         
-        // Verify current token
         if ($request->current_token !== $tokenSetting->value) {
             return redirect()->back()->with('error', 'Token saat ini tidak valid');
         }
         
-        // Update token
         $tokenSetting->value = $request->new_token;
         $tokenSetting->save();
         
-        // Update session if user is using this token
         if (session('scan_access_token_' . $request->sekolah_id) === $request->current_token) {
             session(['scan_access_token_' . $request->sekolah_id => $request->new_token]);
         }

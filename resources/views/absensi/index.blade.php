@@ -1,4 +1,6 @@
-<!-- resources/views/absensi/index.blade.php -->
+@extends('layouts.app')
+
+@section('content')
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,85 +30,130 @@
             }
         }
     </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-6">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200">
-                <h1 class="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Data Absensi</h1>
-                <a href="{{ route('absensi.scan') }}" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                    </svg>
-                    Scan QR
-                </a>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Header -->
+            <div class="p-6 bg-gradient-to-r from-primary-700 to-primary-900 text-white border-b border-primary-800">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold mb-1">Data Absensi</h1>
+                        <p class="text-primary-100 text-sm">Monitoring kehadiran siswa secara real-time</p>
+                    </div>
+                    <a href="{{ route('absensi.scan') }}" class="mt-4 md:mt-0 bg-white text-primary-800 hover:bg-primary-50 font-medium py-2 px-4 rounded-lg flex items-center transition duration-200 shadow-md">
+                        <i class="fas fa-qrcode mr-2"></i>
+                        Scan QR Code
+                    </a>
+                </div>
             </div>
 
-            <div class="p-4 md:p-6">
+            <div class="p-6">
+                <!-- Alerts -->
                 @if (session('success'))
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <span class="block sm:inline">{{ session('success') }}</span>
+                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md mb-6 flex items-center" role="alert">
+                        <i class="fas fa-check-circle mr-2 text-green-500"></i>
+                        <span>{{ session('success') }}</span>
                     </div>
                 @endif
                 
                 @if (session('error'))
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <span class="block sm:inline">{{ session('error') }}</span>
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md mb-6 flex items-center" role="alert">
+                        <i class="fas fa-exclamation-circle mr-2 text-red-500"></i>
+                        <span>{{ session('error') }}</span>
                     </div>
                 @endif
 
-                <form action="{{ route('absensi.index') }}" method="GET" class="mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label for="sekolah_id" class="block text-sm font-medium text-gray-700 mb-1">Sekolah</label>
-                            <select id="sekolah_id" name="sekolah_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
-                                <option value="">Semua Sekolah</option>
-                                @foreach($sekolah as $s)
-                                    <option value="{{ $s->id }}" {{ $sekolah_id == $s->id ? 'selected' : '' }}>{{ $s->nama_sekolah }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
-                            <select id="kelas_id" name="kelas_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" {{ empty($sekolah_id) ? 'disabled' : '' }}>
-                                <option value="">Semua Kelas</option>
-                                @foreach($kelas as $k)
-                                    <option value="{{ $k->id }}" {{ $kelas_id == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label for="tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                            <input type="date" id="tanggal" name="tanggal" value="{{ $tanggal }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5">
-                        </div>
-                        <div class="flex items-end space-x-2">
-                            <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg">
-                                Filter
-                            </button>
-                            <a href="{{ route('absensi.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg">
-                                Reset
-                            </a>
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-blue-50 rounded-lg shadow p-4 border border-blue-100">
+                        <div class="flex items-center">
+                            <div class="bg-blue-500 rounded-full p-3 mr-4">
+                                <i class="fas fa-users text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-blue-600 font-medium">Total Hadir</p>
+                                <p class="text-2xl font-bold text-blue-800">{{ $absensi->where('status', 'Hadir')->count() }}</p>
+                            </div>
                         </div>
                     </div>
-                </form>
+                    <div class="bg-yellow-50 rounded-lg shadow p-4 border border-yellow-100">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-500 rounded-full p-3 mr-4">
+                                <i class="fas fa-clock text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-yellow-600 font-medium">Terlambat</p>
+                                <p class="text-2xl font-bold text-yellow-800">{{ $absensi->where('status', 'Terlambat')->count() }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-red-50 rounded-lg shadow p-4 border border-red-100">
+                        <div class="flex items-center">
+                            <div class="bg-red-500 rounded-full p-3 mr-4">
+                                <i class="fas fa-user-slash text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-red-600 font-medium">Tidak Hadir</p>
+                                <p class="text-2xl font-bold text-red-800">{{ $absensi->where('status', 'Tidak Hadir')->count() }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Form -->
+                <div class="bg-gray-50 rounded-lg shadow-md p-5 mb-6 border border-gray-200">
+                    <form action="{{ route('absensi.index') }}" method="GET">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label for="sekolah_id" class="block text-sm font-medium text-gray-700 mb-1">Sekolah</label>
+                                <select id="sekolah_id" name="sekolah_id" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 shadow-sm">
+                                    <option value="">Semua Sekolah</option>
+                                    @foreach($sekolah as $s)
+                                        <option value="{{ $s->id }}" {{ $sekolah_id == $s->id ? 'selected' : '' }}>{{ $s->nama_sekolah }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                                <select id="kelas_id" name="kelas_id" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 shadow-sm" {{ empty($sekolah_id) ? 'disabled' : '' }}>
+                                    <option value="">Semua Kelas</option>
+                                    @foreach($kelas as $k)
+                                        <option value="{{ $k->id }}" {{ $kelas_id == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label for="tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                                <input type="date" id="tanggal" name="tanggal" value="{{ $tanggal }}" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 shadow-sm">
+                            </div>
+                            <div class="flex items-end space-x-2">
+                                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-md flex items-center">
+                                    <i class="fas fa-filter mr-2"></i> Filter
+                                </button>
+                                <a href="{{ route('absensi.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-md flex items-center">
+                                    <i class="fas fa-redo-alt mr-2"></i> Reset
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 
+                <!-- Export Buttons -->
                 <div class="flex flex-wrap gap-2 mb-6">
-                    <a href="" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
+                    <a href="" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-md flex items-center">
+                        <i class="fas fa-file-pdf mr-2"></i>
                         Export PDF
                     </a>
-                    <a href="" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                    <a href="" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-md flex items-center">
+                        <i class="fas fa-file-excel mr-2"></i>
                         Export Excel
                     </a>
                 </div>
 
                 <!-- Desktop Table View -->
-                <div class="hidden md:block">
+                <div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -122,7 +169,7 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse($absensi as $key => $item)
-                                    <tr class="hover:bg-gray-50">
+                                    <tr class="hover:bg-gray-50 transition duration-150">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $absensi->firstItem() + $key }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $item->siswa->nisn }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->siswa->nama }}</td>
@@ -131,17 +178,29 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ \Carbon\Carbon::parse($item->waktu_scan)->format('d-m-Y H:i:s') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($item->status == 'Hadir')
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hadir</span>
+                                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    <i class="fas fa-check-circle mr-1"></i> Hadir
+                                                </span>
                                             @elseif($item->status == 'Terlambat')
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Terlambat</span>
+                                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    <i class="fas fa-clock mr-1"></i> Terlambat
+                                                </span>
                                             @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Tidak Hadir</span>
+                                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    <i class="fas fa-times-circle mr-1"></i> Tidak Hadir
+                                                </span>
                                             @endif
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">Tidak ada data absensi</td>
+                                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <i class="fas fa-inbox text-gray-300 text-5xl mb-3"></i>
+                                                <p class="text-lg font-medium">Tidak ada data absensi</p>
+                                                <p class="text-sm text-gray-400">Silakan sesuaikan filter atau coba lagi nanti</p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -152,27 +211,31 @@
                 <!-- Mobile List View -->
                 <div class="md:hidden space-y-4">
                     @forelse($absensi as $key => $item)
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden transition duration-200 hover:shadow-lg">
                             <div class="p-4 cursor-pointer flex justify-between items-center" onclick="toggleDetails('details-{{ $item->id }}')">
                                 <div>
                                     <p class="font-medium text-gray-900">{{ $item->siswa->nama }}</p>
-                                    <p class="text-sm text-gray-500">{{ $item->siswa->nisn }}</p>
+                                    <p class="text-sm text-gray-500">NISN: {{ $item->siswa->nisn }}</p>
                                 </div>
-                                <div>
+                                <div class="flex items-center">
                                     @if($item->status == 'Hadir')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Hadir</span>
+                                        <span class="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 mr-2">
+                                            <i class="fas fa-check-circle mr-1"></i> Hadir
+                                        </span>
                                     @elseif($item->status == 'Terlambat')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Terlambat</span>
+                                        <span class="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 mr-2">
+                                            <i class="fas fa-clock mr-1"></i> Terlambat
+                                        </span>
                                     @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Tidak Hadir</span>
+                                        <span class="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 mr-2">
+                                            <i class="fas fa-times-circle mr-1"></i> Tidak
+                                        </span>
                                     @endif
-                                    <svg id="icon-{{ $item->id }}" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 ml-2 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
+                                    <i id="icon-{{ $item->id }}" class="fas fa-chevron-down text-gray-400 transition-transform duration-200"></i>
                                 </div>
                             </div>
                             <div id="details-{{ $item->id }}" class="hidden px-4 py-3 bg-gray-50 border-t border-gray-200">
-                                <div class="grid grid-cols-2 gap-2">
+                                <div class="grid grid-cols-2 gap-3">
                                     <div>
                                         <p class="text-xs text-gray-500">Sekolah</p>
                                         <p class="text-sm font-medium">{{ $item->siswa->sekolah->nama_sekolah ?? '-' }}</p>
@@ -183,14 +246,23 @@
                                     </div>
                                     <div class="col-span-2">
                                         <p class="text-xs text-gray-500">Waktu Scan</p>
-                                        <p class="text-sm font-medium">{{ \Carbon\Carbon::parse($item->waktu_scan)->format('d-m-Y H:i:s') }}</p>
+                                        <p class="text-sm font-medium">
+                                            <i class="far fa-calendar-alt mr-1 text-primary-600"></i>
+                                            {{ \Carbon\Carbon::parse($item->waktu_scan)->format('d-m-Y') }}
+                                            <i class="far fa-clock ml-2 mr-1 text-primary-600"></i>
+                                            {{ \Carbon\Carbon::parse($item->waktu_scan)->format('H:i:s') }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center text-gray-500">
-                            Tidak ada data absensi
+                        <div class="bg-white rounded-lg shadow-md border border-gray-200 p-8 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <i class="fas fa-inbox text-gray-300 text-5xl mb-3"></i>
+                                <p class="text-lg font-medium text-gray-700">Tidak ada data absensi</p>
+                                <p class="text-sm text-gray-400 mt-1">Silakan sesuaikan filter atau coba lagi nanti</p>
+                            </div>
                         </div>
                     @endforelse
                 </div>
@@ -201,10 +273,10 @@
                 </div>
             </div>
         </div>
+        
     </div>
 
     <script>
-        // Function to toggle details on mobile
         function toggleDetails(id) {
             const element = document.getElementById(id);
             const iconId = id.replace('details', 'icon');
@@ -241,3 +313,4 @@
     </script>
 </body>
 </html>
+@endsection
