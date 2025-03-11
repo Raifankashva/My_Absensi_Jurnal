@@ -1,64 +1,126 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
-
 <p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <a href="https://laravel.com" target="_blank">
+    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
+  </a>
 </p>
 
-## About Laravel
+<p align="center">
+  <a href="https://github.com/yourusername/My_Absensi_Jurnal/actions"><img src="https://github.com/yourusername/My_Absensi_Jurnal/workflows/Build/badge.svg" alt="Build Status"></a>
+  <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+  <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-brightgreen" alt="License"></a>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<h1 align="center">My_Absensi_Jurnal</h1>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<p align="center">
+  Sistem Absensi, Jurnal Guru, dan Pendataan Murid Modern berbasis Laravel.
+</p>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 📝 Tentang My_Absensi_Jurnal
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**My_Absensi_Jurnal** adalah sebuah sistem manajemen absensi, jurnal mengajar guru, dan pendataan murid yang dirancang untuk memudahkan administrasi sekolah. Dibangun dengan framework Laravel, sistem ini menawarkan fitur-fitur canggih dengan antarmuka yang ramah pengguna.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Fitur Utama:
+- **Manajemen Absensi**: Mencatat kehadiran guru dan murid secara real-time.
+- **Jurnal Mengajar Guru**: Guru dapat mencatat aktivitas mengajar harian dengan mudah.
+- **Pendataan Murid**: Menyimpan dan mengelola data murid secara terstruktur.
+- **Laporan Otomatis**: Generate laporan absensi dan jurnal secara otomatis.
+- **Multi-User Role**: Dukungan untuk admin, guru, dan staff dengan hak akses berbeda.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## 🚀 Instalasi
 
-### Premium Partners
+Berikut adalah langkah-langkah untuk menginstal dan menjalankan proyek ini di lingkungan lokal Anda:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+1. **Clone Repository**:
+   ```bash
+   git clone https://github.com/yourusername/My_Absensi_Jurnal.git
+   cd My_Absensi_Jurnal
 
-## Contributing
+2.Instal Dependencies:
+   ```bash
+  composer install
+  npm install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3.Setup Environment:
+  Salin file .env.example menjadi .env.
+  Konfigurasi database di file .env.
+  php artisan key:generate
 
-## Code of Conduct
+4.Jalankan Migrasi dan Seeder:
+  bash
+  Copy
+  php artisan migrate --seed
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5.Jalankan Aplikasi:
+  php artisan serve
+  npm run dev
 
-## Security Vulnerabilities
+Buka browser dan akses http://localhost:8000.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+🛠 Teknologi yang Digunakan
+Framework: Laravel
 
-## License
+Frontend: Tailwind CSS 
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Database: MySQL 
+
+Autentikasi: Laravel 
+
+
+📂 Struktur Proyek
+Copy
+My_Absensi_Jurnal/
+├── app/               # Logic aplikasi
+├── database/          Migrasi dan seeder
+├── resources/         # Blade views, assets, dan lang
+├── routes/            # Web dan API routes
+├── tests/             # Unit dan feature tests
+└── ...
+🤝 Berkontribusi
+Kami sangat menghargai kontribusi dari komunitas! Berikut cara Anda dapat berkontribusi:
+
+Fork proyek ini.
+
+Buat branch baru (git checkout -b fitur-baru).
+
+Commit perubahan Anda (git commit -m 'Menambahkan fitur baru').
+
+Push ke branch (git push origin fitur-baru).
+
+Buat Pull Request.
+
+📜 Lisensi
+Proyek ini dilisensikan di bawah MIT License.
+
+💻 Demo
+Anda dapat mencoba demo aplikasi di https://myabsensijurnal.demo.
+
+📞 Kontak
+Jika Anda memiliki pertanyaan atau masukan, silakan hubungi:
+
+Email: your.email@example.com
+
+LinkedIn: Your Name
+
+Twitter: @yourusername
+
+<p align="center"> Dibuat dengan ❤️ oleh <a href="https://github.com/yourusername">KAshva</a> </p> ```
+Penjelasan Perubahan:
+Desain Modern: Menambahkan badge, header, dan struktur yang lebih rapi.
+
+Fitur Utama: Menjelaskan fitur-fitur utama dengan poin-poin yang jelas.
+
+Instalasi: Langkah-langkah instalasi yang mudah diikuti.
+
+Teknologi: Menyebutkan teknologi yang digunakan untuk memberikan gambaran teknis.
+
+Kontribusi: Menambahkan panduan untuk berkontribusi.
+
+Demo dan Kontak: Memberikan informasi demo dan kontak untuk kolaborasi.
+
+Anda dapat menyesuaikan lebih lanjut
