@@ -5,7 +5,7 @@
     <div class="w-full max-w-3xl bg-white shadow-lg rounded-lg p-6">
         <div class="border-b pb-4 mb-4 flex justify-between items-center">
             <h4 class="text-xl font-semibold text-gray-800">Manajemen Token Akses - {{ $sekolah->nama_sekolah }}</h4>
-            <a href="{{ route('absensi.select.school') }}" class="text-sm text-blue-500 hover:underline">Ganti Sekolah</a>
+            <a href="{{ route('absensi.token.logout') }}" class="text-sm text-blue-500 hover:underline">Ganti Sekolah</a>            
         </div>
         
         @if(session('success'))

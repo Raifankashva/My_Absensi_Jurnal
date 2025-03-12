@@ -76,8 +76,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
     Route::resource('adminsiswa', DataSiswaController::class);
     Route::get('/siswa/{id}/download-qr', [DataSiswaController::class, 'downloadQrCode'])->name('siswa.download-qr');
-    Route::get('adminsiswa/{id}/download-qr', [DataSiswaController::class, 'downloadQRCode'])
-    ->name('adminsiswa.download-qr');
+    Route::get('adminsiswa/{id}/download-qr', [DataSiswaController::class, 'downloadQRCode'])->name('adminsiswa.download-qr');
 Route::get('api/get-kelas/{sekolah_id}', [DataSiswaController::class, 'getKelasBySekolah'])->name('api.kelas.by.sekolah');
     Route::resource('kelas', KelasController::class);
 
@@ -101,7 +100,7 @@ Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendanc
     Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
 
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
-    Route::post('adminsiswa/download-qrcodes', [DataSiswa::class, 'downloadQRCodes'])->name('adminsiswa.download-qrcodes');
+    Route::post('adminsiswa/download-qrcodes', [DataSiswaController::class, 'downloadQRCodes'])->name('adminsiswa.download-qrcodes');
 
     Route::get('/jadwal-pelajaran', [JadwalPelajaranController::class, 'index'])->name('jadwal-pelajaran.index');
     Route::get('/jadwal-pelajaran/create', [JadwalPelajaranController::class, 'create'])->name('jadwal-pelajaran.create');
@@ -138,6 +137,8 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
     Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('siswa.dashboard');
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
     Route::get('/siswa/jadwal', [SiswaController::class, 'jadwal'])->name('siswa.jadwal');
+    Route::get('/siswa/kartu-pelajar', [SiswaController::class, 'generateStudentCard'])->name('siswa.kartu-pelajar');
+
 });
 
 Route::get('/', function () {
@@ -182,3 +183,5 @@ Route::get('/absensi/token/management', [AbsensiController::class, 'tokenManagem
 Route::post('/absensi/token/create', [AbsensiController::class, 'createToken'])->name('absensi.token.create');
 Route::post('/absensi/token/update', [AbsensiController::class, 'updateToken'])->name('absensi.token.update');
 Route::get('/absensi/select-school', [AbsensiController::class, 'selectSchool'])->name('absensi.select.school');
+Route::get('/absensi/scan/logout', [AbsensiController::class, 'logoutScan'])->name('absensi.scan.logout');
+Route::get('/absensi/token/logout', [AbsensiController::class, 'logoutTokenManagement'])->name('absensi.token.logout');

@@ -32,6 +32,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use App\Exports\UserCredentialsExport;
 use App\Imports\DataSiswaImport;
 use App\Exports\TemplateExport;
+use ZipArchive;
 
 class DataSiswaController extends Controller
 {
@@ -69,19 +70,33 @@ class DataSiswaController extends Controller
     
             $result = $writer->write($qrCode);
     
-            // Simpan QR code dengan nama unik berdasarkan ID siswa
             $qrCodePath = 'public/qrcodes/siswa-' . $siswa->id . '.png';
             Storage::put($qrCodePath, $result->getString());
     
             // Simpan URL QR Code dalam array
-            $qrCodeUrls[$siswa->id] = Storage::url('qrcodes/' . $siswa->id . '.png');
-        }
+            $qrCodeUrls[$siswa->id] = Storage::url('qrcodes/siswa-' . $siswa->id . '.png');
+                }
     
         return view('adminsiswa.index', compact('dataSiswa', 'sekolahs', 'allKelas', 'groupedStudents', 'qrCodeUrls'));
     }
     
-
-
+    
+    
+    private function generateQRCodeForStudent($siswa)
+    {
+        $writer = new PngWriter();
+        $qrCode = QrCode::create($this->generateQRContent($siswa))
+            ->setEncoding(new Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(new ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
+            ->setSize(300)
+            ->setMargin(10)
+            ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
+            ->setForegroundColor(new Color(0, 0, 0))
+            ->setBackgroundColor(new Color(255, 255, 255));
+    
+        $result = $writer->write($qrCode);
+        Storage::put('public/qrcodes/siswa-' . $siswa->id . '.png', $result->getString());
+    }
     public function create()
     {
         $sekolahs = Sekolah::all();
@@ -500,13 +515,7 @@ public function showQR($id)
         
         return view('adminsiswa.qr-code', compact('dataSiswa', 'qrContent'));
     }
-public function downloadQRCode($id)
-{
-    $dataSiswa = DataSiswa::findOrFail($id);
-    $qrCodePath = storage_path('app/public/qrcodes/siswa-' . $id . '.png');
 
-    return response()->download($qrCodePath, 'qrcode-' . $dataSiswa->nama_lengkap . '.png');
-}
 
     public function destroy($id)
     {
@@ -573,75 +582,6 @@ public function downloadQRCode($id)
         return Excel::download(new DataSiswaExport, 'data_siswa.xlsx');
     }
 
-    public function downloadSelectedQRCodes(Request $request)
-{
-    // Validate the request
-    $request->validate([
-        'selected_students' => 'required|array',
-        'selected_students.*' => 'exists:data_siswa,id'
-    ]);
-
-    // Check if no students were selected
-    if (empty($request->selected_students)) {
-        return redirect()->back()->with('error', 'Pilih minimal satu siswa untuk di-download QR Code-nya.');
-    }
-
-    // If only one student is selected, download individual QR
-    if (count($request->selected_students) == 1) {
-        $studentId = $request->selected_students[0];
-        return $this->downloadQRCode($studentId);
-    }
-
-    // Multiple students - create a zip file
-    $zip = new \ZipArchive();
-    $zipFileName = 'selected_students_qrcodes_' . now()->format('YmdHis') . '.zip';
-    $zipFilePath = storage_path('app/public/qrcodes/' . $zipFileName);
-
-    // Ensure the directory exists
-    Storage::makeDirectory('public/qrcodes');
-
-    if ($zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
-        foreach ($request->selected_students as $studentId) {
-            $dataSiswa = DataSiswa::findOrFail($studentId);
-            
-            // Generate QR Code
-            $writer = new PngWriter();
-            $qrCode = QrCode::create($this->generateQRContent($dataSiswa))
-                ->setEncoding(new Encoding('UTF-8'))
-                ->setErrorCorrectionLevel(new ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
-                ->setSize(300)
-                ->setMargin(10)
-                ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
-                ->setForegroundColor(new Color(0, 0, 0))
-                ->setBackgroundColor(new Color(255, 255, 255));
-
-            // Add Logo to QR Code (optional)
-            $logoPath = public_path('images/logo.png');
-            if (file_exists($logoPath)) {
-                $logo = Logo::create($logoPath)->setResizeToWidth(50);
-                $qrCode = $qrCode->setLogo($logo);
-            }
-
-            $result = $writer->write($qrCode);
-            
-            // Generate filename
-            $filename = 'qrcode_' . $dataSiswa->nisn . '_' . $dataSiswa->nama_lengkap . '.png';
-            
-            // Add QR code to zip
-            $zip->addFromString($filename, $result->getString());
-        }
-
-        $zip->close();
-
-        // Download the zip file
-        return response()->download($zipFilePath, $zipFileName)->deleteFileAfterSend(true);
-    }
-
-    // If zip creation fails
-    return redirect()->back()->with('error', 'Gagal membuat file download QR Code.');
-}
-
-
     public function downloadQRCodes(Request $request)
     {
         $selectedStudents = $request->input('selected_students', []);
@@ -649,29 +589,84 @@ public function downloadQRCode($id)
         if (empty($selectedStudents)) {
             return back()->with('error', 'Pilih minimal satu siswa untuk mengunduh QR Code.');
         }
-
+    
+        // If only one student is selected, use the single download function
+        if (count($selectedStudents) == 1) {
+            return $this->downloadQRCode($selectedStudents[0]);
+        }
+    
         // Create a temporary zip file
         $zipFileName = 'qrcodes_' . time() . '.zip';
-        $zipPath = storage_path('app/public/temp/' . $zipFileName);
-
+        $zipPath = storage_path('app/temp/' . $zipFileName);
+        
+        // Ensure the directory exists
+        if (!file_exists(dirname($zipPath))) {
+            mkdir(dirname($zipPath), 0755, true);
+        }
+    
         $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE) === TRUE) {
             foreach ($selectedStudents as $studentId) {
                 $student = DataSiswa::find($studentId);
                 if ($student) {
-                    $qrCodePath = storage_path('app/public/qrcodes/siswa-' . $studentId . '.png');
-                    if (file_exists($qrCodePath)) {
-                        // Add file to zip with student name
-                        $zip->addFile($qrCodePath, 'qrcode_' . $student->nama_lengkap . '.png');
-                    }
+                    // Generate QR Code on the fly
+                    $writer = new PngWriter();
+                    $qrCode = QrCode::create($this->generateQRContent($student))
+                        ->setEncoding(new Encoding('UTF-8'))
+                        ->setErrorCorrectionLevel(new ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
+                        ->setSize(300)
+                        ->setMargin(10)
+                        ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
+                        ->setForegroundColor(new Color(0, 0, 0))
+                        ->setBackgroundColor(new Color(255, 255, 255));
+    
+                    $result = $writer->write($qrCode);
+                    
+                    // Add to zip with clean filename
+                    $zip->addFromString('qrcode_' . $student->nama_lengkap . '.png', $result->getString());
                 }
             }
             $zip->close();
-
+    
             // Download zip file and then delete it
             return response()->download($zipPath)->deleteFileAfterSend(true);
         }
-
+    
         return back()->with('error', 'Gagal membuat file zip QR Code.');
     }
+
+public function downloadQRCode($id)
+{
+    $siswa = DataSiswa::findOrFail($id);
+    $qrCodePath = storage_path('app/public/qrcodes/siswa-' . $siswa->id . '.png');
+    
+    // Check if file exists
+    if (!file_exists($qrCodePath)) {
+        // Generate the QR code if it doesn't exist
+        $writer = new PngWriter();
+        $qrCode = QrCode::create($this->generateQRContent($siswa))
+            ->setEncoding(new Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(new ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
+            ->setSize(300)
+            ->setMargin(10)
+            ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
+            ->setForegroundColor(new Color(0, 0, 0))
+            ->setBackgroundColor(new Color(255, 255, 255));
+
+        $result = $writer->write($qrCode);
+        
+        // Make sure directory exists
+        Storage::makeDirectory('public/qrcodes');
+        
+        // Save the QR code
+        Storage::put('public/qrcodes/siswa-' . $siswa->id . '.png', $result->getString());
+    }
+    
+    // Now try to download
+    if (file_exists($qrCodePath)) {
+        return response()->download($qrCodePath, 'qrcode-' . $siswa->nama_lengkap . '.png');
+    }
+    
+    return back()->with('error', 'QR Code tidak dapat dibuat.');
+}
 }

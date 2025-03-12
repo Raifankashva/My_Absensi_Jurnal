@@ -151,23 +151,7 @@ class DataSiswa extends Model
     {
         return $this->foto ? asset('storage/' . $this->foto) : null;
     }
-    public function downloadQRCodes()
-    {
-        // Pastikan ID siswa tersedia
-        if (!$this->id) {
-            throw new \Exception("ID Siswa tidak ditemukan.");
-        }
     
-        // Generate QR code dengan ID siswa
-        $qrCode = QrCode::format('png')->size(300)->generate((string) $this->id);
-        $fileName = "qrcodes/siswa_{$this->id}.png";
-    
-        // Simpan QR Code ke dalam storage
-        Storage::put($fileName, $qrCode);
-    
-        // Download file QR Code
-        return response()->download(storage_path("app/$fileName"));
-    }
     public function absensi()
 {
     return $this->hasMany(Absensi::class, 'siswa_id');

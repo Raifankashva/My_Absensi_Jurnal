@@ -4,42 +4,63 @@
 <div class="min-h-screen bg-gray-50/50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Welcome Banner -->
-        <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
-            <div class="flex items-center justify-between p-8 bg-gradient-to-r from-blue-600 to-indigo-600">
-                <div class="flex items-center space-x-8">
-                    <div class="flex-shrink-0 h-24 w-24 rounded-full ring-4 ring-white/90 overflow-hidden">
-                        <img src="{{ asset('storage/' . $user->dataSiswa->foto) }}" 
-                             alt="Foto {{ $user->dataSiswa->nama_lengkap }}" 
-                             class="h-full w-full object-cover">
-                    </div>
-                    <div>
-                        <div class="flex items-center space-x-3">
-                            <h1 class="text-3xl font-bold text-white">
-                                {{ $user->dataSiswa->nama_lengkap }}
-                            </h1>
-                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-blue-500/20 text-white border border-white/20">
-                                Siswa Aktif
-                            </span>
-                        </div>
-                        <div class="flex space-x-4 mt-3">
-                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-white/90 text-blue-800">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
-                                </svg>
-                                NISN: {{ $user->dataSiswa->nisn }}
-                            </span>
-                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-white/90 text-blue-800">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                </svg>
-                                Kelas {{ $user->dataSiswa->kelas->nama_kelas }}
-                            </span>
-                        </div>
-                    </div>
+        <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+    <!-- Header with gradient background -->
+    <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600">
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+            <!-- Student photo -->
+            <div class="flex-shrink-0 h-24 w-24 rounded-full ring-4 ring-white/90 overflow-hidden bg-white">
+                <img src="{{ asset('storage/' . $user->dataSiswa->foto) }}" 
+                     alt="Foto {{ $user->dataSiswa->nama_lengkap }}" 
+                     class="h-full w-full object-cover">
+            </div>
+            
+            <!-- Student information -->
+            <div class="text-center md:text-left">
+                <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+                    <h1 class="text-2xl md:text-3xl font-bold text-white">
+                        {{ $user->dataSiswa->nama_lengkap }}
+                    </h1>
+                    <span class="px-3 py-1 rounded-full text-sm font-medium bg-blue-500/20 text-white border border-white/20 inline-block">
+                        Siswa Aktif
+                    </span>
+                </div>
+                
+                <!-- Student details -->
+                <div class="flex flex-col md:flex-row gap-3 mt-3">
+                    <span class="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-sm font-medium bg-white/90 text-blue-800">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+                        </svg>
+                        NISN: {{ $user->dataSiswa->nisn }}
+                    </span>
+                    <span class="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-sm font-medium bg-white/90 text-blue-800">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        Kelas {{ $user->dataSiswa->kelas->nama_kelas }}
+                    </span>
                 </div>
             </div>
+            
+            <!-- QR Code moved to the right side -->
+            <div class="md:ml-auto">
+                <img src="{{ $qrCodeUrl }}" alt="QR Code {{ $user->dataSiswa->nama_lengkap }}" class="h-24 w-24">
+            </div>
         </div>
-
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">
+        <h5>Kartu Pelajar</h5>
+    </div>
+    <div class="card-body">
+        <p>Download kartu pelajar resmi yang berisi data pribadi dan QR Code untuk absensi.</p>
+        <a href="{{ route('siswa.kartu-pelajar') }}" class="btn btn-primary">
+            <i class="fas fa-download"></i> Download Kartu Pelajar
+        </a>
+    </div>
+</div>
         <!-- Quick Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-sm p-6 transition-all duration-200 hover:shadow-md">
@@ -94,7 +115,24 @@
                     <div class="ml-4">
                         <p class="text-sm text-gray-500 font-medium">Hari Ini</p>
                         <h3 class="text-lg font-semibold text-gray-800 mt-1">{{ now()->isoFormat('dddd') }} {{ now()->format('H:i') }}</h3>
+                        <div class="qr-code">
+    </div>
                     </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6 transition-all duration-200 hover:shadow-md">
+                <div class="flex items-center">
+                <div class="p-3 rounded-xl bg-gray-50 ">
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M3 3h4v4H3V3zm0 8h4v4H3v-4zm0 8h4v4H3v-4zm8-16h4v4h-4V3zm0 8h4v4h-4v-4zm0 8h4v4h-4v-4zm8-16h4v4h-4V3zm0 8h4v4h-4v-4zm0 8h4v4h-4v-4z"/>
+    </svg>
+</div>
+
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500 font-medium">QR Code</p>
+                        <img src="{{ $qrCodeUrl }}" alt="QR Code {{ $user->dataSiswa->nama_lengkap }}" class="img-fluid">
+                        </div>
                 </div>
             </div>
         </div>

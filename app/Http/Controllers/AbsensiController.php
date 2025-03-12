@@ -109,7 +109,7 @@ class AbsensiController extends Controller
     
     public function scanQR(Request $request)
     {
-        // If no sekolah_id is provided, show the school selection page
+        
         if (!$request->has('sekolah_id') && !session()->has('scan_sekolah_id')) {
             $sekolah = Sekolah::all();
             return view('absensi.select_school', compact('sekolah'));
@@ -191,6 +191,15 @@ class AbsensiController extends Controller
         
         return view('absensi.token_management', compact('sekolah', 'tokenExists'));
     }
+    public function logoutTokenManagement()
+{
+    // Clear the school ID from the session for token management
+    session()->forget('token_sekolah_id');
+    
+    // Redirect to the school selection page for token management
+    return redirect()->route('absensi.token.management')
+        ->with('success', 'Berhasil keluar. Silakan pilih sekolah lain.');
+}
 
     public function createToken(Request $request)
     {
@@ -294,4 +303,19 @@ class AbsensiController extends Controller
         
         return Excel::download(new AbsensiExport($sekolah_id, $kelas_id, $tanggal), 'absensi-'.$tanggal.'.xlsx');
     }
+    public function logoutScan(Request $request)
+{
+    // Clear the school selection and token from the session
+    if (session()->has('scan_sekolah_id')) {
+        $sekolah_id = session('scan_sekolah_id');
+        // Remove the specific school token
+        session()->forget('scan_access_token_' . $sekolah_id);
+        // Remove the selected school
+        session()->forget('scan_sekolah_id');
+    }
+    
+    // Redirect to the school selection page
+    return redirect()->route('absensi.scan')
+        ->with('success', 'Berhasil keluar. Silakan pilih sekolah lain.');
+}
 }

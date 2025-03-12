@@ -304,7 +304,7 @@
                             {!! renderSidebarLink(route('kelas.index'), 'bx-chalkboard', 'Kelas') !!}
                             {!! renderSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
                             {!! renderSidebarLink(route('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
-                            {!! renderSidebarLink(route('jadwal-pelajaran.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
+                            {!! renderSidebarLink(route('jurnal-guru.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
                         </div>
                         @elseif (auth()->user()->role == 'guru')
                         <div class="mb-4">
@@ -312,8 +312,10 @@
                                 Teacher Menu
                             </h2>
                             {!! renderSidebarLink(route('guru.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
-                            {!! renderSidebarLink('#', 'bx-book', 'Mata Pelajaran', '3') !!}
-                            {!! renderSidebarLink('#', 'bx-notepad', 'Nilai') !!}
+                            {!! renderSidebarLink(route('jadwal-pelajaran.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
+                            {!! renderSidebarLink(route('jurnal-guru.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
+                            {!! renderSidebarLink(route('absensi.select.school'), 'bx-calendar', 'Absensi') !!}
+                            
                         </div>
                         @elseif (auth()->user()->role == 'siswa')
                         <div class="mb-4">
