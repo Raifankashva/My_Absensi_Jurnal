@@ -41,12 +41,12 @@ Berikut adalah langkah-langkah untuk menginstal dan menjalankan proyek ini di li
    git clone https://github.com/yourusername/My_Absensi_Jurnal.git
    cd My_Absensi_Jurnal
 
-2.Instal Dependencies:
+2.**Instal Dependencies**:
    ```bash
   composer install
   npm install
 
-3.Setup Environment:
+3.**Setup Environment**:
   Salin file .env.example menjadi .env.
   Konfigurasi database di file .env.
   php artisan key:generate
