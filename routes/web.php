@@ -18,7 +18,7 @@ use App\Models\DataSiswa;
 use App\Http\Controllers\JurnalGuruController;
 use App\Http\Controllers\JadwalPelajaranController;
 use App\Http\Controllers\SiswaController;
-
+use App\Http\Controllers\SchoolDashboardController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -44,6 +44,10 @@ Route::get('/get-villages', [SekolahController::class, 'getVillages'])->name('ge
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
 Route::get('/public/attendance', [PublicAttendanceController::class, 'view'])
     ->name('attendance.public.view');
@@ -185,3 +189,22 @@ Route::post('/absensi/token/update', [AbsensiController::class, 'updateToken'])-
 Route::get('/absensi/select-school', [AbsensiController::class, 'selectSchool'])->name('absensi.select.school');
 Route::get('/absensi/scan/logout', [AbsensiController::class, 'logoutScan'])->name('absensi.scan.logout');
 Route::get('/absensi/token/logout', [AbsensiController::class, 'logoutTokenManagement'])->name('absensi.token.logout');
+
+Route::middleware(['auth', 'role:sekolah'])->prefix('sekolah')->group(function () {
+
+// Dashboard
+Route::get('/dashboard', [SchoolDashboardController::class, 'index'])->name('school.dashboard');
+        
+// Class routes
+Route::get('/classes', [SchoolDashboardController::class, 'indexClasses'])->name('school.classes');
+Route::get('/classes/capacity', [SchoolDashboardController::class, 'classCapacity'])->name('school.classes.capacity');
+Route::get('/class/{id}', [SchoolDashboardController::class, 'showClass'])->name('class.show');
+
+// Student routes
+Route::get('/students', [SchoolDashboardController::class, 'indexStudents'])->name('school.students');
+Route::get('/student/{id}', [SchoolDashboardController::class, 'showStudent'])->name('school.student.show');
+
+// Teacher routes
+Route::get('/teachers', [SchoolDashboardController::class, 'indexTeachers'])->name('school.teachers');
+Route::get('/teacher/{id}', [SchoolDashboardController::class, 'showTeacher'])->name('school.teacher.show');
+});

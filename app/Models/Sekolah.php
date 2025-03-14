@@ -9,6 +9,7 @@ class Sekolah extends Model
     protected $table = 'sekolahs';
     
     protected $fillable = [
+        'user_id',
         'npsn',
         'nama_sekolah',
         'jenjang',

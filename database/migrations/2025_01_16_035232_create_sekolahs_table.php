@@ -10,6 +10,7 @@ class CreateSekolahsTable extends Migration
     {
         Schema::create('sekolahs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->unique(); // Add this line
             $table->string('npsn', 8)->unique(); // Nomor Pokok Sekolah Nasional
             $table->string('nama_sekolah');
             $table->enum('jenjang', ['SD', 'SMP', 'SMA', 'SMK']);
@@ -55,6 +56,11 @@ class CreateSekolahsTable extends Migration
                   ->references('id')
                   ->on('villages')
                   ->onDelete('restrict')
+                  ->onUpdate('cascade');
+                  $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade') // Or 'restrict' depending on your needs
                   ->onUpdate('cascade');
         });
     }

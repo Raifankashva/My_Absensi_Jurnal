@@ -214,7 +214,20 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700"><i class="fas fa-id-card mr-2 text-blue-500"></i> Password</label>
+                            <input type="password" name="password" id="password" value="{{ old('password') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            @error('password')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700"><i class="fas fa-id-card mr-2 text-blue-500"></i> Konfirmasi Password</label>
+                            <input type="password" name="password_confirmation" id="password_confirmation" value="{{ old('password') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            @error('password_confirmation')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                         <div class="flex justify-end space-x-3">
                             <a href="{{ route('sekolahs.index') }}" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                                 Batal

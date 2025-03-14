@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - School Management System</title>
+    <title>Lupa Password - Sistem Informasi Akademik</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -130,31 +130,41 @@
         <div class="absolute top-1/2 left-1/3 w-8 h-8 bg-blue-300 rounded-full opacity-20 floating" style="animation-delay: 2s;"></div>
     </div>
 
-    <!-- Login Container -->
+    <!-- Main Container -->
     <div class="w-full max-w-md relative z-10 opacity-0 animate-fade-in">
         <!-- Logo and Header -->
         <div class="text-center mb-8 opacity-0 animate-slide-up stagger-1">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg mb-4 transform transition-all duration-300 hover:scale-110">
-                <i class='bx bxs-school text-3xl text-white'></i>
+                <i class='bx bx-lock-open-alt text-3xl text-white'></i>
             </div>
-            <h1 class="text-3xl font-bold text-gray-900">Welcome Back</h1>
-            <p class="text-gray-600 mt-2">Sign in to your account</p>
+            <h1 class="text-3xl font-bold text-gray-900">Lupa Password?</h1>
+            <p class="text-gray-600 mt-2">Masukkan email Anda untuk menerima link reset password</p>
         </div>
 
-        <!-- Login Form -->
+        <!-- Form Container -->
         <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden opacity-0 animate-slide-up stagger-2">
             <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 border-b border-white/10">
                 <h2 class="text-xl font-semibold text-white flex items-center">
-                    <i class='bx bx-lock-open-alt mr-2'></i>
-                    Login
+                    <i class='bx bx-envelope mr-2'></i>
+                    Reset Password
                 </h2>
             </div>
 
             <div class="p-6">
-                <form method="POST" action="{{ route('login') }}" class="space-y-6">
-                    @csrf
+                @if (session('message'))
+                    <div class="p-4 mb-6 rounded-xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-200 relative overflow-hidden opacity-0 animate-slide-up stagger-3">
+                        <div class="absolute inset-0 bg-green-500/5"></div>
+                        <div class="relative flex items-center">
+                            <div class="flex-shrink-0 bg-gradient-to-r from-green-500 to-emerald-500 text-white p-2 rounded-lg mr-3">
+                                <i class='bx bx-check text-xl'></i>
+                            </div>
+                            <p class="text-green-800">{{ session('message') }}</p>
+                        </div>
+                    </div>
+                @endif
 
-                    <!-- Email Field -->
+                <form action="{{ route('password.email') }}" method="POST" class="space-y-6">
+                    @csrf
                     <div class="space-y-2 opacity-0 animate-slide-up stagger-3">
                         <label for="email" class="block text-sm font-medium text-gray-700">
                             Email Address
@@ -167,14 +177,10 @@
                                 id="email"
                                 type="email"
                                 name="email"
-                                value="{{ old('email') }}"
                                 required
-                                autocomplete="email"
-                                autofocus
                                 class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl 
                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                       transition-all duration-300 bg-white/80 backdrop-blur-sm
-                                       @error('email') border-red-500 @enderror"
+                                       transition-all duration-300 bg-white/80 backdrop-blur-sm"
                                 placeholder="your.email@example.com"
                             >
                         </div>
@@ -183,61 +189,7 @@
                         @enderror
                     </div>
 
-                    <!-- Password Field -->
-                    <div class="space-y-2 opacity-0 animate-slide-up stagger-4">
-                        <div class="flex items-center justify-between">
-                            <label for="password" class="block text-sm font-medium text-gray-700">
-                                Password
-                            </label>
-                            @if (Route::has('password.request'))
-                                <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:text-blue-800 transition-colors duration-300">
-                                    Forgot your password?
-                                </a>
-                            @endif
-                        </div>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class='bx bx-lock-alt text-gray-400'></i>
-                            </div>
-                            <input
-                                id="password"
-                                type="password"
-                                name="password"
-                                required
-                                autocomplete="current-password"
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl 
-                                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                       transition-all duration-300 bg-white/80 backdrop-blur-sm
-                                       @error('password') border-red-500 @enderror"
-                                placeholder="••••••••"
-                            >
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                <button type="button" id="togglePassword" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                                    <i class='bx bx-hide text-xl'></i>
-                                </button>
-                            </div>
-                        </div>
-                        @error('password')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Remember Me -->
-                    <div class="flex items-center opacity-0 animate-slide-up" style="animation-delay: 0.5s;">
-                        <input
-                            id="remember"
-                            type="checkbox"
-                            name="remember"
-                            {{ old('remember') ? 'checked' : '' }}
-                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-300"
-                        >
-                        <label for="remember" class="ml-2 block text-sm text-gray-700">
-                            Remember me
-                        </label>
-                    </div>
-
-                    <!-- Login Button -->
-                    <div class="opacity-0 animate-slide-up" style="animation-delay: 0.6s;">
+                    <div class="opacity-0 animate-slide-up stagger-4">
                         <button
                             type="submit"
                             class="w-full flex justify-center items-center px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 
@@ -245,63 +197,25 @@
                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
                                    transform transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                         >
-                            <i class='bx bx-log-in-circle mr-2'></i>
-                            Sign in
+                            <i class='bx bx-mail-send mr-2'></i>
+                            Kirim Link Reset
                         </button>
                     </div>
                 </form>
 
-                <!-- Divider -->
-                <div class="relative my-6 opacity-0 animate-slide-up" style="animation-delay: 0.7s;">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">Or continue with</span>
-                    </div>
-                </div>
-
-                <!-- Social Login Buttons -->
-                <div class="grid grid-cols-3 gap-3 opacity-0 animate-slide-up" style="animation-delay: 0.8s;">
-                    <button
-                        type="button"
-                        class="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm 
-                               bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                               transition-all duration-300"
-                    >
-                        <i class='bx bxl-google text-xl text-red-500'></i>
-                    </button>
-                    <button
-                        type="button"
-                        class="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm 
-                               bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                               transition-all duration-300"
-                    >
-                        <i class='bx bxl-microsoft text-xl text-blue-500'></i>
-                    </button>
-                    <button
-                        type="button"
-                        class="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm 
-                               bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                               transition-all duration-300"
-                    >
-                        <i class='bx bxl-apple text-xl'></i>
-                    </button>
+                <div class="mt-6 text-center opacity-0 animate-slide-up" style="animation-delay: 0.5s;">
+                    <a href="{{ route('login') }}" class="text-sm text-blue-600 hover:text-blue-800 transition-colors duration-300 flex items-center justify-center">
+                        <i class='bx bx-arrow-back mr-1'></i>
+                        Kembali ke halaman login
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Register Link -->
-        <div class="text-center mt-6 opacity-0 animate-slide-up" style="animation-delay: 0.9s;">
-            <p class="text-gray-600">
-                Don't have an account?
-                <a href="#" class="font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300">
-                    Register now
-                </a>
-            </p>
-            <p class="text-gray-600">
-                Lupa Password?
-                <a href="{{ route('password.request') }}" class="font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300">Reset</a>
+        <!-- Footer -->
+        <div class="text-center mt-6 opacity-0 animate-slide-up" style="animation-delay: 0.6s;">
+            <p class="text-gray-600 text-sm">
+                © {{ date('Y') }} Sistem Informasi Akademik. Hak Cipta Dilindungi.
             </p>
         </div>
     </div>
@@ -312,22 +226,7 @@
             document.querySelectorAll('.opacity-0').forEach(el => {
                 el.classList.remove('opacity-0');
             });
-
-            // Toggle password visibility
-            const togglePassword = document.getElementById('togglePassword');
-            const password = document.getElementById('password');
-            
-            togglePassword.addEventListener('click', function() {
-                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-                password.setAttribute('type', type);
-                
-                // Toggle icon
-                const icon = this.querySelector('i');
-                icon.classList.toggle('bx-hide');
-                icon.classList.toggle('bx-show');
-            });
         });
     </script>
 </body>
 </html>
-
