@@ -21,7 +21,6 @@ use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\Label\Label;
-
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use App\Exports\DataSiswaExport;

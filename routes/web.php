@@ -207,4 +207,12 @@ Route::get('/student/{id}', [SchoolDashboardController::class, 'showStudent'])->
 // Teacher routes
 Route::get('/teachers', [SchoolDashboardController::class, 'indexTeachers'])->name('school.teachers');
 Route::get('/teacher/{id}', [SchoolDashboardController::class, 'showTeacher'])->name('school.teacher.show');
+
+Route::get('/kelass', [KelasController::class, 'indexBySchool'])->name('school.kelas.index');
+    Route::get('/kelas/create', [KelasController::class, 'createBySchool'])->name('school.kelas.create');
+    Route::post('/kelas', [KelasController::class, 'storeBySchool'])->name('school.kelas.store');
+    Route::get('/kelas/{kelas}', [KelasController::class, 'showBySchool'])->name('school.kelas.show');
+    Route::get('/kelas/{kelas}/edit', [KelasController::class, 'editBySchool'])->name('school.kelas.edit');
+    Route::put('/kelas/{kelas}', [KelasController::class, 'updateBySchool'])->name('school.kelas.update');
+    Route::delete('/kelas/{kelas}', [KelasController::class, 'destroyBySchool'])->name('school.kelas.destroy');
 });
