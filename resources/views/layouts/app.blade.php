@@ -511,6 +511,14 @@
                             {!! renderSidebarLink('#', 'bx-book', 'Jadwal') !!}
                             {!! renderSidebarLink('#', 'bx-notepad', 'Nilai', '2') !!}
                         </div>
+                        @elseif (auth()->user()->role == 'sekolah')
+                        <div class="mb-4">
+                            <h2 class="px-4 text-xs font-semibold text-primary-400 uppercase tracking-wider mb-2">
+                                Sekolah Menu
+                            </h2>
+                            {!! renderSidebarLink(route('school.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
+                            {!! renderSidebarLink(route('kelas.school.index'), 'bx-chalkboard', 'Kelas') !!}
+                        </div>
                         @endif
 
                         <!-- Quick Actions -->

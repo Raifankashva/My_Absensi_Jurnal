@@ -7,7 +7,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Daftar Kelas</h5>
-                    <a href="{{ route('school.kelas.create') }}" class="btn btn-primary">Tambah Kelas</a>
+                    <a href="{{ route('kelas.school.create') }}" class="btn btn-primary">Tambah Kelas</a>
                 </div>
 
                 <div class="card-body">
