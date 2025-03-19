@@ -517,7 +517,8 @@
                                 Sekolah Menu
                             </h2>
                             {!! renderSidebarLink(route('school.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
-                            {!! renderSidebarLink(route('kelas.school.index'), 'bx-chalkboard', 'Kelas') !!}
+                            {!! renderSidebarLink(route('kelassekolah.index'), 'bx-chalkboard', 'Kelas') !!}
+                            {!! renderSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
                         </div>
                         @endif
 

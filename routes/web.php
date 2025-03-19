@@ -19,6 +19,7 @@ use App\Http\Controllers\JurnalGuruController;
 use App\Http\Controllers\JadwalPelajaranController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SchoolDashboardController;
+use App\Http\Controllers\KelasSekolahController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -67,16 +68,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     
     Route::resource('sekolahs', SekolahController::class);
 
-    Route::prefix('adminguru')->name('adminguru.')->group(function () {
-        Route::get('/', [DataGuruController::class, 'index'])->name('index');
-        Route::get('/create', [DataGuruController::class, 'create'])->name('create');
-        Route::post('/store', [DataGuruController::class, 'store'])->name('store');
-        Route::get('/{guru}', [DataGuruController::class, 'show'])->name('show');
-        Route::get('/{guru}/edit', [DataGuruController::class, 'edit'])->name('edit');
-        Route::put('/{guru}', [DataGuruController::class, 'update'])->name('update');
-        Route::delete('/{guru}', [DataGuruController::class, 'destroy'])->name('destroy');
-    });
-        Route::get('adminguru/{guru}/detail', [DataGuruController::class, 'show'])->name('adminguru.detail');
+    
 
     Route::resource('adminsiswa', DataSiswaController::class);
     Route::get('/siswa/{id}/download-qr', [DataSiswaController::class, 'downloadQrCode'])->name('siswa.download-qr');
@@ -208,14 +200,22 @@ Route::get('/student/{id}', [SchoolDashboardController::class, 'showStudent'])->
 Route::get('/teachers', [SchoolDashboardController::class, 'indexTeachers'])->name('school.teachers');
 Route::get('/teacher/{id}', [SchoolDashboardController::class, 'showTeacher'])->name('school.teacher.show');
 
+Route::get('/kelas', [KelasSekolahController::class, 'index'])->name('kelassekolah.index');
+    Route::get('/kelas/create', [KelasSekolahController::class, 'create'])->name('kelassekolah.create');
+    Route::post('/kelas', [KelasSekolahController::class, 'store'])->name('kelassekolah.store');
+    Route::get('/kelas/{id}', [KelasSekolahController::class, 'show'])->name('kelassekolah.show');
+    Route::get('/kelas/{id}/edit', [KelasSekolahController::class, 'edit'])->name('kelassekolah.edit');
+    Route::put('/kelas/{id}', [KelasSekolahController::class, 'update'])->name('kelassekolah.update');
+    Route::delete('/kelas/{id}', [KelasSekolahController::class, 'destroy'])->name('kelassekolah.destroy');
 
-});
-Route::prefix('school/kelas')->name('kelas.school.')->group(function () {
-    Route::get('/', [KelasController::class, 'indexBySchool'])->name('index');
-    Route::get('/create', [KelasController::class, 'createBySchool'])->name('create');
-    Route::post('/store', [KelasController::class, 'storeBySchool'])->name('store');
-    Route::get('/{kelas}/edit', [KelasController::class, 'editBySchool'])->name('edit');
-    Route::put('/{kelas}', [KelasController::class, 'updateBySchool'])->name('update');
-    Route::delete('/{kelas}', [KelasController::class, 'destroyBySchool'])->name('destroy');
-    Route::get('/{kelas}', [KelasController::class, 'showBySchool'])->name('show');
+    Route::prefix('adminguru')->name('adminguru.')->group(function () {
+        Route::get('/', [DataGuruController::class, 'index'])->name('index');
+        Route::get('/create', [DataGuruController::class, 'create'])->name('create');
+        Route::post('/store', [DataGuruController::class, 'store'])->name('store');
+        Route::get('/{guru}', [DataGuruController::class, 'show'])->name('show');
+        Route::get('/{guru}/edit', [DataGuruController::class, 'edit'])->name('edit');
+        Route::put('/{guru}', [DataGuruController::class, 'update'])->name('update');
+        Route::delete('/{guru}', [DataGuruController::class, 'destroy'])->name('destroy');
+    });
+        Route::get('adminguru/{guru}/detail', [DataGuruController::class, 'show'])->name('adminguru.detail');
 });

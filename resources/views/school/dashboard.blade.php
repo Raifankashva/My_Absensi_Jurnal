@@ -59,7 +59,7 @@
                 </div>
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-4 sm:px-6">
                     <div class="text-sm">
-                        <a href="{{ route('school.teachers') }}" class="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-300 flex items-center">
+                        <a href="{{ route('adminguru.index') }}" class="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-300 flex items-center">
                             Lihat semua guru
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -88,7 +88,7 @@
                 </div>
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-4 sm:px-6">
                     <div class="text-sm">
-                        <a href="{{ route('school.classes') }}" class="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-300 flex items-center">
+                        <a href="{{ route('kelassekolah.index') }}" class="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-300 flex items-center">
                             Lihat semua kelas
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
