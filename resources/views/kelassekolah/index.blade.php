@@ -28,9 +28,18 @@
                             <div class="relative">
                                 <select name="tingkat" id="tingkat" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 pl-10 py-2 pr-10">
                                     <option value="">Semua Tingkat</option>
-                                    <option value="1" {{ request('tingkat') == '1' ? 'selected' : '' }}>Tingkat 1</option>
-                                    <option value="2" {{ request('tingkat') == '2' ? 'selected' : '' }}>Tingkat 2</option>
-                                    <option value="3" {{ request('tingkat') == '3' ? 'selected' : '' }}>Tingkat 3</option>
+                                    <option value="I" {{ request('tingkat') == 'I' ? 'selected' : '' }}>Tingkat I</option>
+                                    <option value="II" {{ request('tingkat') == 'II' ? 'selected' : '' }}>Tingkat II</option>
+                                    <option value="III" {{ request('tingkat') == 'III' ? 'selected' : '' }}>Tingkat III</option>
+                                    <option value="IV" {{ request('tingkat') == 'IV' ? 'selected' : '' }}>Tingkat IV</option>
+                                    <option value="V" {{ request('tingkat') == 'V' ? 'selected' : '' }}>Tingkat V</option>
+                                    <option value="VI" {{ request('tingkat') == 'VI' ? 'selected' : '' }}>Tingkat VI</option>
+                                    <option value="VII" {{ request('tingkat') == 'VII' ? 'selected' : '' }}>Tingkat VII</option>
+                                    <option value="VIII" {{ request('tingkat') == 'VIII' ? 'selected' : '' }}>Tingkat VIII</option>
+                                    <option value="IX" {{ request('tingkat') == 'IX' ? 'selected' : '' }}>Tingkat IX</option>
+                                    <option value="X" {{ request('tingkat') == 'X' ? 'selected' : '' }}>Tingkat X</option>
+                                    <option value="XI" {{ request('tingkat') == 'XI' ? 'selected' : '' }}>Tingkat XI</option>
+                                    <option value="XII" {{ request('tingkat') == 'XII' ? 'selected' : '' }}>Tingkat XII</option>
                                 </select>
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,6 +86,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jurusan</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tahun Ajaran</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kapasitas</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sisa Kapasitas</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
@@ -109,6 +119,12 @@
                                             {{ $item->kapasitas }}
                                         </div>
                                     </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            </svg>
+                                            {{ $item->sisa_kapasitas }}
+                                        </div>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
                                             <a href="{{ route('kelassekolah.show', $item->id) }}" class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">

@@ -123,4 +123,104 @@ public function jadwal()
     
     return view('siswa.jadwal', compact('jadwalPerHari'));
 }   
+
+public function profile()
+{
+    $user = User::find(auth()->id())->load('dataSiswa');
+    $dataSiswa = $user->dataSiswa;
+    
+    return view('siswa.profile', compact('dataSiswa'));
+}
+
+// Update student's profile
+public function updateProfile(Request $request)
+{
+    // Validate the request
+    $request->validate([
+        'sekolah_id' => 'required|exists:sekolahs,id',
+        'kelas_id' => 'required|exists:kelas,id',
+        'nisn' => 'required|string|max:10|unique:data_siswa',
+        'nis' => 'required|string|max:10|unique:data_siswa',
+        'nik' => 'required|string|max:16|unique:data_siswa',
+        'nama_lengkap' => 'required|string|max:255',
+        'jenis_kelamin' => 'required|in:laki-laki,perempuan',
+        'tmp_lahir' => 'required|string',
+        'tgl_lahir' => 'required|date',
+        'agama' => 'required|in:Islam,Kristen,Katolik,Hindu,Buddha,Konghucu',
+        'province_id' => 'required|exists:provinces,id',
+        'city_id' => 'required|exists:regencies,id',
+        'district_id' => 'required|exists:districts,id',
+        'village_id' => 'required|exists:villages,id',
+        'kode_pos' => 'required|string|max:5',
+        'tinggal' => 'required|in:Ortu,Wali,Kost,Asrama,Panti',
+        'transport' => 'required|string',
+        'hp' => 'nullable|string',
+        'ayah' => 'required|string',
+        'email_ayah' => 'nullable|email',
+        'kerja_ayah' => 'nullable|string',
+        'ibu' => 'required|string',
+        'email_ibu' => 'nullable|email',
+        'kerja_ibu' => 'nullable|string',
+        'wali' => 'nullable|string',
+        'email_wali' => 'nullable|email',
+        'kerja_wali' => 'nullable|string',
+        'tb' => 'nullable|integer',
+        'bb' => 'nullable|integer',
+        'kks' => 'nullable|string',
+        'kph' => 'nullable|string',
+        'kip' => 'nullable|string',
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'email' => 'required|email|unique:users,email',  
+        'alamat' => 'required|string',
+    ]);
+
+    $user = Auth::user();
+    $dataSiswa = $user->dataSiswa;
+
+    // Update profile data
+    $dataSiswa->update([
+        'user_id' => $user->id,
+            'sekolah_id' => $request->sekolah_id,
+            'kelas_id' => $request->kelas_id,
+            'nisn' => $request->nisn,
+            'nis' => $request->nis,
+            'nik' => $request->nik,
+            'nama_lengkap' => $request->nama_lengkap,
+            'foto' => $fotoPath ? str_replace('public/', '', $fotoPath) : null,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'tmp_lahir' => $request->tmp_lahir,
+            'tgl_lahir' => $request->tgl_lahir,
+            'agama' => $request->agama,
+            'province_id' => $request->province_id,
+            'city_id' => $request->city_id,
+            'district_id' => $request->district_id,
+            'village_id' => $request->village_id,
+            'kode_pos' => $request->kode_pos,
+            'tinggal' => $request->tinggal,
+            'transport' => $request->transport,
+            'hp' => $request->hp,
+            'ayah' => $request->ayah,
+            'email_ayah' => $request->email_ayah,
+            'kerja_ayah' => $request->kerja_ayah,
+            'ibu' => $request->ibu,
+            'email_ibu' => $request->email_ibu,
+            'kerja_ibu' => $request->kerja_ibu,
+            'wali' => $request->wali,
+            'email_wali' => $request->email_wali,
+            'kerja_wali' => $request->kerja_wali,
+            'tb' => $request->tb,
+            'bb' => $request->bb,
+            'kks' => $request->kks,
+            'kph' => $request->kph,
+            'kip' => $request->kip,
+    ]);
+
+    // If the user uploaded a new photo or file, handle the upload
+    if ($request->hasFile('foto')) {
+        $photoPath = $request->file('foto')->store('public/siswa-photos');
+        $dataSiswa->update(['foto' => Storage::url($photoPath)]);
+    }
+
+    return redirect()->route('siswa.profile')->with('success', 'Profile updated successfully!');
+}
 }

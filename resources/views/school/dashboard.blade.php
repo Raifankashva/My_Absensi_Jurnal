@@ -6,6 +6,7 @@
         <!-- Header with gradient background -->
         <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 shadow-lg mb-8 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
             <h1 class="text-3xl font-bold text-white">Dashboard Sekolah</h1>
+            <img src="{{ asset('storage/' . $sekolah->foto) }}" alt="Foto {{ $sekolah->nama_sekolah }}" class="w-16 h-16 rounded-md">
             <h2 class="text-xl font-medium text-blue-100">{{ $sekolah->nama_sekolah }}</h2>
         </div>
 

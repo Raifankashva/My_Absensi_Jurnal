@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+ 
 
 class SekolahController extends Controller
 {
@@ -92,64 +94,71 @@ class SekolahController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-{
-    try {
-        DB::beginTransaction();
-
-        $validator = Validator::make($request->all(), [
-            'npsn' => 'required|string|max:8|unique:sekolahs',
-            'nama_sekolah' => 'required|string|max:255',
-            'jenjang' => 'required|in:SD,SMP,SMA,SMK',
-            'status' => 'required|in:Negeri,Swasta',
-            'alamat' => 'required|string',
-            'province_id' => 'required|exists:provinces,id',
-            'city_id' => 'required|exists:regencies,id',
-            'district_id' => 'required|exists:districts,id',
-            'village_id' => 'required|exists:villages,id',
-            'kode_pos' => 'required|string|max:5',
-            'no_telp' => 'required|string|max:15',
-            'email' => 'required|email|unique:sekolahs,email|unique:users,email',
-            'website' => 'nullable|url',
-            'akreditasi' => 'nullable|string|max:1',
-            'kepala_sekolah' => 'required|string|max:255',
-            'nip_kepala_sekolah' => 'nullable|string|max:18',
-            'password' => 'required|string|min:8|confirmed' // Add password field
-        ]);
-
-        if ($validator->fails()) {
+    {
+        try {
+            DB::beginTransaction();
+    
+            $validator = Validator::make($request->all(), [
+                'npsn' => 'required|string|max:8|unique:sekolahs',
+                'nama_sekolah' => 'required|string|max:255',
+                'jenjang' => 'required|in:SD,SMP,SMA,SMK',
+                'status' => 'required|in:Negeri,Swasta',
+                'alamat' => 'required|string',
+                'province_id' => 'required|exists:provinces,id',
+                'city_id' => 'required|exists:regencies,id',
+                'district_id' => 'required|exists:districts,id',
+                'village_id' => 'required|exists:villages,id',
+                'kode_pos' => 'required|string|max:5',
+                'no_telp' => 'required|string|max:15',
+                'email' => 'required|email|unique:sekolahs,email|unique:users,email',
+                'website' => 'nullable|url',
+                'akreditasi' => 'nullable|string|max:1',
+                'kepala_sekolah' => 'required|string|max:255',
+                'nip_kepala_sekolah' => 'nullable|string|max:18',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'password' => 'required|string|min:8|confirmed'
+            ]);
+    
+            if ($validator->fails()) {
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+    
+            // Create user first
+            $user = User::create([
+                'name' => $request->nama_sekolah,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'alamat' => $request->alamat,
+                'no_hp' => $request->no_telp,
+                'role' => 'sekolah',
+            ]);
+    
+            // Handle Foto
+            $sekolahData = $request->all();
+            $sekolahData['user_id'] = $user->id;
+    
+            if ($request->hasFile('foto')) {
+                $fotoPath = $request->file('foto')->store('foto_sekolah', 'public'); // Simpan ke storage/app/public/foto_sekolah
+                $sekolahData['foto'] = $fotoPath;
+            }
+    
+            Sekolah::create($sekolahData);
+    
+            DB::commit();
+    
+            return redirect()->route('sekolahs.index')
+                ->with('success', 'Data sekolah berhasil ditambahkan');
+    
+        } catch (\Exception $e) {
+            DB::rollback();
             return redirect()->back()
-                ->withErrors($validator)
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
                 ->withInput();
         }
-
-        // Create user first
-        $user = User::create([
-            'name' => $request->nama_sekolah,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'alamat' => $request->alamat,
-            'no_hp' => $request->no_telp,
-            'role' => 'sekolah',
-        ]);
-
-        // Now create the sekolah with user_id
-        $sekolahData = $request->all();
-        $sekolahData['user_id'] = $user->id;
-        
-        Sekolah::create($sekolahData);
-
-        DB::commit();
-
-        return redirect()->route('sekolahs.index')
-            ->with('success', 'Data sekolah berhasil ditambahkan');
-
-    } catch (\Exception $e) {
-        DB::rollback();
-        return redirect()->back()
-            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
-            ->withInput();
     }
-}
+    
 
     /**
      * Get cities based on province

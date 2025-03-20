@@ -38,46 +38,53 @@ class DataSiswaController extends Controller
 
     
     public function index(Request $request)
-    {
-        $dataSiswa = DataSiswa::with(['user', 'sekolah', 'kelas', 'province', 'city', 'district', 'village'])
-            ->latest()
-            ->paginate(10);
+{
+    // Get the current logged-in user's school
+    $user = auth()->user();
+    $sekolah = Sekolah::where('user_id', $user->id)->firstOrFail();
     
-        $sekolahs = Sekolah::all();
-        $allKelas = Kelas::all();
+    $dataSiswa = DataSiswa::with(['user', 'sekolah', 'kelas', 'province', 'city', 'district', 'village'])
+        ->where('sekolah_id', $sekolah->id) // Only show students from this school
+        ->latest()
+        ->paginate(10);
+
+    $allKelas = Kelas::where('sekolah_id', $sekolah->id)->get();
+
+    // Grouped students for this school only
+    $sekolah->load(['kelas.siswa' => function ($query) use ($request) {
+        if ($request->filled('kelas_id')) {
+            $query->where('kelas_id', $request->kelas_id);
+        }
+    }]);
     
-        // Optionally filter based on request inputs
-        $groupedStudents = Sekolah::with(['kelas.siswa' => function ($query) use ($request) {
-            if ($request->filled('kelas_id')) {
-                $query->where('kelas_id', $request->kelas_id);
-            }
-        }])->get();
+    $groupedStudents = collect([$sekolah]);
     
-        // Buat QR Code untuk setiap siswa dalam hasil paginasi
-        $writer = new PngWriter();
-        $qrCodeUrls = [];
-    
-        foreach ($dataSiswa as $siswa) {
-            $qrCode = QrCode::create($this->generateQRContent($siswa))
-                ->setEncoding(new Encoding('UTF-8'))
-                ->setErrorCorrectionLevel(new ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
-                ->setSize(300)
-                ->setMargin(10)
-                ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
-                ->setForegroundColor(new Color(0, 0, 0))
-                ->setBackgroundColor(new Color(255, 255, 255));
-    
-            $result = $writer->write($qrCode);
-    
-            $qrCodePath = 'public/qrcodes/siswa-' . $siswa->id . '.png';
-            Storage::put($qrCodePath, $result->getString());
-    
-            // Simpan URL QR Code dalam array
-            $qrCodeUrls[$siswa->id] = Storage::url('qrcodes/siswa-' . $siswa->id . '.png');
-                }
-    
-        return view('adminsiswa.index', compact('dataSiswa', 'sekolahs', 'allKelas', 'groupedStudents', 'qrCodeUrls'));
+
+    // Generate QR codes
+    $writer = new PngWriter();
+    $qrCodeUrls = [];
+
+    foreach ($dataSiswa as $siswa) {
+        $qrCode = QrCode::create($this->generateQRContent($siswa))
+            ->setEncoding(new Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(new ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
+            ->setSize(300)
+            ->setMargin(10)
+            ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
+            ->setForegroundColor(new Color(0, 0, 0))
+            ->setBackgroundColor(new Color(255, 255, 255));
+
+        $result = $writer->write($qrCode);
+
+        $qrCodePath = 'public/qrcodes/siswa-' . $siswa->id . '.png';
+        Storage::put($qrCodePath, $result->getString());
+
+        // Store QR Code URL in array
+        $qrCodeUrls[$siswa->id] = Storage::url('qrcodes/siswa-' . $siswa->id . '.png');
     }
+
+    return view('adminsiswa.index', compact('dataSiswa', 'sekolah', 'allKelas', 'groupedStudents', 'qrCodeUrls'));
+}
     
     
     

@@ -30,6 +30,7 @@ class CreateSekolahsTable extends Migration
             $table->string('akreditasi', 1)->nullable();
             $table->string('kepala_sekolah');
             $table->string('nip_kepala_sekolah', 18)->nullable();
+            $table->string('foto')->nullable();
             $table->timestamps();
             
             // Menambahkan foreign key constraints

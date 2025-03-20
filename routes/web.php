@@ -134,6 +134,8 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
     Route::get('/siswa/jadwal', [SiswaController::class, 'jadwal'])->name('siswa.jadwal');
     Route::get('/siswa/kartu-pelajar', [SiswaController::class, 'generateStudentCard'])->name('siswa.kartu-pelajar');
+    Route::get('/profile', [SiswaController::class, 'profile'])->name('siswa.profile');
+    Route::post('/profile/update', [SiswaController::class, 'updateProfile'])->name('siswa.profile.update');
 
 });
 
@@ -218,4 +220,12 @@ Route::get('/kelas', [KelasSekolahController::class, 'index'])->name('kelassekol
         Route::delete('/{guru}', [DataGuruController::class, 'destroy'])->name('destroy');
     });
         Route::get('adminguru/{guru}/detail', [DataGuruController::class, 'show'])->name('adminguru.detail');
+        Route::resource('adminsiswa', DataSiswaController::class);
+
+    Route::get('get-kelas/{sekolahId}', [DataSiswaController::class, 'getKelas'])->name('get.kelas');
+    Route::get('get-cities/{provinceId}', [DataSiswaController::class, 'getCities'])->name('get.cities');
+    Route::get('get-districts/{cityId}', [DataSiswaController::class, 'getDistricts'])->name('get.districts');
+    Route::get('get-villages/{districtId}', [DataSiswaController::class, 'getVillages'])->name('get.villages');
+    Route::post('download-qrcode', [DataSiswaController::class, 'downloadQRCodes'])->name('download.download');
+    Route::get('download-qrcode/{id}', [DataSiswaController::class, 'downloadQRCode'])->name('adminsiswa.download-qrcode');
 });

@@ -26,6 +26,7 @@ class Sekolah extends Model
         'akreditasi',
         'kepala_sekolah',
         'nip_kepala_sekolah',
+        'foto',
         'total_siswa',
     ];
 

@@ -8,8 +8,16 @@
                     <h2 class="text-3xl font-extrabold text-gray-800 mb-6 border-b-2 border-blue-500 pb-3">
                         <i class="fas fa-school mr-3 text-blue-600"></i>Tambah Data Sekolah
                     </h2>
-                    
-                    <form method="POST" action="{{ route('sekolahs.store') }}" class="space-y-6">
+                    @if ($errors->any())
+            <div class="mb-4 p-4 bg-red-100 text-red-600 rounded">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+                    <form method="POST" action="{{ route('sekolahs.store') }}" class="space-y-6" enctype="multipart/form-data">
                         @csrf
 
                         {{-- NPSN dan Nama Sekolah --}}
@@ -221,6 +229,10 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+                        <div class="mb-4">
+                <label class="block text-gray-700 font-semibold">Foto Sekolah (Opsional)</label>
+                <input type="file" name="foto" class="w-full p-2 border rounded">
+            </div>
                         <div>
                             <label for="password_confirmation" class="block text-sm font-medium text-gray-700"><i class="fas fa-id-card mr-2 text-blue-500"></i> Konfirmasi Password</label>
                             <input type="password" name="password_confirmation" id="password_confirmation" value="{{ old('password') }}" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">

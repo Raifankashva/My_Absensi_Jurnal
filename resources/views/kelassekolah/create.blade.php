@@ -64,10 +64,19 @@
                                 <select name="tingkat" id="tingkat" 
                                        class="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" 
                                        required>
-                                    <option value="">Pilih Tingkat</option>
-                                    <option value="1" {{ old('tingkat') == '1' ? 'selected' : '' }}>Tingkat 1</option>
-                                    <option value="2" {{ old('tingkat') == '2' ? 'selected' : '' }}>Tingkat 2</option>
-                                    <option value="3" {{ old('tingkat') == '3' ? 'selected' : '' }}>Tingkat 3</option>
+                                       <option value="">Pilih Tingkat</option>
+                    <option value="I">I</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
+                    <option value="IV">IV</option>
+                    <option value="V">V</option>
+                    <option value="VI">VI</option>
+                    <option value="VII">VII</option>
+                    <option value="VIII">VIII</option>
+                    <option value="IX">IX</option>
+                    <option value="X">X</option>
+                    <option value="XI">XI</option>
+                    <option value="XII">XII</option>
                                 </select>
                             </div>
                         </div>
