@@ -1,126 +1,116 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Edit Jadwal Pelajaran</h5>
+<div class="container mx-auto px-4 py-6">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-400 px-6 py-4">
+            <h3 class="text-xl font-bold text-white">Edit Jadwal Pelajaran</h3>
+        </div>
+        <form action="{{ route('jadwal-pelajaran.update', $jadwalPelajaran->id) }}" method="POST" id="jadwalForm">
+            @csrf
+            @method('PUT')
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Kelas</label>
+                        <select name="kelas_id" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 @error('kelas_id') border-red-500 @enderror" 
+                                required>
+                            <option value="">Pilih Kelas</option>
+                            @foreach($kelas as $k)
+                                <option value="{{ $k->id }}" 
+                                    {{ $jadwalPelajaran->kelas_id == $k->id ? 'selected' : '' }}>
+                                    {{ $k->nama_kelas }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('kelas_id')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Guru</label>
+                        <select name="guru_id" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 @error('guru_id') border-red-500 @enderror" 
+                                required>
+                            <option value="">Pilih Guru</option>
+                            @foreach($guru as $g)
+                                <option value="{{ $g->id }}" 
+                                    {{ $jadwalPelajaran->guru_id == $g->id ? 'selected' : '' }}>
+                                    {{ $g->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('guru_id')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
-
-                <div class="card-body">
-                    <form action="{{ route('jadwal-pelajaran.update', $jadwalPelajaran->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        
-                        <div class="form-group row mb-3">
-                            <label for="kelas_id" class="col-md-4 col-form-label text-md-right">Kelas</label>
-                            <div class="col-md-6">
-                                <select name="kelas_id" id="kelas_id" class="form-control @error('kelas_id') is-invalid @enderror" required>
-                                    <option value="">Pilih Kelas</option>
-                                    @foreach($kelas as $k)
-                                        <option value="{{ $k->id }}" {{ (old('kelas_id', $jadwalPelajaran->kelas_id) == $k->id) ? 'selected' : '' }}>
-                                            {{ $k->nama_kelas }} ({{ $k->tingkat }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('kelas_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <div class="form-group row mb-3">
-                            <label for="guru_id" class="col-md-4 col-form-label text-md-right">Guru</label>
-                            <div class="col-md-6">
-                                <select name="guru_id" id="guru_id" class="form-control @error('guru_id') is-invalid @enderror" required>
-                                    <option value="">Pilih Guru</option>
-                                    @foreach($guru as $g)
-                                        <option value="{{ $g->id }}" {{ (old('guru_id', $jadwalPelajaran->guru_id) == $g->id) ? 'selected' : '' }}>
-                                            {{ $g->nama_lengkap }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('guru_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <div class="form-group row mb-3">
-                            <label for="mata_pelajaran" class="col-md-4 col-form-label text-md-right">Mata Pelajaran</label>
-                            <div class="col-md-6">
-                                <input type="text" name="mata_pelajaran" id="mata_pelajaran" class="form-control @error('mata_pelajaran') is-invalid @enderror" value="{{ old('mata_pelajaran', $jadwalPelajaran->mata_pelajaran) }}" required>
-                                @error('mata_pelajaran')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <div class="form-group row mb-3">
-                            <label for="hari" class="col-md-4 col-form-label text-md-right">Hari</label>
-                            <div class="col-md-6">
-                                <select name="hari" id="hari" class="form-control @error('hari') is-invalid @enderror" required>
-                                    <option value="">Pilih Hari</option>
-                                    @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as $hari)
-                                        <option value="{{ $hari }}" {{ (old('hari', $jadwalPelajaran->hari) == $hari) ? 'selected' : '' }}>
-                                            {{ $hari }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('hari')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <div class="form-group row mb-3">
-                            <label for="jam_mulai" class="col-md-4 col-form-label text-md-right">Jam Mulai</label>
-                            <div class="col-md-6">
-                                <input type="time" name="jam_mulai" id="jam_mulai" class="form-control @error('jam_mulai') is-invalid @enderror" value="{{ old('jam_mulai', $jadwalPelajaran->jam_mulai) }}" required>
-                                @error('jam_mulai')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <div class="form-group row mb-3">
-                            <label for="jam_selesai" class="col-md-4 col-form-label text-md-right">Jam Selesai</label>
-                            <div class="col-md-6">
-                                <input type="time" name="jam_selesai" id="jam_selesai" class="form-control @error('jam_selesai') is-invalid @enderror" value="{{ old('jam_selesai', $jadwalPelajaran->jam_selesai) }}" required>
-                                @error('jam_selesai')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-                        
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    Perbarui
-                                </button>
-                                <a href="{{ route('jadwal-pelajaran.index') }}" class="btn btn-secondary">
-                                    Batal
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mata Pelajaran</label>
+                        <input type="text" name="mata_pelajaran" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 @error('mata_pelajaran') border-red-500 @enderror" 
+                               value="{{ $jadwalPelajaran->mata_pelajaran }}" 
+                               placeholder="Masukkan Mata Pelajaran" required>
+                        @error('mata_pelajaran')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Hari</label>
+                        <select name="hari" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 @error('hari') border-red-500 @enderror" 
+                                required>
+                            <option value="">Pilih Hari</option>
+                            <option value="Senin" {{ $jadwalPelajaran->hari == 'Senin' ? 'selected' : '' }}>Senin</option>
+                            <option value="Selasa" {{ $jadwalPelajaran->hari == 'Selasa' ? 'selected' : '' }}>Selasa</option>
+                            <option value="Rabu" {{ $jadwalPelajaran->hari == 'Rabu' ? 'selected' : '' }}>Rabu</option>
+                            <option value="Kamis" {{ $jadwalPelajaran->hari == 'Kamis' ? 'selected' : '' }}>Kamis</option>
+                            <option value="Jumat" {{ $jadwalPelajaran->hari == 'Jumat' ? 'selected' : '' }}>Jumat</option>
+                            <option value="Sabtu" {{ $jadwalPelajaran->hari == 'Sabtu' ? 'selected' : '' }}>Sabtu</option>
+                        </select>
+                        @error('hari')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jam Mulai</label>
+                        <input type="time" name="jam_mulai" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 @error('jam_mulai') border-red-500 @enderror" 
+                               value="{{ $jadwalPelajaran->jam_mulai }}" required>
+                        @error('jam_mulai')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jam Selesai</label>
+                        <input type="time" name="jam_selesai" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 @error('jam_selesai') border-red-500 @enderror" 
+                               value="{{ $jadwalPelajaran->jam_selesai }}" required>
+                        @error('jam_selesai')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+                <a href="{{ route('jadwal-pelajaran.index') }}" 
+                   class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition duration-200">
+                    Kembali
+                </a>
+                <button type="submit" 
+                        class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg shadow-md hover:shadow-lg transition duration-200">
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+
 @endsection
+

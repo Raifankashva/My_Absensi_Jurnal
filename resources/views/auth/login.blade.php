@@ -51,7 +51,6 @@
         }
     </script>
     <style>
-        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -79,14 +78,12 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Animated background */
         .animated-bg {
             background: linear-gradient(-45deg, #EFF6FF, #DBEAFE, #BFDBFE, #93C5FD);
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
         }
 
-        /* Glass morphism */
         .glass-morphism {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
@@ -94,12 +91,10 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
 
-        /* Floating elements */
         .floating {
             animation: float 3s ease-in-out infinite;
         }
 
-        /* Fade in animation classes */
         .animate-fade-in {
             animation: fadeIn 0.5s ease-in-out forwards;
         }
@@ -108,7 +103,6 @@
             animation: slideUp 0.5s ease-in-out forwards;
         }
 
-        /* Staggered animations */
         .stagger-1 { animation-delay: 0.1s; }
         .stagger-2 { animation-delay: 0.2s; }
         .stagger-3 { animation-delay: 0.3s; }
@@ -116,32 +110,25 @@
     </style>
 </head>
 <body class="font-sans animated-bg min-h-screen flex items-center justify-center p-4">
-    <!-- Decorative Elements -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <!-- Top right decorative circle -->
         <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full opacity-10 -translate-y-1/2 translate-x-1/2"></div>
         
-        <!-- Bottom left decorative circle -->
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500 rounded-full opacity-10 translate-y-1/2 -translate-x-1/2"></div>
         
-        <!-- Floating elements -->
         <div class="absolute top-1/4 left-1/4 w-16 h-16 bg-blue-400 rounded-full opacity-20 floating"></div>
         <div class="absolute top-3/4 right-1/4 w-12 h-12 bg-indigo-400 rounded-full opacity-20 floating" style="animation-delay: 1s;"></div>
         <div class="absolute top-1/2 left-1/3 w-8 h-8 bg-blue-300 rounded-full opacity-20 floating" style="animation-delay: 2s;"></div>
     </div>
 
-    <!-- Login Container -->
     <div class="w-full max-w-md relative z-10 opacity-0 animate-fade-in">
-        <!-- Logo and Header -->
         <div class="text-center mb-8 opacity-0 animate-slide-up stagger-1">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg mb-4 transform transition-all duration-300 hover:scale-110">
                 <i class='bx bxs-school text-3xl text-white'></i>
             </div>
-            <h1 class="text-3xl font-bold text-gray-900">Welcome Back</h1>
-            <p class="text-gray-600 mt-2">Sign in to your account</p>
+            <h1 class="text-3xl font-bold text-gray-900">Selamat Datang Kembali</h1>
+            <p class="text-gray-600 mt-2">Masuk Ke Akun Anda            </p>
         </div>
 
-        <!-- Login Form -->
         <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden opacity-0 animate-slide-up stagger-2">
             <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 border-b border-white/10">
                 <h2 class="text-xl font-semibold text-white flex items-center">
@@ -157,7 +144,7 @@
                     <!-- Email Field -->
                     <div class="space-y-2 opacity-0 animate-slide-up stagger-3">
                         <label for="email" class="block text-sm font-medium text-gray-700">
-                            Email Address
+                            Email
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -183,7 +170,6 @@
                         @enderror
                     </div>
 
-                    <!-- Password Field -->
                     <div class="space-y-2 opacity-0 animate-slide-up stagger-4">
                         <div class="flex items-center justify-between">
                             <label for="password" class="block text-sm font-medium text-gray-700">
@@ -191,7 +177,7 @@
                             </label>
                             @if (Route::has('password.request'))
                                 <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:text-blue-800 transition-colors duration-300">
-                                    Forgot your password?
+                                    Lupa Password?
                                 </a>
                             @endif
                         </div>
@@ -222,7 +208,6 @@
                         @enderror
                     </div>
 
-                    <!-- Remember Me -->
                     <div class="flex items-center opacity-0 animate-slide-up" style="animation-delay: 0.5s;">
                         <input
                             id="remember"
@@ -232,11 +217,10 @@
                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-300"
                         >
                         <label for="remember" class="ml-2 block text-sm text-gray-700">
-                            Remember me
+                            Ingat Saya
                         </label>
                     </div>
 
-                    <!-- Login Button -->
                     <div class="opacity-0 animate-slide-up" style="animation-delay: 0.6s;">
                         <button
                             type="submit"
@@ -246,12 +230,11 @@
                                    transform transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                         >
                             <i class='bx bx-log-in-circle mr-2'></i>
-                            Sign in
+                            Masuk
                         </button>
                     </div>
                 </form>
 
-                <!-- Divider -->
                 <div class="relative my-6 opacity-0 animate-slide-up" style="animation-delay: 0.7s;">
                     <div class="absolute inset-0 flex items-center">
                         <div class="w-full border-t border-gray-300"></div>
@@ -261,7 +244,6 @@
                     </div>
                 </div>
 
-                <!-- Social Login Buttons -->
                 <div class="grid grid-cols-3 gap-3 opacity-0 animate-slide-up" style="animation-delay: 0.8s;">
                     <button
                         type="button"
@@ -291,19 +273,7 @@
             </div>
         </div>
 
-        <!-- Register Link -->
-        <div class="text-center mt-6 opacity-0 animate-slide-up" style="animation-delay: 0.9s;">
-            <p class="text-gray-600">
-                Don't have an account?
-                <a href="#" class="font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300">
-                    Register now
-                </a>
-            </p>
-            <p class="text-gray-600">
-                Lupa Password?
-                <a href="{{ route('password.request') }}" class="font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300">Reset</a>
-            </p>
-        </div>
+        
     </div>
 
     <script>

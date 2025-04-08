@@ -1,245 +1,196 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="py-6 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
-        <div class="bg-white rounded-lg shadow">
-            <div class="border-b border-gray-200 px-4 py-4 sm:px-6">
-                <h5 class="text-lg font-medium text-gray-900">Isi Jurnal Pembelajaran</h5>
+<div class="container mx-auto px-4 py-6">
+    <div class="bg-white shadow-md rounded-lg">
+        <div class="p-6 border-b border-gray-200">
+            <h1 class="text-2xl font-bold text-gray-800">Buat Jurnal Pembelajaran</h1>
+        </div>
+        @if ($errors->any())
+            <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        <form action="{{ route('jurnal-guru.store') }}" method="POST" class="p-6">
+            @csrf
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- Jadwal Pelajaran --}}
+                <div class="form-group">
+                    <label for="jadwal_pelajaran_id" class="block text-sm font-medium text-gray-700">
+                        Jadwal Pelajaran
+                    </label>
+                    <select 
+                        name="jadwal_pelajaran_id" 
+                        id="jadwal_pelajaran_id" 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        required
+                    >
+                        <option value="">Pilih Jadwal Pelajaran</option>
+                        @foreach($jadwalHariIni as $jadwal)
+                            <option value="{{ $jadwal->id }}">
+                                {{ $jadwal->kelas->nama_kelas }} - {{ $jadwal->mata_pelajaran }} ({{ $jadwal->jam_mulai }} - {{ $jadwal->jam_selesai }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Tanggal --}}
+                <div class="form-group">
+                    <label for="tanggal" class="block text-sm font-medium text-gray-700">
+                        Tanggal
+                    </label>
+                    <input 
+                        type="date" 
+                        name="tanggal" 
+                        id="tanggal" 
+                        value="{{ date('Y-m-d') }}"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        required
+                    >
+                </div>
             </div>
 
-            <div class="px-4 py-5 sm:p-6">
-                @if (session('error'))
-                    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                        <div class="text-sm text-red-700">
-                            {{ session('error') }}
-                        </div>
+            {{-- Materi yang Disampaikan --}}
+            <div class="mt-6">
+                <label for="materi_yang_disampaikan" class="block text-sm font-medium text-gray-700">
+                    Materi yang Disampaikan
+                </label>
+                <textarea 
+                    name="materi_yang_disampaikan" 
+                    id="materi_yang_disampaikan" 
+                    rows="3"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    required
+                ></textarea>
+            </div>
+
+            {{-- Status Pertemuan --}}
+            <div class="mt-6">
+                <label class="block text-sm font-medium text-gray-700">
+                    Status Pertemuan
+                </label>
+                <div class="mt-2 space-y-2">
+                    <div class="flex items-center">
+                        <input 
+                            type="radio" 
+                            name="status_pertemuan" 
+                            value="Terlaksana" 
+                            id="status_terlaksana"
+                            class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                            checked
+                        >
+                        <label for="status_terlaksana" class="ml-2 block text-sm text-gray-900">
+                            Terlaksana
+                        </label>
                     </div>
-                @endif
-                
-                @if(count($jadwalHariIni) > 0)
-                <form action="{{ route('jurnal-guru.store') }}" method="POST">
-                    @csrf
-                    
-                    <div class="space-y-6">
-                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                            <div class="sm:col-span-2">
-                                <label for="jadwal_pelajaran_id" class="block text-sm font-medium text-gray-700">
-                                    Jadwal Pelajaran
-                                </label>
-                            </div>
-                            <div class="sm:col-span-4">
-                                <select name="jadwal_pelajaran_id" id="jadwal_pelajaran_id" 
-                                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md @error('jadwal_pelajaran_id') border-red-300 text-red-900 placeholder-red-300 @enderror">
-                                    <option value="">Pilih Jadwal</option>
-                                    @foreach($jadwalHariIni as $jadwal)
-                                        <option value="{{ $jadwal->id }}" {{ old('jadwal_pelajaran_id') == $jadwal->id ? 'selected' : '' }}>
-                                            {{ $jadwal->mata_pelajaran }} - {{ $jadwal->kelas->nama_kelas }} 
-                                            ({{ substr($jadwal->jam_mulai, 0, 5) }} - {{ substr($jadwal->jam_selesai, 0, 5) }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('jadwal_pelajaran_id')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                    <div class="flex items-center">
+                        <input 
+                            type="radio" 
+                            name="status_pertemuan" 
+                            value="Diganti" 
+                            id="status_diganti"
+                            class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                        >
+                        <label for="status_diganti" class="ml-2 block text-sm text-gray-900">
+                            Diganti
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input 
+                            type="radio" 
+                            name="status_pertemuan" 
+                            value="Dibatalkan" 
+                            id="status_dibatalkan"
+                            class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                        >
+                        <label for="status_dibatalkan" class="ml-2 block text-sm text-gray-900">
+                            Dibatalkan
+                        </label>
+                    </div>
+                </div>
+            </div>
 
-                            <div class="sm:col-span-2">
-                                <label for="tanggal" class="block text-sm font-medium text-gray-700">
-                                    Tanggal
-                                </label>
-                            </div>
-                            <div class="sm:col-span-4">
-                                <input type="date" name="tanggal" id="tanggal"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('tanggal') border-red-300 text-red-900 placeholder-red-300 @enderror"
-                                    value="{{ old('tanggal', date('Y-m-d')) }}">
-                                @error('tanggal')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label for="materi_yang_disampaikan" class="block text-sm font-medium text-gray-700">
-                                    Materi yang Disampaikan
-                                </label>
-                            </div>
-                            <div class="sm:col-span-4">
-                                <textarea name="materi_yang_disampaikan" id="materi_yang_disampaikan" rows="4"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('materi_yang_disampaikan') border-red-300 text-red-900 placeholder-red-300 @enderror">{{ old('materi_yang_disampaikan') }}</textarea>
-                                @error('materi_yang_disampaikan')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label for="status_pertemuan" class="block text-sm font-medium text-gray-700">
-                                    Status Pertemuan
-                                </label>
-                            </div>
-                            <div class="sm:col-span-4">
-                                <select name="status_pertemuan" id="status_pertemuan"
-                                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md @error('status_pertemuan') border-red-300 text-red-900 placeholder-red-300 @enderror">
-                                    <option value="Terlaksana" {{ old('status_pertemuan') == 'Terlaksana' ? 'selected' : '' }}>Terlaksana</option>
-                                    <option value="Diganti" {{ old('status_pertemuan') == 'Diganti' ? 'selected' : '' }}>Diganti</option>
-                                    <option value="Dibatalkan" {{ old('status_pertemuan') == 'Dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
-                                </select>
-                                @error('status_pertemuan')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label for="jumlah_siswa_hadir" class="block text-sm font-medium text-gray-700">
-                                    Jumlah Siswa Hadir
-                                </label>
-                            </div>
-                            <div class="sm:col-span-4">
-                                <input type="number" name="jumlah_siswa_hadir" id="jumlah_siswa_hadir" min="0"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('jumlah_siswa_hadir') border-red-300 text-red-900 placeholder-red-300 @enderror"
-                                    value="{{ old('jumlah_siswa_hadir') }}">
-                                @error('jumlah_siswa_hadir')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label for="jumlah_siswa_tidak_hadir" class="block text-sm font-medium text-gray-700">
-                                    Jumlah Siswa Tidak Hadir
-                                </label>
-                            </div>
-                            <div class="sm:col-span-4">
-                                <input type="number" name="jumlah_siswa_tidak_hadir" id="jumlah_siswa_tidak_hadir" min="0"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('jumlah_siswa_tidak_hadir') border-red-300 text-red-900 placeholder-red-300 @enderror"
-                                    value="{{ old('jumlah_siswa_tidak_hadir') }}">
-                                @error('jumlah_siswa_tidak_hadir')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label for="data_siswa_tidak_hadir" class="block text-sm font-medium text-gray-700">
-                                    Data Siswa Tidak Hadir
-                                </label>
-                            </div>
-                            <div class="sm:col-span-4" id="siswa-tidak-hadir-list">
-                                <div class="space-y-2">
-                                    <div class="siswa-input">
-                                        <input type="text" name="data_siswa_tidak_hadir[]" 
-                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                            placeholder="Nama siswa dan alasan tidak hadir">
+            {{-- Daftar Siswa Absensi --}}
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Daftar Siswa</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($jadwalHariIni->first()->kelas->siswa as $siswa)
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">
+                                    {{ $siswa->nama_lengkap }}
+                                </span>
+                                <div class="flex items-center space-x-4">
+                                    <label class="flex items-center">
+                                        <input 
+                                            type="checkbox" 
+                                            name="siswa_hadir[]" 
+                                            value="{{ $siswa->id }}"
+                                            class="form-checkbox h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                            checked
+                                        >
+                                        <span class="ml-2 text-sm text-gray-700">Hadir</span>
+                                    </label>
+                                    <div class="relative">
+                                        <select 
+                                            name="keterangan_tidak_hadir[{{ $siswa->id }}]"
+                                            class="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+                                            onchange="handleAbsensiChange(this)"
+                                        >
+                                            <option value="">Pilih Keterangan</option>
+                                            <option value="Sakit">Sakit</option>
+                                            <option value="Izin">Izin</option>
+                                            <option value="Alpa">Alpa</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <button type="button" id="tambah-siswa-btn"
-                                    class="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    <svg class="-ml-0.5 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                                    </svg>
-                                    Tambah Siswa
-                                </button>
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label for="catatan_pembelajaran" class="block text-sm font-medium text-gray-700">
-                                    Catatan Pembelajaran
-                                </label>
-                            </div>
-                            <div class="sm:col-span-4">
-                                <textarea name="catatan_pembelajaran" id="catatan_pembelajaran" rows="3"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('catatan_pembelajaran') border-red-300 text-red-900 placeholder-red-300 @enderror">{{ old('catatan_pembelajaran') }}</textarea>
-                                @error('catatan_pembelajaran')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
                         </div>
-
-                        <div class="flex justify-end space-x-3">
-                            <a href="{{ route('jurnal-guru.index') }}"
-                                class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Batal
-                            </a>
-                            <button type="submit"
-                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Simpan Jurnal
-                            </button>
-                        </div>
-                    </div>
-                </form>
-                @else
-                    <div class="rounded-md bg-blue-50 p-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-blue-700">
-                                    Tidak ada jadwal mengajar untuk hari ini. Silakan pilih hari lain atau hubungi admin jika ada kesalahan jadwal.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-5 text-center">
-                        <a href="{{ route('jurnal-guru.index') }}"
-                            class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Kembali
-                        </a>
-                    </div>
-                @endif
+                    @endforeach
+                </div>
             </div>
-        </div>
+
+            {{-- Catatan Tambahan --}}
+            <div class="mt-6">
+                <label for="catatan_pembelajaran" class="block text-sm font-medium text-gray-700">
+                    Catatan Tambahan
+                </label>
+                <textarea 
+                    name="catatan_pembelajaran" 
+                    id="catatan_pembelajaran" 
+                    rows="2"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                ></textarea>
+            </div>
+
+            {{-- Submit Button --}}
+            <div class="mt-8 flex justify-end">
+                <button 
+                    type="submit" 
+                    class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Simpan Jurnal
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const tambahSiswaBtn = document.getElementById('tambah-siswa-btn');
-    const siswaContainer = document.getElementById('siswa-tidak-hadir-list');
-    
-    if (tambahSiswaBtn) {
-        tambahSiswaBtn.addEventListener('click', function() {
-            const siswaInput = document.createElement('div');
-            siswaInput.className = 'siswa-input mt-2';
-            siswaInput.innerHTML = `
-                <div class="flex space-x-2">
-                    <input type="text" name="data_siswa_tidak_hadir[]" 
-                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        placeholder="Nama siswa dan alasan tidak hadir">
-                    <button type="button" class="hapus-siswa-btn inline-flex items-center p-2 border border-gray-300 rounded-md text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-            `;
-            
-            const firstInput = siswaContainer.querySelector('.siswa-input');
-            siswaContainer.insertBefore(siswaInput, firstInput.nextSibling);
-            
-            // Add event listener to new delete button
-            const deleteButton = siswaInput.querySelector('.hapus-siswa-btn');
-            deleteButton.addEventListener('click', function() {
-                siswaInput.remove();
-            });
-        });
-    }
-    
-    // Show/hide tidak hadir section based on input
-    const jumlahTidakHadir = document.getElementById('jumlah_siswa_tidak_hadir');
-    const siswaContainer = document.getElementById('siswa-tidak-hadir-container');
-    
-    function toggleSiswaTidakHadir() {
-        if (parseInt(jumlahTidakHadir.value) > 0) {
-            siswaContainer.classList.remove('hidden');
+    function handleAbsensiChange(selectElement) {
+        const checkboxId = selectElement.closest('.flex').querySelector('input[type="checkbox"]');
+        
+        if (selectElement.value) {
+            checkboxId.checked = false;
         } else {
-            siswaContainer.classList.add('hidden');
+            checkboxId.checked = true;
         }
     }
-    
-    if (jumlahTidakHadir) {
-        toggleSiswaTidakHadir(); // Initial check
-        jumlahTidakHadir.addEventListener('input', toggleSiswaTidakHadir);
-    }
-});
 </script>
+
 @endsection

@@ -1,316 +1,335 @@
 @extends('layouts.app')
 
+@section('title', 'Data Absensi')
+
 @section('content')
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Absensi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            '50': '#f0f9ff',
-                            '100': '#e0f2fe',
-                            '200': '#bae6fd',
-                            '300': '#7dd3fc',
-                            '400': '#38bdf8',
-                            '500': '#0ea5e9',
-                            '600': '#0284c7',
-                            '700': '#0369a1',
-                            '800': '#075985',
-                            '900': '#0c4a6e',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <!-- Header -->
-            <div class="p-6 bg-gradient-to-r from-primary-700 to-primary-900 text-white border-b border-primary-800">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <div>
-                        <h1 class="text-2xl font-bold mb-1">Data Absensi</h1>
-                        <p class="text-primary-100 text-sm">Monitoring kehadiran siswa secara real-time</p>
-                    </div>
-                    <a href="{{ route('absensi.scan') }}" class="mt-4 md:mt-0 bg-white text-primary-800 hover:bg-primary-50 font-medium py-2 px-4 rounded-lg flex items-center transition duration-200 shadow-md">
-                        <i class="fas fa-qrcode mr-2"></i>
-                        Scan QR Code
-                    </a>
-                </div>
+<div class="space-y-8">
+    <!-- Header with gradient background -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-calendar-check text-white text-3xl"></i>
+                <h1 class="text-2xl font-bold text-white">Data Absensi {{ $authSchool->nama }}</h1>
             </div>
+            {{-- Replace the existing export buttons in the header with these --}}
+<div class="flex space-x-3 mt-4 md:mt-0">
+    <button type="button" id="exportBtn" 
+       class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg inline-flex items-center transition-all duration-300 backdrop-blur-sm border border-white/20">
+        <i class="fas fa-download mr-2"></i> Export
+    </button>
+</div>
 
-            <div class="p-6">
-                <!-- Alerts -->
-                @if (session('success'))
-                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md mb-6 flex items-center" role="alert">
-                        <i class="fas fa-check-circle mr-2 text-green-500"></i>
-                        <span>{{ session('success') }}</span>
-                    </div>
-                @endif
-                
-                @if (session('error'))
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md mb-6 flex items-center" role="alert">
-                        <i class="fas fa-exclamation-circle mr-2 text-red-500"></i>
-                        <span>{{ session('error') }}</span>
-                    </div>
-                @endif
+<!-- Export Dropdown Menu (hidden by default) -->
+<div id="exportMenu" class="hidden absolute right-6 mt-12 bg-white rounded-lg shadow-lg z-50 w-64 border border-blue-100 overflow-hidden">
+    <div class="bg-blue-50 p-3 text-blue-600 font-semibold border-b border-blue-100">
+        <i class="fas fa-file-export mr-2"></i> Export Options
+    </div>
+    <div class="p-3 space-y-2">
+        <div class="text-gray-600 text-sm mb-2 font-medium">Single Day Export</div>
+        <a href="{{ route('absensi.exportPDF', ['kelas_id' => request('kelas_id'), 'tanggal' => request('tanggal', Carbon\Carbon::now()->format('Y-m-d'))]) }}" 
+            class="flex items-center p-2 hover:bg-blue-50 rounded text-gray-700 transition-colors">
+            <i class="fas fa-file-pdf text-red-500 mr-2"></i> Export PDF (Single Day)
+        </a>
+        <a href="{{ route('absensi.exportExcel', ['kelas_id' => request('kelas_id'), 'tanggal' => request('tanggal', Carbon\Carbon::now()->format('Y-m-d'))]) }}" 
+            class="flex items-center p-2 hover:bg-blue-50 rounded text-gray-700 transition-colors">
+            <i class="fas fa-file-excel text-green-500 mr-2"></i> Export Excel (Single Day)
+        </a>
+        
+        <div class="border-t border-gray-200 my-2"></div>
+        
+        <div class="text-gray-600 text-sm mb-2 font-medium">Period Export</div>
+        <a href="{{ route('absensi.exportPeriodePDF', [
+                'kelas_id' => request('kelas_id'), 
+                'periode' => request('periode', 'today'),
+                'tanggal_mulai' => request('tanggal_mulai'),
+                'tanggal_akhir' => request('tanggal_akhir')
+            ]) }}" 
+            class="flex items-center p-2 hover:bg-blue-50 rounded text-gray-700 transition-colors">
+            <i class="fas fa-file-pdf text-red-500 mr-2"></i> Export PDF (Period)
+        </a>
+        <a href="{{ route('absensi.exportPeriodeExcel', [
+                'kelas_id' => request('kelas_id'), 
+                'periode' => request('periode', 'today'),
+                'tanggal_mulai' => request('tanggal_mulai'),
+                'tanggal_akhir' => request('tanggal_akhir')
+            ]) }}" 
+            class="flex items-center p-2 hover:bg-blue-50 rounded text-gray-700 transition-colors">
+            <i class="fas fa-file-excel text-green-500 mr-2"></i> Export Excel (Period)
+        </a>
+    </div>
+</div>
 
-                <!-- Summary Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="bg-blue-50 rounded-lg shadow p-4 border border-blue-100">
-                        <div class="flex items-center">
-                            <div class="bg-blue-500 rounded-full p-3 mr-4">
-                                <i class="fas fa-users text-white"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-blue-600 font-medium">Total Hadir</p>
-                                <p class="text-2xl font-bold text-blue-800">{{ $absensi->where('status', 'Hadir')->count() }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-yellow-50 rounded-lg shadow p-4 border border-yellow-100">
-                        <div class="flex items-center">
-                            <div class="bg-yellow-500 rounded-full p-3 mr-4">
-                                <i class="fas fa-clock text-white"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-yellow-600 font-medium">Terlambat</p>
-                                <p class="text-2xl font-bold text-yellow-800">{{ $absensi->where('status', 'Terlambat')->count() }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-red-50 rounded-lg shadow p-4 border border-red-100">
-                        <div class="flex items-center">
-                            <div class="bg-red-500 rounded-full p-3 mr-4">
-                                <i class="fas fa-user-slash text-white"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-red-600 font-medium">Tidak Hadir</p>
-                                <p class="text-2xl font-bold text-red-800">{{ $absensi->where('status', 'Tidak Hadir')->count() }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {{-- Add this to the existing filter form in your absensi.index.blade.php --}}
+<div class="transition-all duration-300 hover:scale-105">
+    <label for="periode" class="block text-sm font-medium text-gray-700 mb-1">Periode</label>
+    <div class="relative">
+        <select name="periode" id="periode" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 pl-10 py-3">
+            <option value="today" {{ request('periode') == 'today' ? 'selected' : '' }}>Hari Ini</option>
+            <option value="this_week" {{ request('periode') == 'this_week' ? 'selected' : '' }}>Minggu Ini</option>
+            <option value="last_week" {{ request('periode') == 'last_week' ? 'selected' : '' }}>Minggu Lalu</option>
+            <option value="this_month" {{ request('periode') == 'this_month' ? 'selected' : '' }}>Bulan Ini</option>
+            <option value="last_month" {{ request('periode') == 'last_month' ? 'selected' : '' }}>Bulan Lalu</option>
+            <option value="last_2_months" {{ request('periode') == 'last_2_months' ? 'selected' : '' }}>2 Bulan Terakhir</option>
+            <option value="custom" {{ request('periode') == 'custom' ? 'selected' : '' }}>Kustom (Pilih Tanggal)</option>
+        </select>
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
+            <i class="fas fa-calendar-week"></i>
+        </div>
+    </div>
+</div>
 
-                <!-- Filter Form -->
-                <div class="bg-gray-50 rounded-lg shadow-md p-5 mb-6 border border-gray-200">
-                    <form action="{{ route('absensi.index') }}" method="GET">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label for="sekolah_id" class="block text-sm font-medium text-gray-700 mb-1">Sekolah</label>
-                                <select id="sekolah_id" name="sekolah_id" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 shadow-sm">
-                                    <option value="">Semua Sekolah</option>
-                                    @foreach($sekolah as $s)
-                                        <option value="{{ $s->id }}" {{ $sekolah_id == $s->id ? 'selected' : '' }}>{{ $s->nama_sekolah }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
-                                <select id="kelas_id" name="kelas_id" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 shadow-sm" {{ empty($sekolah_id) ? 'disabled' : '' }}>
-                                    <option value="">Semua Kelas</option>
-                                    @foreach($kelas as $k)
-                                        <option value="{{ $k->id }}" {{ $kelas_id == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label for="tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                                <input type="date" id="tanggal" name="tanggal" value="{{ $tanggal }}" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 shadow-sm">
-                            </div>
-                            <div class="flex items-end space-x-2">
-                                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-md flex items-center">
-                                    <i class="fas fa-filter mr-2"></i> Filter
-                                </button>
-                                <a href="{{ route('absensi.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-md flex items-center">
-                                    <i class="fas fa-redo-alt mr-2"></i> Reset
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Export Buttons -->
-                <div class="flex flex-wrap gap-2 mb-6">
-                    <a href="" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-md flex items-center">
-                        <i class="fas fa-file-pdf mr-2"></i>
-                        Export PDF
-                    </a>
-                    <a href="" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-md flex items-center">
-                        <i class="fas fa-file-excel mr-2"></i>
-                        Export Excel
-                    </a>
-                </div>
-
-                <!-- Desktop Table View -->
-                <div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NISN</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sekolah</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu Scan</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($absensi as $key => $item)
-                                    <tr class="hover:bg-gray-50 transition duration-150">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $absensi->firstItem() + $key }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $item->siswa->nisn }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->siswa->nama }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->siswa->sekolah->nama_sekolah ?? '-' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->siswa->kelas->nama_kelas ?? '-' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ \Carbon\Carbon::parse($item->waktu_scan)->format('d-m-Y H:i:s') }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($item->status == 'Hadir')
-                                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                    <i class="fas fa-check-circle mr-1"></i> Hadir
-                                                </span>
-                                            @elseif($item->status == 'Terlambat')
-                                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                    <i class="fas fa-clock mr-1"></i> Terlambat
-                                                </span>
-                                            @else
-                                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                    <i class="fas fa-times-circle mr-1"></i> Tidak Hadir
-                                                </span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
-                                            <div class="flex flex-col items-center justify-center">
-                                                <i class="fas fa-inbox text-gray-300 text-5xl mb-3"></i>
-                                                <p class="text-lg font-medium">Tidak ada data absensi</p>
-                                                <p class="text-sm text-gray-400">Silakan sesuaikan filter atau coba lagi nanti</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Mobile List View -->
-                <div class="md:hidden space-y-4">
-                    @forelse($absensi as $key => $item)
-                        <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden transition duration-200 hover:shadow-lg">
-                            <div class="p-4 cursor-pointer flex justify-between items-center" onclick="toggleDetails('details-{{ $item->id }}')">
-                                <div>
-                                    <p class="font-medium text-gray-900">{{ $item->siswa->nama }}</p>
-                                    <p class="text-sm text-gray-500">NISN: {{ $item->siswa->nisn }}</p>
-                                </div>
-                                <div class="flex items-center">
-                                    @if($item->status == 'Hadir')
-                                        <span class="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 mr-2">
-                                            <i class="fas fa-check-circle mr-1"></i> Hadir
-                                        </span>
-                                    @elseif($item->status == 'Terlambat')
-                                        <span class="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 mr-2">
-                                            <i class="fas fa-clock mr-1"></i> Terlambat
-                                        </span>
-                                    @else
-                                        <span class="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 mr-2">
-                                            <i class="fas fa-times-circle mr-1"></i> Tidak
-                                        </span>
-                                    @endif
-                                    <i id="icon-{{ $item->id }}" class="fas fa-chevron-down text-gray-400 transition-transform duration-200"></i>
-                                </div>
-                            </div>
-                            <div id="details-{{ $item->id }}" class="hidden px-4 py-3 bg-gray-50 border-t border-gray-200">
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <p class="text-xs text-gray-500">Sekolah</p>
-                                        <p class="text-sm font-medium">{{ $item->siswa->sekolah->nama_sekolah ?? '-' }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Kelas</p>
-                                        <p class="text-sm font-medium">{{ $item->siswa->kelas->nama_kelas ?? '-' }}</p>
-                                    </div>
-                                    <div class="col-span-2">
-                                        <p class="text-xs text-gray-500">Waktu Scan</p>
-                                        <p class="text-sm font-medium">
-                                            <i class="far fa-calendar-alt mr-1 text-primary-600"></i>
-                                            {{ \Carbon\Carbon::parse($item->waktu_scan)->format('d-m-Y') }}
-                                            <i class="far fa-clock ml-2 mr-1 text-primary-600"></i>
-                                            {{ \Carbon\Carbon::parse($item->waktu_scan)->format('H:i:s') }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="bg-white rounded-lg shadow-md border border-gray-200 p-8 text-center">
-                            <div class="flex flex-col items-center justify-center">
-                                <i class="fas fa-inbox text-gray-300 text-5xl mb-3"></i>
-                                <p class="text-lg font-medium text-gray-700">Tidak ada data absensi</p>
-                                <p class="text-sm text-gray-400 mt-1">Silakan sesuaikan filter atau coba lagi nanti</p>
-                            </div>
-                        </div>
-                    @endforelse
-                </div>
-
-                <!-- Pagination -->
-                <div class="mt-6">
-                    {{ $absensi->appends(request()->query())->links() }}
-                </div>
+<!-- Custom Date Range (initially hidden) -->
+<div id="customDateRange" class="grid grid-cols-1 md:grid-cols-2 gap-4 {{ request('periode') == 'custom' ? '' : 'hidden' }}">
+    <div class="transition-all duration-300 hover:scale-105">
+        <label for="tanggal_mulai" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+        <div class="relative">
+            <input type="date" name="tanggal_mulai" id="tanggal_mulai" value="{{ request('tanggal_mulai') }}" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 pl-10 py-3">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
+                <i class="fas fa-calendar-day"></i>
             </div>
         </div>
-        
     </div>
+    
+    <div class="transition-all duration-300 hover:scale-105">
+        <label for="tanggal_akhir" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Akhir</label>
+        <div class="relative">
+            <input type="date" name="tanggal_akhir" id="tanggal_akhir" value="{{ request('tanggal_akhir') }}" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 pl-10 py-3">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+    
+    <!-- Filter Form with glass morphism effect -->
+    <div class="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-md border border-blue-100 transform transition-all duration-300 hover:shadow-lg">
+        <div class="flex items-center mb-4 text-blue-600">
+            <i class="fas fa-filter mr-2 text-xl"></i>
+            <h2 class="text-lg font-semibold">Filter Data</h2>
+        </div>
+        <form action="{{ route('absensi.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="transition-all duration-300 hover:scale-105">
+                <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                <div class="relative">
+                    <select name="kelas_id" id="kelas_id" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 pl-10 py-3">
+                        <option value="">Semua Kelas</option>
+                        @foreach($kelas as $k)
+                        <option value="{{ $k->id }}" {{ $kelas_id == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
+                        <i class="fas fa-school"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="transition-all duration-300 hover:scale-105">
+                <label for="tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                <div class="relative">
+                    <input type="date" name="tanggal" id="tanggal" value="{{ $tanggal }}" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 pl-10 py-3">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-end">
+                <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-6 py-3 rounded-lg inline-flex items-center transition-all duration-300 shadow-md hover:shadow-lg w-full justify-center">
+                    <i class="fas fa-search mr-2"></i> Tampilkan Data
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Manual Attendance Form -->
+    <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-xl shadow-md border border-blue-200 transform transition-all duration-300 hover:shadow-lg">
+        <div class="flex items-center mb-4 text-blue-600">
+            <i class="fas fa-user-check mr-2 text-xl"></i>
+            <h2 class="text-lg font-semibold">Absensi Manual</h2>
+        </div>
+        <form action="{{ route('absensi.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @csrf
+            <div class="transition-all duration-300 hover:scale-105">
+                <label for="nisn" class="block text-sm font-medium text-gray-700 mb-1">NISN Siswa</label>
+                <div class="relative">
+                    <input type="text" name="nisn" id="nisn" required class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 pl-10 py-3" placeholder="Masukkan NISN Siswa">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-end">
+                <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-6 py-3 rounded-lg inline-flex items-center transition-all duration-300 shadow-md hover:shadow-lg w-full justify-center">
+                    <i class="fas fa-save mr-2"></i> Simpan Absensi
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Attendance Data Grouped by Class -->
+    <div class="space-y-8">
+        @if($kelas_id)
+            <!-- If a specific class is selected, show only that class -->
+            @php
+                $filteredKelas = $kelas->where('id', $kelas_id);
+            @endphp
+        @else
+            <!-- If no class is selected, show all classes -->
+            @php
+                $filteredKelas = $kelas;
+            @endphp
+        @endif
 
-    <script>
-        function toggleDetails(id) {
-            const element = document.getElementById(id);
-            const iconId = id.replace('details', 'icon');
-            const icon = document.getElementById(iconId);
+        @foreach($filteredKelas as $k)
+            @php
+                $classAttendance = $absensi->filter(function($item) use ($k) {
+                    return $item->siswa->kelas_id == $k->id;
+                });
+            @endphp
             
-            if (element.classList.contains('hidden')) {
-                element.classList.remove('hidden');
-                icon.classList.add('rotate-180');
-            } else {
-                element.classList.add('hidden');
-                icon.classList.remove('rotate-180');
-            }
-        }
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-blue-100 transform transition-all duration-300 hover:shadow-lg animate-fadeIn">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-400 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-users text-white text-xl"></i>
+                            <h3 class="text-lg font-semibold text-white">Kelas: {{ $k->nama_kelas }}</h3>
+                        </div>
+                        <div class="bg-white/20 text-white text-sm px-3 py-1 rounded-full backdrop-blur-sm">
+                            {{ $classAttendance->count() }} Siswa
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-blue-50">
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">No</th>
+                                <th class="py-3 px-4 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">NISN</th>
+                                <th class="py-3 px-4 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Nama Siswa</th>
+                                <th class="py-3 px-4 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Waktu</th>
+                                <th class="py-3 px-4 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-blue-100">
+                            @forelse($classAttendance as $index => $a)
+                            <tr class="hover:bg-blue-50 transition-colors duration-200">
+                                <td class="py-3 px-4 whitespace-nowrap">{{ $index + 1 }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ $a->siswa->nisn }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ $a->siswa->nama_lengkap }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($a->waktu_scan)->format('H:i:s') }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">
+                                    @if($a->status == 'Hadir')
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i> Hadir
+                                    </span>
+                                    @elseif($a->status == 'Terlambat')
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        <i class="fas fa-clock mr-1"></i> Terlambat
+                                    </span>
+                                    @else
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        <i class="fas fa-times-circle mr-1"></i> Tidak Hadir
+                                    </span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="py-6 px-4 text-center text-gray-500">
+                                    <div class="flex flex-col items-center">
+                                        <i class="fas fa-calendar-times text-blue-300 text-4xl mb-2"></i>
+                                        <p>Tidak ada data absensi untuk kelas ini</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endforeach
+        
+        @if($filteredKelas->count() == 0)
+            <div class="bg-white rounded-xl shadow-md p-8 text-center border border-blue-100">
+                <i class="fas fa-school text-blue-300 text-5xl mb-4"></i>
+                <p class="text-gray-600">Tidak ada data kelas yang tersedia</p>
+            </div>
+        @endif
+    </div>
+</div>
 
-        // Function to handle school selection change
-        document.addEventListener('DOMContentLoaded', function() {
-            const sekolahSelect = document.getElementById('sekolah_id');
-            const kelasSelect = document.getElementById('kelas_id');
-            
-            sekolahSelect.addEventListener('change', function() {
-                if (this.value === '') {
-                    kelasSelect.disabled = true;
-                    kelasSelect.value = '';
-                } else {
-                    kelasSelect.disabled = false;
-                }
-                this.form.submit();
-            });
-            
-            document.getElementById('tanggal').addEventListener('change', function() {
-                this.form.submit();
-            });
+<style>
+/* Add animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Add this to your CSS to ensure proper animation timing for each class card */
+.bg-white.rounded-xl {
+    animation-delay: calc(var(--animation-order, 0) * 0.1s);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation order to each class card
+    const classCards = document.querySelectorAll('.bg-white.rounded-xl');
+    classCards.forEach((card, index) => {
+        card.style.setProperty('--animation-order', index);
+    });
+    
+    // Add hover animation to buttons
+    const buttons = document.querySelectorAll('button, a.bg-gradient-to-r, a.bg-white\\/10');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.classList.add('scale-105');
         });
-    </script>
-</body>
-</html>
+        button.addEventListener('mouseleave', function() {
+            this.classList.remove('scale-105');
+        });
+    });
+});
+</script>
+
+<script>
+    // Add this to your existing script section or create a new one
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle export dropdown menu
+        const exportBtn = document.getElementById('exportBtn');
+        const exportMenu = document.getElementById('exportMenu');
+        
+        exportBtn.addEventListener('click', function() {
+            exportMenu.classList.toggle('hidden');
+        });
+        
+        // Close the dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!exportBtn.contains(event.target) && !exportMenu.contains(event.target)) {
+                exportMenu.classList.add('hidden');
+            }
+        });
+        
+        // Show/hide custom date range based on selected period
+        const periodeSelect = document.getElementById('periode');
+        const customDateRange = document.getElementById('customDateRange');
+        
+        periodeSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customDateRange.classList.remove('hidden');
+            } else {
+                customDateRange.classList.add('hidden');
+            }
+        });
+    });
+</script>
 @endsection
+

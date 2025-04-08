@@ -520,6 +520,8 @@
                             {!! renderSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
                             {!! renderSidebarLink(route('kelassekolah.index'), 'bx-chalkboard', 'Kelas') !!}
                             {!! renderSidebarLink(route('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
+                            {!! renderSidebarLink(route('absensi.index'), 'bx-calendar', 'Data Absensi') !!}
+                            {!! renderSidebarLink(route('absensi.scan'), 'bx-calendar', 'Scan Absensi') !!}
                         </div>
                         @endif
 

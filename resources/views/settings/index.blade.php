@@ -9,7 +9,7 @@
         <label class="block">Pilih Sekolah:</label>
         <select name="sekolah_id" class="w-full p-2 border rounded mb-3">
             @foreach ($sekolahs as $sekolah)
-                <option value="{{ $sekolah->id }}">{{ $sekolah->nama }}</option>
+                <option value="{{ $sekolah->id }}">{{ $sekolah->nama_sekolah }}</option>
             @endforeach
         </select>
 

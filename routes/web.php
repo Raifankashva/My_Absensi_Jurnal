@@ -98,17 +98,9 @@ Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendanc
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
     Route::post('adminsiswa/download-qrcodes', [DataSiswaController::class, 'downloadQRCodes'])->name('adminsiswa.download-qrcodes');
 
-    Route::get('/jadwal-pelajaran', [JadwalPelajaranController::class, 'index'])->name('jadwal-pelajaran.index');
-    Route::get('/jadwal-pelajaran/create', [JadwalPelajaranController::class, 'create'])->name('jadwal-pelajaran.create');
-    Route::post('/jadwal-pelajaran', [JadwalPelajaranController::class, 'store'])->name('jadwal-pelajaran.store');
-    Route::get('/jadwal-pelajaran/{id}/edit', [JadwalPelajaranController::class, 'edit'])->name('jadwal-pelajaran.edit');
-    Route::put('/jadwal-pelajaran/{id}', [JadwalPelajaranController::class, 'update'])->name('jadwal-pelajaran.update');
-    Route::delete('/jadwal-pelajaran/{id}', [JadwalPelajaranController::class, 'destroy'])->name('jadwal-pelajaran.destroy');
+    
 
-    // API routes for fetching schedule data
-    Route::get('/jadwal-pelajaran/guru/{guruId}', [JadwalPelajaranController::class, 'getJadwalByGuru'])->name('jadwal-pelajaran.by-guru');
-    Route::get('/jadwal-pelajaran/hari-ini/{guruId}', [JadwalPelajaranController::class, 'getJadwalHariIni'])->name('jadwal-pelajaran.hari-ini');
-    Route::post('/check-jadwal-bentrok', [JadwalPelajaranController::class, 'checkJadwalBentrok']);
+ 
 });
 
 // Routes untuk Guru
@@ -228,4 +220,24 @@ Route::get('/kelas', [KelasSekolahController::class, 'index'])->name('kelassekol
     Route::get('get-villages/{districtId}', [DataSiswaController::class, 'getVillages'])->name('get.villages');
     Route::post('download-qrcode', [DataSiswaController::class, 'downloadQRCodes'])->name('download.download');
     Route::get('download-qrcode/{id}', [DataSiswaController::class, 'downloadQRCode'])->name('adminsiswa.download-qrcode');
+
+    Route::prefix('jadwal-pelajaran')->name('jadwal-pelajaran.')->group(function () {
+        Route::get('/', [JadwalPelajaranController::class, 'index'])->name('index');
+        Route::get('/create', [JadwalPelajaranController::class, 'create'])->name('create');
+        Route::post('/', [JadwalPelajaranController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [JadwalPelajaranController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [JadwalPelajaranController::class, 'update'])->name('update');
+        Route::delete('/{id}', [JadwalPelajaranController::class, 'destroy'])->name('destroy');
+        
+        // Additional AJAX routes
+        Route::get('/jadwal-guru/{guruId}', [JadwalPelajaranController::class, 'getJadwalByGuru'])->name('jadwal-guru');
+        Route::get('/jadwal-hari-ini/{guruId}', [JadwalPelajaranController::class, 'getJadwalHariIni'])->name('jadwal-hari-ini');
+        Route::post('/check-bentrok', [JadwalPelajaranController::class, 'checkJadwalBentrok'])->name('check-bentrok');
+    });
+    Route::get('/absensi/export-pdf', [AbsensiController::class, 'exportPDF'])->name('absensi.exportPDF');
+    Route::get('/absensi/export-excel', [AbsensiController::class, 'exportExcel'])->name('absensi.exportExcel');
+// Add these routes to your web.php routes file
+Route::get('/absensi/export-periode-pdf', [AbsensiController::class, 'exportPeriodePDF'])->name('absensi.exportPeriodePDF');
+Route::get('/absensi/export-periode-excel', [AbsensiController::class, 'exportPeriodeExcel'])->name('absensi.exportPeriodeExcel');
 });
+Route::get('/jurnal-guru/laporan-absensi', [JurnalGuruController::class, 'laporanAbsensi'])->name('absensi.laporan');

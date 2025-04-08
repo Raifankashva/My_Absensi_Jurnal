@@ -23,8 +23,12 @@ class AuthController extends Controller
     $credentials = $request->validate([
         'email' => 'required|email',
         'password' => 'required'
+    ], [
+        'email.required' => 'Email wajib diisi.',
+        'email.email' => 'Format email tidak valid.',
+        'password.required' => 'Password wajib diisi.'
     ]);
-
+    
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
 
@@ -41,8 +45,9 @@ class AuthController extends Controller
     }
 
     return back()->withErrors([
-        'email' => 'The provided credentials do not match our records.',
+        'email' => __('auth.failed'),
     ]);
+    
 }
 
 public function showForgotPasswordForm()
@@ -67,7 +72,7 @@ public function sendResetLinkEmail(Request $request)
         $message->subject('Reset Password Notification');
     });
 
-    return back()->with('message', 'We have emailed your password reset link!');
+    return back()->with('message', 'Kami telah mengirimkan link reset password ke email Anda!');
 }
 
 public function showResetPasswordForm($token)
