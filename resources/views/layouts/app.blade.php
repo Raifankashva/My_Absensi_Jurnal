@@ -39,6 +39,9 @@
                         'float': 'float 3s ease-in-out infinite',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'shimmer': 'shimmer 2s linear infinite',
+                        'slide-in': 'slideIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-out',
                     },
                     keyframes: {
                         float: {
@@ -242,8 +245,9 @@
 
         /* Sidebar active item */
         .sidebar-active {
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.5), rgba(37, 99, 235, 0.2));
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.05));
             border-left: 3px solid #3B82F6;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
         }
 
         /* Scrollbar styling */
@@ -298,6 +302,97 @@
         .dark .animated-bg {
             background: linear-gradient(-45deg, #0F172A, #1E293B, #334155, #475569);
             background-size: 400% 400%;
+        }
+
+        /* Enhanced Sidebar Styles */
+        .sidebar-bg {
+            background-image: radial-gradient(circle at 0% 100%, #1E3A8A, #1E40AF 40%, #1D4ED8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%232563EB' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .sidebar-menu-item {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-menu-item::after {
+            content: '';
+            position: absolute;
+            height: 100%;
+            width: 3px;
+            background: linear-gradient(to bottom, #60A5FA, #3B82F6);
+            left: 0;
+            top: 0;
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
+            transform-origin: top;
+        }
+
+        .sidebar-menu-item:hover::after {
+            transform: scaleY(1);
+        }
+
+        .sidebar-icon-container {
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .sidebar-icon-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(37, 99, 235, 0.1));
+            border-radius: inherit;
+            z-index: -1;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .sidebar-menu-item:hover .sidebar-icon-container::before {
+            opacity: 1;
+        }
+
+        .sidebar-category {
+            position: relative;
+            padding-left: 0.75rem;
+        }
+
+        .sidebar-category::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 1rem;
+            background: linear-gradient(to bottom, #60A5FA, #3B82F6);
+            border-radius: 1rem;
+        }
+
+        .sidebar-quick-action {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .sidebar-quick-action:hover {
+            transform: translateY(-3px);
         }
     </style>
     <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
@@ -393,41 +488,49 @@
         <i class='bx' :class="sidebarOpen ? 'bx-x' : 'bx-menu'"></i>
     </button>
 
-    <!-- Sidebar -->
+    <!-- Enhanced Sidebar -->
     <aside
         x-cloak
         :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
-        class="fixed inset-y-0 left-0 w-72 bg-gradient-to-b from-primary-900 via-primary-800 to-primary-900 
-               shadow-2xl transform transition-all duration-300 ease-in-out z-40 backdrop-blur-lg">
-        <!-- Logo Section -->
-        <div class="flex items-center h-16 px-6 border-b border-primary-700/50 bg-primary-900/50 backdrop-blur-md">
-            <div class="flex items-center space-x-3">
-                <div class="p-2 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg shadow-lg">
-                    <i class='bx bxs-school text-2xl text-white'></i>
+        class="fixed inset-y-0 left-0 w-72 sidebar-bg shadow-2xl transform transition-all duration-300 ease-in-out z-40 backdrop-blur-lg">
+        
+        <!-- Logo Section with Enhanced Design -->
+        <div class="relative overflow-hidden">
+            <!-- Decorative top wave -->
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-400 via-primary-500 to-primary-400"></div>
+            
+            <div class="flex items-center h-20 px-6 border-b border-primary-700/30 backdrop-blur-md">
+                <div class="flex items-center space-x-3">
+                    <div class="p-3 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl shadow-lg transform transition-transform duration-300 hover:scale-105 group">
+                        <i class='bx bxs-school text-2xl text-white group-hover:animate-pulse'></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Absensi Jurnal</h1>
+                        <div class="flex items-center">
+                            <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse"></span>
+                            <p class="text-xs text-primary-200">Management System</p>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-xl font-bold text-white">Absensi Jurnal</h1>
-                    <p class="text-xs text-primary-200">Management System</p>
-                </div>
+                <button
+                    @click="sidebarOpen = false"
+                    class="md:hidden ml-auto text-white hover:text-primary-200 transition">
+                    <i class='bx bx-x text-2xl'></i>
+                </button>
             </div>
-            <button
-                @click="sidebarOpen = false"
-                class="md:hidden ml-auto text-white hover:text-primary-200 transition">
-                <i class='bx bx-x text-2xl'></i>
-            </button>
         </div>
 
-        <!-- Navigation -->
-        <nav class="p-4 overflow-y-auto h-[calc(100vh-4rem)] scrollbar-thin scrollbar-thumb-primary-700 scrollbar-track-primary-900/30">
+        <!-- Enhanced Navigation -->
+        <nav class="p-4 overflow-y-auto h-[calc(100vh-5rem)] scrollbar-thin scrollbar-thumb-primary-700 scrollbar-track-primary-900/30">
             @if (auth()->check())
-            <!-- User Profile Section -->
-            <div class="mb-6">
-                <div class="px-4 py-4 bg-gradient-to-r from-primary-800 to-primary-700 rounded-xl mb-4 
-                            shadow-lg group hover:scale-[1.02] transition-all duration-300">
-                    <div class="flex items-center space-x-3">
+            <!-- Enhanced User Profile Section -->
+            <div class="mb-6 animate-fade-in">
+                <div class="px-4 py-5 bg-gradient-to-r from-primary-800/80 to-primary-700/80 rounded-xl mb-4 
+                            shadow-lg group hover:scale-[1.02] transition-all duration-300 backdrop-blur-sm border border-primary-600/20">
+                    <div class="flex items-center space-x-4">
                         <div class="relative">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center 
-                                      shadow-lg group-hover:scale-110 transition-all duration-300">
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center 
+                                      shadow-lg group-hover:scale-110 transition-all duration-300 border-2 border-primary-300/20">
                                 <i class='bx bxs-user text-2xl text-white'></i>
                             </div>
                             <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full 
@@ -435,110 +538,145 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-primary-100">Welcome back,</p>
-                            <p class="text-sm font-bold text-white">{{ auth()->user()->name }}</p>
-                            <span class="inline-block px-2 py-1 bg-primary-600/50 rounded-full text-xs 
-                                       text-primary-100 mt-1">
-                                {{ ucfirst(auth()->user()->role) }}
-                            </span>
+                            <p class="text-base font-bold text-white mb-1">{{ auth()->user()->name }}</p>
+                            <div class="flex items-center">
+                                <span class="inline-block px-3 py-1 bg-primary-600/50 rounded-full text-xs 
+                                       text-primary-100 border border-primary-500/30 shadow-inner">
+                                    {{ ucfirst(auth()->user()->role) }}
+                                </span>
+                                <span class="ml-2 text-xs text-primary-300 flex items-center">
+                                    <i class='bx bxs-circle text-green-400 text-[8px] mr-1'></i> Online
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="space-y-1">
+                <!-- Enhanced Navigation Links with Better Structure -->
+                <div class="space-y-5 animate-slide-in" style="--delay: 0.2s">
                     @php
-                    function renderSidebarLink($route, $icon, $label, $badge = null) {
-                    $isActive = request()->routeIs($route);
-                    $activeClass = $isActive ? 'sidebar-active shadow-lg' : 'hover:bg-primary-700/50';
-                    $badgeHtml = $badge ? "<span class='px-2 py-1 bg-red-500 rounded-full text-xs text-white animate-pulse'>$badge</span>" : '';
+                    function renderEnhancedSidebarLink($routeName, $icon, $label, $badge = null) {
+    $isActive = request()->routeIs($routeName);
+    $activeClass = $isActive ? 'sidebar-active shadow-lg bg-primary-700 text-white' : '';
+    $url = route($routeName);
+    $badgeHtml = $badge ? "<span class='px-2 py-0.5 bg-red-500 rounded-full text-xs text-white animate-pulse ml-auto'>$badge</span>" : '';
 
-                    return <<< HTML
-                        <a href="$route"
-                        class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-primary-100 
-                                  $activeClass hover:text-white group relative overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-transparent 
-                                      opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <div class="bg-primary-800/50 p-2 rounded-lg shadow-inner mr-3 
-                                      group-hover:bg-primary-700 group-hover:scale-110 transition-all duration-300">
-                            <i class='bx $icon text-xl'></i>
-                        </div>
-                        <span class="font-medium">$label</span>
-                        $badgeHtml
-                        <div class="ml-auto opacity-0 transform translate-x-2 
-                                      group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                            <i class='bx bx-chevron-right'></i>
-                        </div>
-                        </a>
-                        HTML;
-                        }
-                        @endphp
+    return <<< HTML
+        <a href="$url"
+           class="sidebar-menu-item flex items-center px-4 py-3 rounded-xl transition-all duration-300 
+                  $activeClass hover:text-white group relative overflow-hidden">
+            <div class="sidebar-icon-container bg-primary-800/50 p-2.5 rounded-lg shadow-inner mr-3 
+                        group-hover:bg-primary-700 transition-all duration-300">
+                <i class='bx $icon text-xl'></i>
+            </div>
+            <span class="font-medium">$label</span>
+            $badgeHtml
+            <div class="ml-auto opacity-0 transform translate-x-2 
+                        group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                <i class='bx bx-chevron-right'></i>
+            </div>
+        </a>
+    HTML;
+}
 
-                        @if (auth()->user()->role == 'admin')
-                        <div class="mb-4">
-                            <h2 class="px-4 text-xs font-semibold text-primary-400 uppercase tracking-wider mb-2">
-                                Main Menu
-                            </h2>
-                            {!! renderSidebarLink(route('admin.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
-                        </div>
+                    @endphp
 
-                        <div class="mb-4">
-                            <h2 class="px-4 text-xs font-semibold text-primary-400 uppercase tracking-wider mb-2">
-                                Management
-                            </h2>
-                            {!! renderSidebarLink(route('sekolahs.index'), 'bxs-school', 'Sekolah', ) !!}
-                            {!! renderSidebarLink(route('kelas.index'), 'bx-chalkboard', 'Kelas') !!}
-                            {!! renderSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
-                            {!! renderSidebarLink(route('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
-                            {!! renderSidebarLink(route('jurnal-guru.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
+                    @if (auth()->user()->role == 'admin')
+                    <div class="mb-6">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                            <i class='bx bx-category-alt mr-2'></i> Main Menu
+                        </h2>
+                        <div class="space-y-1 pl-1">
+                            {!! renderEnhancedSidebarLink(route('admin.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
                         </div>
-                        @elseif (auth()->user()->role == 'guru')
-                        <div class="mb-4">
-                            <h2 class="px-4 text-xs font-semibold text-primary-400 uppercase tracking-wider mb-2">
-                                Teacher Menu
-                            </h2>
-                            {!! renderSidebarLink(route('guru.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
-                            {!! renderSidebarLink(route('jadwal-pelajaran.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
-                            {!! renderSidebarLink(route('jurnal-guru.index'), 'bx-book-open', 'Jurnal Mengajar') !!}
-                            {!! renderSidebarLink(route('absensi.select.school'), 'bx-user-check', 'Absensi') !!}
-                            
-                        </div>
-                        @elseif (auth()->user()->role == 'siswa')
-                        <div class="mb-4">
-                            <h2 class="px-4 text-xs font-semibold text-primary-400 uppercase tracking-wider mb-2">
-                                Student Menu
-                            </h2>
-                            {!! renderSidebarLink(route('siswa.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
-                            {!! renderSidebarLink('#', 'bx-book', 'Jadwal') !!}
-                            {!! renderSidebarLink('#', 'bx-notepad', 'Nilai', '2') !!}
-                        </div>
-                        @elseif (auth()->user()->role == 'sekolah')
-                        <div class="mb-4">
-                            <h2 class="px-4 text-xs font-semibold text-primary-400 uppercase tracking-wider mb-2">
-                                Sekolah Menu
-                            </h2>
-                            {!! renderSidebarLink(route('school.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
-                            {!! renderSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
-                            {!! renderSidebarLink(route('kelassekolah.index'), 'bx-chalkboard', 'Kelas') !!}
-                            {!! renderSidebarLink(route('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
-                            {!! renderSidebarLink(route('absensi.index'), 'bx-calendar', 'Data Absensi') !!}
-                            {!! renderSidebarLink(route('absensi.scan'), 'bx-calendar', 'Scan Absensi') !!}
-                        </div>
-                        @endif
+                    </div>
 
-                        <!-- Quick Actions -->
-                        <div class="mt-8">
-                            <h2 class="px-4 text-xs font-semibold text-primary-400 uppercase tracking-wider mb-2">
-                                Quick Actions
-                            </h2>
-                            <div class="grid grid-cols-2 gap-2 p-2">
-                                <x-task-modal />
-                                <x-schedule-create />
+                    <div class="mb-6">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                            <i class='bx bx-cog mr-2'></i> Management
+                        </h2>
+                        <div class="space-y-1 pl-1">
+                            {!! renderEnhancedSidebarLink(route('sekolahs.index'), 'bxs-school', 'Sekolah') !!}
+                            {!! renderEnhancedSidebarLink(route('kelas.index'), 'bx-chalkboard', 'Kelas') !!}
+                            {!! renderEnhancedSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
+                            {!! renderEnhancedSidebarLink(route('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
+                            {!! renderEnhancedSidebarLink(route('jurnal-guru.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
+                        </div>
+                    </div>
+                    @elseif (auth()->user()->role == 'guru')
+                    <div class="mb-6">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                            <i class='bx bx-chalkboard mr-2'></i> Teacher Menu
+                        </h2>
+                        <div class="space-y-1 pl-1">
+                            {!! renderEnhancedSidebarLink(route('guru.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
+                            {!! renderEnhancedSidebarLink(route('jadwal-pelajaran.index'), 'bx-calendar-check', 'Jadwal Pelajaran') !!}
+                            {!! renderEnhancedSidebarLink(route('jadwal-pelajaran.index'), 'bx-calendar-check', 'Jadwal Pelajaran') !!}
+                            {!! renderEnhancedSidebarLink(route('jurnal-guru.index'), 'bx-book-open', 'Jurnal Mengajar') !!}
+                            {!! renderEnhancedSidebarLink(route('absensi.select.school'), 'bx-user-check', 'Absensi') !!}
+                        </div>
+                    </div>
+                    @elseif (auth()->user()->role == 'siswa')
+                    <div class="mb-6">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                            <i class='bx bx-book-reader mr-2'></i> Student Menu
+                        </h2>
+                        <div class="space-y-1 pl-1">
+                            {!! renderEnhancedSidebarLink(route('siswa.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
+                            {!! renderEnhancedSidebarLink('#', 'bx-calendar-event', 'Jadwal') !!}
+                            {!! renderEnhancedSidebarLink('#', 'bx-medal', 'Nilai', '2') !!}
+                        </div>
+                    </div>
+                    @elseif (auth()->user()->role == 'sekolah')
+                    <div class="mb-6">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                            <i class='bx bx-building-house mr-2'></i> Sekolah Menu
+                        </h2>
+                        <div class="space-y-1 pl-1">
+                            {!! renderEnhancedSidebarLink('school.dashboard', 'bxs-dashboard', 'Dashboard') !!}
+                            {!! renderEnhancedSidebarLink('adminguru.index', 'bxs-user-detail', 'Guru') !!}
+                            {!! renderEnhancedSidebarLink(('kelassekolah.index'), 'bx-chalkboard', 'Kelas') !!}
+                            {!! renderEnhancedSidebarLink(('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
+                            {!! renderEnhancedSidebarLink(('absensi.index'), 'bx-calendar-check', 'Data Absensi') !!}
+                            {!! renderEnhancedSidebarLink(('absensi.scan'), 'bx-scan', 'Scan Absensi') !!}
+                            {!! renderEnhancedSidebarLink(('settings.index'), 'bx-cog', 'Pengaturan') !!}
+                        </div>
+                    </div>
+                    @endif
+
+                   
+                    <!-- System Status -->
+                    <div class="mt-8 px-4 py-4 bg-gradient-to-r from-primary-800/60 to-primary-700/60 rounded-xl border border-primary-600/20">
+                        <h3 class="text-xs font-semibold text-primary-300 uppercase mb-3 flex items-center">
+                            <i class='bx bx-server mr-2'></i> System Status
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-primary-200">Server</span>
+                                <div class="flex items-center">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-1"></span>
+                                    <span class="text-xs text-primary-200">Online</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-primary-200">Database</span>
+                                <div class="flex items-center">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-1"></span>
+                                    <span class="text-xs text-primary-200">Connected</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-primary-200">Last Update</span>
+                                <span class="text-xs text-primary-200">Today, 08:30</span>
                             </div>
                         </div>
+                    </div>
                 </div>
             </div>
             @endif
         </nav>
+
+        
     </aside>
 
     <!-- Main Content -->
@@ -720,4 +858,3 @@
 </body>
 
 </html>
-

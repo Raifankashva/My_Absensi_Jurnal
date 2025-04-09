@@ -142,12 +142,20 @@
                         <input type="text" name="kerja_ayah" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                     </div>
                     <div>
+                        <label for="email_ayah" class="block text-sm font-medium text-gray-700">Email Ayah</label>
+                        <Input type="email" name="email_ayah" id="email_ayah" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-gray-700">Nama Ibu</label>
                         <input type="text" name="ibu" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Pekerjaan Ibu</label>
                         <input type="text" name="kerja_ibu" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="email_ibu" class="block text-sm font-medium text-gray-700">Email Ibu</label>
+                        <Input type="email" name="email_ibu" id="email_ibu" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                     </div>
                 </div>
             </div>
@@ -217,10 +225,7 @@
 
             <div class="mb-6">
                 <h2 class="text-lg font-semibold mb-4">User</h2>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Username</label>
-                    <input type="text" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
-                </div>
+                
                 <div >
                     <label class="block text-sm font-medium text-gray-700">Email</label>
                     <input type="email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>

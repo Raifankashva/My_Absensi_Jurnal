@@ -84,12 +84,12 @@ class AbsensiController extends Controller
         if (!$siswa) {
             return redirect()->back()->with('error', 'Siswa tidak ditemukan atau bukan dari sekolah Anda');
         }
-
+    
         $setting = Setting::where('sekolah_id', $authSchool->id)->first();
         if (!$setting) {
             return redirect()->back()->with('error', 'Pengaturan sekolah tidak ditemukan');
         }
-
+    
         // Check if student already has attendance for today
         $today = Carbon::now()->format('Y-m-d');
         $alreadyPresent = Absensi::where('siswa_id', $siswa->id)
@@ -99,41 +99,54 @@ class AbsensiController extends Controller
         if ($alreadyPresent) {
             return redirect()->back()->with('error', 'Siswa sudah melakukan absensi hari ini');
         }
-
+    
         $waktu_scan = Carbon::now();
+        $jam_scan = $waktu_scan->format('H:i:s');
         $status = 'Tidak Hadir';
-
-        if ($waktu_scan->format('H:i:s') <= $setting->jam_masuk) {
+        
+        // Convert times to Carbon for easier comparison
+        $jam_masuk = Carbon::createFromFormat('H:i:s', $setting->jam_masuk);
+        $batas_terlambat = Carbon::createFromFormat('H:i:s', $setting->batas_terlambat);
+        $batas_tidak_hadir = (clone $batas_terlambat)->addHour(); // 1 jam setelah batas terlambat
+        
+        $jam_scan_carbon = Carbon::createFromFormat('H:i:s', $jam_scan);
+    
+        // Determine status based on time
+        if ($jam_scan_carbon <= $jam_masuk) {
             $status = 'Hadir';
-        } elseif ($waktu_scan->format('H:i:s') <= $setting->batas_terlambat) {
+        } elseif ($jam_scan_carbon <= $batas_terlambat) {
             $status = 'Terlambat';
+        } elseif ($jam_scan_carbon <= $batas_tidak_hadir) {
+            $status = 'Terlambat';
+        } else {
+            $status = 'Tidak Hadir';
         }
-
+    
         Absensi::create([
             'siswa_id' => $siswa->id,
             'waktu_scan' => $waktu_scan,
             'status' => $status
         ]);
-
+    
         // Kirim Email ke Ayah, Ibu, dan Wali (jika ada emailnya)
         $emailRecipients = [];
-
+    
         if (!empty($siswa->email_ayah)) {
             $emailRecipients[] = $siswa->email_ayah;
         }
-
+    
         if (!empty($siswa->email_ibu)) {
             $emailRecipients[] = $siswa->email_ibu;
         }
-
+    
         if (!empty($siswa->email_wali)) {
             $emailRecipients[] = $siswa->email_wali;
         }
-
+    
         if (!empty($emailRecipients)) {
             Mail::to($emailRecipients)->send(new AbsensiNotification($siswa, $status, $waktu_scan));
         }
-
+    
         return redirect()->back()->with('success', 'Absensi berhasil dicatat dan notifikasi telah dikirim ke email orang tua/wali.');
     }
     
