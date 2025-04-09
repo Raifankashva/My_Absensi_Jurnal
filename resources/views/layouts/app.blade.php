@@ -587,7 +587,7 @@
                             <i class='bx bx-category-alt mr-2'></i> Main Menu
                         </h2>
                         <div class="space-y-1 pl-1">
-                            {!! renderEnhancedSidebarLink(route('admin.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
+                            {!! renderEnhancedSidebarLink(('admin.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
                         </div>
                     </div>
 
@@ -596,11 +596,11 @@
                             <i class='bx bx-cog mr-2'></i> Management
                         </h2>
                         <div class="space-y-1 pl-1">
-                            {!! renderEnhancedSidebarLink(route('sekolahs.index'), 'bxs-school', 'Sekolah') !!}
-                            {!! renderEnhancedSidebarLink(route('kelas.index'), 'bx-chalkboard', 'Kelas') !!}
-                            {!! renderEnhancedSidebarLink(route('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
-                            {!! renderEnhancedSidebarLink(route('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
-                            {!! renderEnhancedSidebarLink(route('jurnal-guru.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
+                            {!! renderEnhancedSidebarLink(('sekolahs.index'), 'bxs-school', 'Sekolah') !!}
+                            {!! renderEnhancedSidebarLink(('kelas.index'), 'bx-chalkboard', 'Kelas') !!}
+                            {!! renderEnhancedSidebarLink(('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
+                            {!! renderEnhancedSidebarLink(('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
+                            {!! renderEnhancedSidebarLink(('jurnal-guru.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
                         </div>
                     </div>
                     @elseif (auth()->user()->role == 'guru')
@@ -609,11 +609,11 @@
                             <i class='bx bx-chalkboard mr-2'></i> Teacher Menu
                         </h2>
                         <div class="space-y-1 pl-1">
-                            {!! renderEnhancedSidebarLink(route('guru.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
-                            {!! renderEnhancedSidebarLink(route('jadwal-pelajaran.index'), 'bx-calendar-check', 'Jadwal Pelajaran') !!}
-                            {!! renderEnhancedSidebarLink(route('jadwal-pelajaran.index'), 'bx-calendar-check', 'Jadwal Pelajaran') !!}
-                            {!! renderEnhancedSidebarLink(route('jurnal-guru.index'), 'bx-book-open', 'Jurnal Mengajar') !!}
-                            {!! renderEnhancedSidebarLink(route('absensi.select.school'), 'bx-user-check', 'Absensi') !!}
+                            {!! renderEnhancedSidebarLink(('guru.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
+                            {!! renderEnhancedSidebarLink(('jadwal-pelajaran.index'), 'bx-calendar-check', 'Jadwal Pelajaran') !!}
+                            {!! renderEnhancedSidebarLink(('jadwal-pelajaran.index'), 'bx-calendar-check', 'Jadwal Pelajaran') !!}
+                            {!! renderEnhancedSidebarLink(('jurnal-guru.index'), 'bx-book-open', 'Jurnal Mengajar') !!}
+                            {!! renderEnhancedSidebarLink(('absensi.select.school'), 'bx-user-check', 'Absensi') !!}
                         </div>
                     </div>
                     @elseif (auth()->user()->role == 'siswa')
@@ -622,7 +622,7 @@
                             <i class='bx bx-book-reader mr-2'></i> Student Menu
                         </h2>
                         <div class="space-y-1 pl-1">
-                            {!! renderEnhancedSidebarLink(route('siswa.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
+                            {!! renderEnhancedSidebarLink(('siswa.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
                             {!! renderEnhancedSidebarLink('#', 'bx-calendar-event', 'Jadwal') !!}
                             {!! renderEnhancedSidebarLink('#', 'bx-medal', 'Nilai', '2') !!}
                         </div>
