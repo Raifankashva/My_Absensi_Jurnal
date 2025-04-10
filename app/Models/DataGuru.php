@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\JadwalPelajaran;
 
 class DataGuru extends Model
 {
@@ -84,4 +85,12 @@ class DataGuru extends Model
             $q->where('role', 'guru');
         });
     }
+    public function jadwalPelajaran()
+{
+    return $this->hasMany(JadwalPelajaran::class, 'guru_id');
+}public function jurnalGuru()
+{
+    return $this->hasMany(JurnalGuru::class, 'guru_id');
+}
+
 }

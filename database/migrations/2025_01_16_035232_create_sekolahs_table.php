@@ -32,7 +32,8 @@ class CreateSekolahsTable extends Migration
             $table->string('nip_kepala_sekolah', 18)->nullable();
             $table->string('foto')->nullable();
             $table->timestamps();
-            
+            $table->boolean('is_active')->default(false); // tambahkan ini
+
             // Menambahkan foreign key constraints
             $table->foreign('province_id')
                   ->references('id')

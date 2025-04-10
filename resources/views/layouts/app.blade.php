@@ -637,40 +637,13 @@
                             {!! renderEnhancedSidebarLink('adminguru.index', 'bxs-user-detail', 'Guru') !!}
                             {!! renderEnhancedSidebarLink(('kelassekolah.index'), 'bx-chalkboard', 'Kelas') !!}
                             {!! renderEnhancedSidebarLink(('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
+                            {!! renderEnhancedSidebarLink(('jadwal-pelajaran.index'),'bx-calendar','Jadwal Pelajaran' ) !!}
                             {!! renderEnhancedSidebarLink(('absensi.index'), 'bx-calendar-check', 'Data Absensi') !!}
                             {!! renderEnhancedSidebarLink(('absensi.scan'), 'bx-scan', 'Scan Absensi') !!}
                             {!! renderEnhancedSidebarLink(('settings.index'), 'bx-cog', 'Pengaturan') !!}
                         </div>
                     </div>
                     @endif
-
-                   
-                    <!-- System Status -->
-                    <div class="mt-8 px-4 py-4 bg-gradient-to-r from-primary-800/60 to-primary-700/60 rounded-xl border border-primary-600/20">
-                        <h3 class="text-xs font-semibold text-primary-300 uppercase mb-3 flex items-center">
-                            <i class='bx bx-server mr-2'></i> System Status
-                        </h3>
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs text-primary-200">Server</span>
-                                <div class="flex items-center">
-                                    <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-1"></span>
-                                    <span class="text-xs text-primary-200">Online</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs text-primary-200">Database</span>
-                                <div class="flex items-center">
-                                    <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-1"></span>
-                                    <span class="text-xs text-primary-200">Connected</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs text-primary-200">Last Update</span>
-                                <span class="text-xs text-primary-200">Today, 08:30</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             @endif

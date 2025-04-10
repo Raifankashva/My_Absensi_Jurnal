@@ -1,6 +1,7 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SchoolRegistrationController;
+use App\Http\Controllers\SchoolManagementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\SekolahController;
@@ -20,6 +21,8 @@ use App\Http\Controllers\JadwalPelajaranController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SchoolDashboardController;
 use App\Http\Controllers\KelasSekolahController;
+use App\Http\Controllers\AbsensiPelajaranController;
+use App\Http\Controllers\SiswaImportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -49,6 +52,17 @@ Route::get('forgot-password', [AuthController::class, 'showForgotPasswordForm'])
 Route::post('forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
 Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+
+// Authentication routes
+
+// School registration routes
+Route::get('/school/register', [SchoolRegistrationController::class, 'showRegistrationForm'])->name('school.register');
+Route::post('/school/register', [SchoolRegistrationController::class, 'register']);
+
+// OTP verification routes
+Route::get('/verify-otp', [SchoolRegistrationController::class, 'showOtpForm'])->name('verification.notice');
+Route::post('/verify-otp', [SchoolRegistrationController::class, 'verifyOtp'])->name('verify.otp');
+Route::post('/resend-otp', [SchoolRegistrationController::class, 'resendOtp'])->name('resend.otp');
 
 Route::get('/public/attendance', [PublicAttendanceController::class, 'view'])
     ->name('attendance.public.view');
@@ -98,7 +112,9 @@ Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendanc
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
     Route::post('adminsiswa/download-qrcodes', [DataSiswaController::class, 'downloadQRCodes'])->name('adminsiswa.download-qrcodes');
 
-    
+    Route::get('/schools', [SchoolManagementController::class, 'index'])->name('schools.index');
+    Route::get('/schools/{school}', [SchoolManagementController::class, 'show'])->name('schools.show');
+    Route::patch('/schools/{school}/toggle-activation', [SchoolManagementController::class, 'toggleActivation'])->name('schools.toggle-activation');
 
  
 });
@@ -114,7 +130,9 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
     Route::get('/jurnal-guru/{id}/edit', [JurnalGuruController::class, 'edit'])->name('jurnal-guru.edit');
     Route::put('/jurnal-guru/{id}', [JurnalGuruController::class, 'update'])->name('jurnal-guru.update');
     Route::delete('/jurnal-guru/{id}', [JurnalGuruController::class, 'destroy'])->name('jurnal-guru.destroy');
-    
+    Route::get('/profile', [App\Http\Controllers\GuruProfileController::class, 'show'])->name('guru.profile');
+    Route::get('/profile/edit', [App\Http\Controllers\GuruProfileController::class, 'edit'])->name('guru.profile.edit');
+    Route::put('/profile/update', [App\Http\Controllers\GuruProfileController::class, 'update'])->name('guru.profile.update');
     // Rute untuk laporan jurnal
     Route::get('/jurnal-guru/laporan', [JurnalGuruController::class, 'laporanJurnal'])->name('jurnal-guru.laporan');
 
@@ -241,3 +259,40 @@ Route::get('/absensi/export-periode-pdf', [AbsensiController::class, 'exportPeri
 Route::get('/absensi/export-periode-excel', [AbsensiController::class, 'exportPeriodeExcel'])->name('absensi.exportPeriodeExcel');
 });
 Route::get('/jurnal-guru/laporan-absensi', [JurnalGuruController::class, 'laporanAbsensi'])->name('absensi.laporan');
+
+
+// Absensi Pelajaran Routes
+Route::prefix('absensi-pelajaran')->name('absensi.pelajaran.')->middleware(['auth'])->group(function () {
+    // View today's schedules
+    Route::get('/jadwal-hari-ini', [App\Http\Controllers\AbsensiPelajaranController::class, 'jadwalHariIni'])
+        ->name('jadwal-hari-ini');
+        
+    // Form to fill attendance
+    Route::get('/isi', [App\Http\Controllers\AbsensiPelajaranController::class, 'index'])
+        ->name('index');
+        
+    // Store attendance
+    Route::post('/store', [App\Http\Controllers\AbsensiPelajaranController::class, 'store'])
+        ->name('store');
+        
+    // View specific attendance
+    Route::get('/show/{jadwal_id}/{tanggal?}', [App\Http\Controllers\AbsensiPelajaranController::class, 'showBySubject'])
+        ->name('show');
+        
+    // Attendance reports
+    Route::get('/laporan', [App\Http\Controllers\AbsensiPelajaranController::class, 'report'])
+        ->name('report');
+});
+
+// API endpoint for filtering jadwal by kelas (used in the report page)
+Route::get('/api/jadwal-by-kelas/{kelas_id}', function ($kelasId) {
+    $jadwalList = App\Models\JadwalPelajaran::where('kelas_id', $kelasId)
+        ->where('is_active', true)
+        ->get();
+        
+    return response()->json($jadwalList);
+});
+
+Route::get('/siswa/import', [SiswaImportController::class, 'index'])->name('siswa.import');
+    Route::post('/siswa/import', [SiswaImportController::class, 'import'])->name('siswa.import');
+    Route::get('/siswa/download-template', [SiswaImportController::class, 'downloadTemplate'])->name('siswa.download-template');

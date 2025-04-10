@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PengaturanAbsensiController;
 use App\Http\Controllers\JadwalAbsensiController;
 use App\Http\Controllers\JadwalPelajaranController;
+use App\Http\Controllers\API\RegionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,3 +32,6 @@ Route::middleware(['auth:sanctum', 'check.sekolah'])->group(function () {
     Route::get('/jadwal-pelajaran/guru/{guruId}', [JadwalPelajaranController::class, 'getJadwalByGuru']);
     Route::get('/jadwal-pelajaran/hari-ini/{guruId}', [JadwalPelajaranController::class, 'getJadwalHariIni']);
 });
+Route::get('/cities/{province}', [RegionController::class, 'getCities']);
+Route::get('/districts/{city}', [RegionController::class, 'getDistricts']);
+Route::get('/villages/{district}', [RegionController::class, 'getVillages']);
