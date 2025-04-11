@@ -81,6 +81,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     
     Route::resource('sekolahs', SekolahController::class);
+    Route::post('/sekolah/{id}/edit', [SekolahController::class, 'update'])->name('sekolah.update');
 
     
 
