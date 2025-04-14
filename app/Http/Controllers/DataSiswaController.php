@@ -32,6 +32,11 @@ use App\Exports\UserCredentialsExport;
 use App\Imports\DataSiswaImport;
 use App\Exports\TemplateExport;
 use ZipArchive;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
+
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 
 class DataSiswaController extends Controller
 {
@@ -43,27 +48,61 @@ class DataSiswaController extends Controller
     $user = auth()->user();
     $sekolah = Sekolah::where('user_id', $user->id)->firstOrFail();
     
-    $dataSiswa = DataSiswa::with(['user', 'sekolah', 'kelas', 'province', 'city', 'district', 'village'])
-        ->where('sekolah_id', $sekolah->id) // Only show students from this school
-        ->latest()
-        ->paginate(10);
-
+    // Get all classes for dropdown
     $allKelas = Kelas::where('sekolah_id', $sekolah->id)->get();
-
-    // Grouped students for this school only
-    $sekolah->load(['kelas.siswa' => function ($query) use ($request) {
-        if ($request->filled('kelas_id')) {
-            $query->where('kelas_id', $request->kelas_id);
-        }
-    }]);
     
-    $groupedStudents = collect([$sekolah]);
+    // Initial student query
+    $dataSiswaQuery = DataSiswa::with(['user', 'sekolah', 'kelas', 'province', 'city', 'district', 'village'])
+        ->where('sekolah_id', $sekolah->id);
     
-
+    // Filter by class
+    if ($request->filled('kelas_id')) {
+        $dataSiswaQuery->where('kelas_id', $request->kelas_id);
+    }
+    
+    // Search by keyword
+    if ($request->filled('search')) {
+        $keyword = $request->search;
+        $dataSiswaQuery->where(function ($query) use ($keyword) {
+            $query->where('nama_lengkap', 'like', "%{$keyword}%")
+                ->orWhere('nisn', 'like', "%{$keyword}%")
+                ->orWhereHas('user', function ($query) use ($keyword) {
+                    $query->where('email', 'like', "%{$keyword}%");
+                });
+        });
+    }
+    
+    // Sorting
+    $sortBy = $request->get('sort_by', 'created_at');
+    $sortOrder = $request->get('sort_order', 'desc');
+    $dataSiswaQuery->orderBy($sortBy, $sortOrder);
+    
+    // Group query by class for grouped view
+    $groupedStudentsQuery = clone $dataSiswaQuery;
+    
+    // Standard paginated results
+    $dataSiswa = $dataSiswaQuery->paginate(10)->withQueryString();
+    
+    // Group students by class
+    $groupedStudents = [];
+    if ($request->get('view_mode', 'list') === 'grouped') {
+        // Get students grouped by class
+        $groupedStudents = $groupedStudentsQuery->get()
+            ->groupBy(function($student) {
+                return $student->kelas ? $student->kelas->nama_kelas : 'Belum Ada Kelas';
+            });
+    }
+    
+    // Calculate statistics
+    $totalStudents = DataSiswa::where('sekolah_id', $sekolah->id)->count();
+    $totalClasses = $allKelas->count();
+    $maleStudents = DataSiswa::where('sekolah_id', $sekolah->id)->where('jenis_kelamin', 'L')->count();
+    $femaleStudents = DataSiswa::where('sekolah_id', $sekolah->id)->where('jenis_kelamin', 'P')->count();
+    
     // Generate QR codes
     $writer = new PngWriter();
     $qrCodeUrls = [];
-
+    
     foreach ($dataSiswa as $siswa) {
         $qrCode = QrCode::create($this->generateQRContent($siswa))
             ->setEncoding(new Encoding('UTF-8'))
@@ -73,18 +112,28 @@ class DataSiswaController extends Controller
             ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
             ->setForegroundColor(new Color(0, 0, 0))
             ->setBackgroundColor(new Color(255, 255, 255));
-
+        
         $result = $writer->write($qrCode);
-
+        
         $qrCodePath = 'public/qrcodes/siswa-' . $siswa->id . '.png';
         Storage::put($qrCodePath, $result->getString());
-
-        // Store QR Code URL in array
+        
         $qrCodeUrls[$siswa->id] = Storage::url('qrcodes/siswa-' . $siswa->id . '.png');
     }
-
-    return view('adminsiswa.index', compact('dataSiswa', 'sekolah', 'allKelas', 'groupedStudents', 'qrCodeUrls'));
+    
+    return view('adminsiswa.index', compact(
+        'dataSiswa', 
+        'sekolah', 
+        'allKelas', 
+        'groupedStudents', 
+        'qrCodeUrls',
+        'totalStudents',
+        'totalClasses',
+        'maleStudents',
+        'femaleStudents'
+    ));
 }
+    
     
     
     
@@ -613,7 +662,7 @@ public function showQR($id)
         $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE) === TRUE) {
             foreach ($selectedStudents as $studentId) {
-                $student = DataSiswa::find($studentId);
+                $student = DataSiswa::findOrFail($studentId);
                 if ($student) {
                     // Generate QR Code on the fly
                     $writer = new PngWriter();
@@ -637,7 +686,7 @@ public function showQR($id)
             // Download zip file and then delete it
             return response()->download($zipPath)->deleteFileAfterSend(true);
         }
-    
+
         return back()->with('error', 'Gagal membuat file zip QR Code.');
     }
 
@@ -674,5 +723,42 @@ public function downloadQRCode($id)
     }
     
     return back()->with('error', 'QR Code tidak dapat dibuat.');
+}
+public function printQRCodes(Request $request)
+{
+    $selectedStudents = $request->input('selected_students', []);
+    
+    if (empty($selectedStudents)) {
+        return back()->with('error', 'Pilih minimal satu siswa untuk mencetak QR Code.');
+    }
+
+    $students = DataSiswa::whereIn('id', $selectedStudents)->get();
+
+    $qrData = [];
+
+    foreach ($students as $student) {
+        $qrCode = \Endroid\QrCode\QrCode::create($this->generateQRContent($student))
+            ->setEncoding(new Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(new ErrorCorrectionLevelHigh())
+            ->setSize(200)
+            ->setMargin(10)
+            ->setForegroundColor(new Color(0, 0, 0))
+            ->setBackgroundColor(new Color(255, 255, 255))
+            ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin());
+
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
+        $base64 = base64_encode($result->getString());
+
+        $qrData[] = [
+            'nama' => $student->nama_lengkap,
+            'nisn' => $student->nisn,
+            'image' => 'data:image/png;base64,' . $base64
+        ];
+    }
+
+    $pdf = Pdf::loadView('adminsiswa.qr_pdf', compact('qrData'))->setPaper('A4');
+
+    return $pdf->download('qrcodes_siswa.pdf');
 }
 }

@@ -111,7 +111,6 @@ Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendanc
     Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
 
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
-    Route::post('adminsiswa/download-qrcodes', [DataSiswaController::class, 'downloadQRCodes'])->name('adminsiswa.download-qrcodes');
 
     Route::get('/schools', [SchoolManagementController::class, 'index'])->name('schools.index');
     Route::get('/schools/{school}', [SchoolManagementController::class, 'show'])->name('schools.show');
@@ -232,6 +231,8 @@ Route::get('/kelas', [KelasSekolahController::class, 'index'])->name('kelassekol
     });
         Route::get('adminguru/{guru}/detail', [DataGuruController::class, 'show'])->name('adminguru.detail');
         Route::resource('adminsiswa', DataSiswaController::class);
+        Route::post('adminsiswa/download-qrcodes', [DataSiswaController::class, 'downloadQRCodes'])->name('adminsiswa.download-qrcodes');
+        Route::post('adminsiswa/print-qrcodes', [DataSiswaController::class, 'printQRCodes'])->name('adminsiswa.print-qrcodes');
 
     Route::get('get-kelas/{sekolahId}', [DataSiswaController::class, 'getKelas'])->name('get.kelas');
     Route::get('get-cities/{provinceId}', [DataSiswaController::class, 'getCities'])->name('get.cities');

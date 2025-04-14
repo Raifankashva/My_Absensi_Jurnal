@@ -30,4 +30,6 @@ return [
         'alamat' => 'Alamat',
         'token' => 'Token',
     ],
+    'in' => ':attribute harus salah satu dari nilai berikut: :values.',
+
 ];
