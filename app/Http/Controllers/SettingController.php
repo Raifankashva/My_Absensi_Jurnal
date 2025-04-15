@@ -31,4 +31,29 @@ class SettingController extends Controller
 
         return redirect()->back()->with('success', 'Pengaturan jam masuk berhasil disimpan!');
     }
+    public function viewSettings()
+{
+    // Get the authenticated user
+    $user = auth()->user();
+    
+    // Check if the user has a school
+    $sekolah = Sekolah::where('user_id', $user->id)->first();
+    
+    if (!$sekolah) {
+        return redirect()->back()->with('error', 'Anda tidak memiliki akses ke pengaturan sekolah.');
+    }
+    
+    // Get the settings for this school
+    $settings = Setting::where('sekolah_id', $sekolah->id)->first();
+    
+    // If no settings exist yet, create a default object to avoid null errors in the view
+    if (!$settings) {
+        $settings = new Setting();
+        $settings->sekolah_id = $sekolah->id;
+        $settings->jam_masuk = '07:00';
+        $settings->batas_terlambat = '07:30';
+    }
+    
+    return view('settings.view', compact('settings', 'sekolah'));
+}
 }

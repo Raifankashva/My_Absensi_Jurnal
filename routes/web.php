@@ -163,7 +163,7 @@ use App\Http\Controllers\SettingController;
 
 Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
 Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
-
+Route::get('/settings/view', [SettingController::class, 'viewSettings'])->name('settings.view');
 
 
 // Data Siswa routes

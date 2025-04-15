@@ -640,7 +640,7 @@
                             {!! renderEnhancedSidebarLink(('jadwal-pelajaran.index'),'bx-calendar','Jadwal Pelajaran' ) !!}
                             {!! renderEnhancedSidebarLink(('absensi.index'), 'bx-calendar-check', 'Data Absensi') !!}
                             {!! renderEnhancedSidebarLink(('absensi.scan'), 'bx-scan', 'Scan Absensi') !!}
-                            {!! renderEnhancedSidebarLink(('settings.index'), 'bx-cog', 'Pengaturan') !!}
+                            {!! renderEnhancedSidebarLink(('settings.view'), 'bx-cog', 'Pengaturan') !!}
                         </div>
                     </div>
                     @endif

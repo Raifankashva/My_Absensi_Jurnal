@@ -301,7 +301,7 @@
                         <div class="flex items-center">
                             <div class="flex-shrink-0 h-12 w-12">
                                 @if($guru->foto)
-                                <img class="h-12 w-12 rounded-full object-cover border-2 border-blue-200 shadow-sm group-hover:border-blue-400 transition-all duration-300" src="{{ asset('storage/' . $guru->foto) }}" alt="{{ $guru->nama_lengkap }}">
+                                <img class="h-12 w-12 rounded-full object-cover border-2 border-blue-200 shadow-sm group-hover:border-blue-400 transition-all duration-300" src="{{ asset('storage/guru-photos/' . $guru->foto) }}" alt="{{ $guru->nama_lengkap }}">
                                 @else
                                 <div class="h-12 w-12 rounded-full bg-gradient-to-br from-violet-400 to-indigo-500 flex items-center justify-center text-white font-bold shadow-sm">
                                     {{ substr($guru->nama_lengkap, 0, 1) }}

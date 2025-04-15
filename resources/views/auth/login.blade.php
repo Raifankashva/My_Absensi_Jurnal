@@ -236,40 +236,7 @@
                 </form>
 
                 <div class="relative my-6 opacity-0 animate-slide-up" style="animation-delay: 0.7s;">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">Or continue with</span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-3 opacity-0 animate-slide-up" style="animation-delay: 0.8s;">
-                    <button
-                        type="button"
-                        class="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm 
-                               bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                               transition-all duration-300"
-                    >
-                        <i class='bx bxl-google text-xl text-red-500'></i>
-                    </button>
-                    <button
-                        type="button"
-                        class="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm 
-                               bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                               transition-all duration-300"
-                    >
-                        <i class='bx bxl-microsoft text-xl text-blue-500'></i>
-                    </button>
-                    <button
-                        type="button"
-                        class="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm 
-                               bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                               transition-all duration-300"
-                    >
-                        <i class='bx bxl-apple text-xl'></i>
-                    </button>
-                </div>
+                    
             </div>
         </div>
 
