@@ -10,8 +10,8 @@ class CreateSekolahsTable extends Migration
     {
         Schema::create('sekolahs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->unique(); // Add this line
-            $table->string('npsn', 8)->unique(); // Nomor Pokok Sekolah Nasional
+            $table->unsignedBigInteger('user_id')->unique(); 
+            $table->string('npsn', 8)->unique(); 
             $table->string('nama_sekolah');
             $table->enum('jenjang', ['SD', 'SMP', 'SMA', 'SMK']);
             $table->enum('status', ['Negeri', 'Swasta']);
@@ -32,7 +32,7 @@ class CreateSekolahsTable extends Migration
             $table->string('nip_kepala_sekolah', 18)->nullable();
             $table->string('foto')->nullable();
             $table->timestamps();
-            $table->boolean('is_active')->default(false); // tambahkan ini
+            $table->boolean('is_active')->default(false); 
 
             // Menambahkan foreign key constraints
             $table->foreign('province_id')

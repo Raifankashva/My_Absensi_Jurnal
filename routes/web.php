@@ -1,6 +1,5 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SchoolRegistrationController;
 use App\Http\Controllers\SchoolManagementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GuruController;
@@ -23,6 +22,9 @@ use App\Http\Controllers\SchoolDashboardController;
 use App\Http\Controllers\KelasSekolahController;
 use App\Http\Controllers\AbsensiPelajaranController;
 use App\Http\Controllers\SiswaImportController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SchoolRegistrationController;
+use App\Http\Controllers\AdminSchoolController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,6 +35,10 @@ use App\Http\Controllers\SiswaImportController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('/', function () {
+    return view('welcome');
+});
 Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
 Route::get('getdistricts/{city}', [SekolahController::class, 'getDistricts']);
 Route::get('getvillages/{district}', [SekolahController::class, 'getVillages']);
@@ -52,17 +58,17 @@ Route::get('forgot-password', [AuthController::class, 'showForgotPasswordForm'])
 Route::post('forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
 Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
-
-// Authentication routes
-
-// School registration routes
-Route::get('/school/register', [SchoolRegistrationController::class, 'showRegistrationForm'])->name('school.register');
-Route::post('/school/register', [SchoolRegistrationController::class, 'register']);
-
-// OTP verification routes
-Route::get('/verify-otp', [SchoolRegistrationController::class, 'showOtpForm'])->name('verification.notice');
-Route::post('/verify-otp', [SchoolRegistrationController::class, 'verifyOtp'])->name('verify.otp');
-Route::post('/resend-otp', [SchoolRegistrationController::class, 'resendOtp'])->name('resend.otp');
+Route::get('/register/school', [SchoolRegistrationController::class, 'showRegistrationForm'])->name('school.register.form');
+Route::post('/register/school', [SchoolRegistrationController::class, 'register'])->name('school.register');
+Route::get('/api/cities', [SchoolRegistrationController::class, 'getCities'])->name('api.cities');
+Route::get('/api/districts', [SchoolRegistrationController::class, 'getDistricts'])->name('api.districts');
+Route::get('/api/villages', [SchoolRegistrationController::class, 'getVillages'])->name('api.villages');
+Route::get('/verify-otp', [SchoolRegistrationController::class, 'showOtpVerificationForm'])
+    ->name('school.verify.otp.form');
+Route::post('/verify-otp', [SchoolRegistrationController::class, 'verifyOtp'])
+    ->name('school.verify.otp');
+Route::post('/resend-otp', [SchoolRegistrationController::class, 'resendOtp'])
+    ->name('school.resend.otp');
 
 Route::get('/public/attendance', [PublicAttendanceController::class, 'view'])
     ->name('attendance.public.view');
@@ -70,7 +76,7 @@ Route::get('/public/attendance/export', [PublicAttendanceController::class, 'exp
     ->middleware('verify.school.token')
     ->name('attendance.public.export');
 
-// Routes untuk Admin
+Route::middleware(['auth', 'school.active'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
@@ -79,7 +85,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/tasks/{id}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
     Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
-    
+    Route::get('/schools', [AdminSchoolController::class, 'index'])->name('adminsekolah.index');
+        Route::get('/schools/{id}', [AdminSchoolController::class, 'show'])->name('adminsekolah.show');
+        Route::get('/schools/{id}/edit', [AdminSchoolController::class, 'edit'])->name('adminsekolah.edit');
+        Route::put('/schools/{id}', [AdminSchoolController::class, 'update'])->name('adminsekolah.update');
+        Route::delete('/schools/{id}', [AdminSchoolController::class, 'destroy'])->name('adminsekolah.destroy');
+        Route::put('/schools/{id}/toggle-active', [AdminSchoolController::class, 'toggleActive'])->name('adminsekolah.toggle-active');
+   
     Route::resource('sekolahs', SekolahController::class);
     Route::post('/sekolah/{id}/edit', [SekolahController::class, 'update'])->name('sekolah.update');
 
@@ -111,10 +123,6 @@ Route::post('/attendance/manual', [AttendanceController::class, 'manualAttendanc
     Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
 
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
-
-    Route::get('/schools', [SchoolManagementController::class, 'index'])->name('schools.index');
-    Route::get('/schools/{school}', [SchoolManagementController::class, 'show'])->name('schools.show');
-    Route::patch('/schools/{school}/toggle-activation', [SchoolManagementController::class, 'toggleActivation'])->name('schools.toggle-activation');
 
  
 });
@@ -149,9 +157,6 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
 
 });
 
-Route::get('/', function () {
-    return view('welcome');
-});
 Route::middleware(['auth'])->group(function () {
     Route::get('/attendance/settings', [AttendanceController::class, 'settings'])->name('attendance.settings');
     Route::put('/attendance/settings/{setting}', [AttendanceController::class, 'updateSettings'])->name('attendance.settings.update');
@@ -159,7 +164,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/attendance/scan', [AttendanceController::class, 'scanQrCode'])->name('attendance.scan');
 });
 
-use App\Http\Controllers\SettingController;
 
 Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
 Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
@@ -219,7 +223,9 @@ Route::get('/kelas', [KelasSekolahController::class, 'index'])->name('kelassekol
     Route::get('/kelas/{id}/edit', [KelasSekolahController::class, 'edit'])->name('kelassekolah.edit');
     Route::put('/kelas/{id}', [KelasSekolahController::class, 'update'])->name('kelassekolah.update');
     Route::delete('/kelas/{id}', [KelasSekolahController::class, 'destroy'])->name('kelassekolah.destroy');
-
+// Export routes for KelasSekolah
+Route::get('/kelassekolah/export/excel', [KelasSekolahController::class, 'exportExcel'])->name('kelassekolah.export.excel');
+Route::get('/kelassekolah/export/pdf', [KelasSekolahController::class, 'exportPdf'])->name('kelassekolah.export.pdf');
     Route::prefix('adminguru')->name('adminguru.')->group(function () {
         Route::get('/', [DataGuruController::class, 'index'])->name('index');
         Route::get('/create', [DataGuruController::class, 'create'])->name('create');
@@ -229,11 +235,20 @@ Route::get('/kelas', [KelasSekolahController::class, 'index'])->name('kelassekol
         Route::put('/{guru}', [DataGuruController::class, 'update'])->name('update');
         Route::delete('/{guru}', [DataGuruController::class, 'destroy'])->name('destroy');
     });
+    // Export routes for DataGuru
+Route::get('/adminguru/export/excel', [DataGuruController::class, 'exportExcel'])->name('adminguru.export.excel');
+Route::get('/adminguru/export/pdf', [DataGuruController::class, 'exportPdf'])->name('adminguru.export.pdf');
         Route::get('adminguru/{guru}/detail', [DataGuruController::class, 'show'])->name('adminguru.detail');
         Route::resource('adminsiswa', DataSiswaController::class);
         Route::post('adminsiswa/download-qrcodes', [DataSiswaController::class, 'downloadQRCodes'])->name('adminsiswa.download-qrcodes');
         Route::post('adminsiswa/print-qrcodes', [DataSiswaController::class, 'printQRCodes'])->name('adminsiswa.print-qrcodes');
-
+// Add these routes to your routes/web.php file
+// Add these routes to your routes/web.php file
+Route::get('jadwal-pelajaran/export-pdf', [App\Http\Controllers\JadwalPelajaranController::class, 'exportPDF'])->name('jadwal-pelajaran.export-pdf');
+Route::get('jadwal-pelajaran/export-excel', [App\Http\Controllers\JadwalPelajaranController::class, 'exportExcel'])->name('jadwal-pelajaran.export-excel');
+// Export routes
+Route::get('/adminsiswa/export/excel', [DataSiswaController::class, 'exportExcel'])->name('adminsiswa.export.excel');
+Route::get('/adminsiswa/export/pdf', [DataSiswaController::class, 'exportPDF'])->name('adminsiswa.export.pdf');
     Route::get('get-kelas/{sekolahId}', [DataSiswaController::class, 'getKelas'])->name('get.kelas');
     Route::get('get-cities/{provinceId}', [DataSiswaController::class, 'getCities'])->name('get.cities');
     Route::get('get-districts/{cityId}', [DataSiswaController::class, 'getDistricts'])->name('get.districts');
@@ -298,3 +313,4 @@ Route::get('/api/jadwal-by-kelas/{kelas_id}', function ($kelasId) {
 Route::get('/siswa/import', [SiswaImportController::class, 'index'])->name('siswa.import');
     Route::post('/siswa/import', [SiswaImportController::class, 'import'])->name('siswa.import');
     Route::get('/siswa/download-template', [SiswaImportController::class, 'downloadTemplate'])->name('siswa.download-template');
+});

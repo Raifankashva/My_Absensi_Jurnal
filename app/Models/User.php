@@ -56,6 +56,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Sekolah::class);
     }
 
+    public function sekolahs() {
+        return $this->hasMany(Sekolah::class);
+    }
     /**
      * Get OTP verifications for the user.
      */

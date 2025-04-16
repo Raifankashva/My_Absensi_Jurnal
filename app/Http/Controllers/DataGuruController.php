@@ -9,18 +9,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\GuruExport;
+use PDF;
+use Carbon\Carbon;
 class DataGuruController extends Controller
 {
     public function create()
     {
-        // Get the authenticated user
         $user = auth()->user();
         
-        // Check if the user has a school
         $sekolah = Sekolah::where('user_id', $user->id)->first();
         
-        // If no school is associated with this user, redirect with error
         if (!$sekolah) {
             return redirect()->route('adminguru.index')
                 ->with('error', 'Anda tidak memiliki akses untuk menambahkan guru');
@@ -31,18 +31,15 @@ class DataGuruController extends Controller
     
     public function store(Request $request)
     {
-        // Get the authenticated user's school
         $user = auth()->user();
         $sekolah = Sekolah::where('user_id', $user->id)->first();
         
-        // If no school is found, redirect with error
         if (!$sekolah) {
             return redirect()->route('adminguru.index')
                 ->with('error', 'Anda tidak memiliki akses untuk menambahkan guru');
         }
         
         $request->validate([
-            // Remove sekolah_id from validation since it will be set automatically
             'nip' => 'nullable|string|size:18|unique:data_guru',
             'nuptk' => 'nullable|string|size:16|unique:data_guru',
             'nama_lengkap' => 'required|string',
@@ -252,5 +249,112 @@ public function update(Request $request, DataGuru $guru)
     public function show (DataGuru $guru)
     {
         return view('adminguru.show', compact('guru'));
+    }
+
+    /**
+     * Export data guru to Excel based on year and month
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function exportExcel(Request $request)
+    {
+        $user = auth()->user();
+        $sekolah = Sekolah::where('user_id', $user->id)->first();
+        
+        $year = $request->year ?? Carbon::now()->year;
+        $month = $request->month ?? Carbon::now()->month;
+        
+        // Initialize query
+        $query = DataGuru::with(['user', 'sekolah']);
+        
+        // If not admin, filter by school ID
+        if ($user->role !== 'admin') {
+            $query->where('sekolah_id', $sekolah->id);
+        }
+        
+        // Apply school filter if provided
+        if ($request->has('sekolah_id') && !empty($request->sekolah_id)) {
+            $query->where('sekolah_id', $request->sekolah_id);
+        }
+        
+        // Filter data by month and year of tmt_kerja
+        $query->whereYear('tmt_kerja', $year);
+        
+        // Only filter by month if it's provided and valid
+        if ($month >= 1 && $month <= 12) {
+            $query->whereMonth('tmt_kerja', $month);
+        }
+        
+        $data = $query->get();
+        
+        // Generate filename based on filters
+        $fileName = 'data_guru_';
+        $fileName .= $user->role === 'admin' ? 'semua_sekolah' : $sekolah->nama_sekolah;
+        $fileName .= '_' . $year;
+        $fileName .= ($month >= 1 && $month <= 12) ? '_' . str_pad($month, 2, '0', STR_PAD_LEFT) : '';
+        $fileName .= '.xlsx';
+        
+        return Excel::download(new GuruExport($data), $fileName);
+    }
+    
+    /**
+     * Export data guru to PDF based on year and month
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf(Request $request)
+    {
+        $user = auth()->user();
+        $sekolah = Sekolah::where('user_id', $user->id)->first();
+        
+        $year = $request->year ?? Carbon::now()->year;
+        $month = $request->month ?? Carbon::now()->month;
+        
+        // Initialize query
+        $query = DataGuru::with(['user', 'sekolah']);
+        
+        // If not admin, filter by school ID
+        if ($user->role !== 'admin') {
+            $query->where('sekolah_id', $sekolah->id);
+        }
+        
+        // Apply school filter if provided
+        if ($request->has('sekolah_id') && !empty($request->sekolah_id)) {
+            $query->where('sekolah_id', $request->sekolah_id);
+        }
+        
+        // Filter data by month and year of tmt_kerja
+        $query->whereYear('tmt_kerja', $year);
+        
+        // Only filter by month if it's provided and valid
+        if ($month >= 1 && $month <= 12) {
+            $query->whereMonth('tmt_kerja', $month);
+        }
+        
+        $data = $query->get();
+        
+        // Get month name for display
+        $monthName = $month >= 1 && $month <= 12 ? Carbon::createFromDate(null, $month, 1)->translatedFormat('F') : 'Semua Bulan';
+        
+        // Generate filename based on filters
+        $fileName = 'data_guru_';
+        $fileName .= $user->role === 'admin' ? 'semua_sekolah' : $sekolah->nama_sekolah;
+        $fileName .= '_' . $year;
+        $fileName .= ($month >= 1 && $month <= 12) ? '_' . str_pad($month, 2, '0', STR_PAD_LEFT) : '';
+        $fileName .= '.pdf';
+        
+        // Get school name for title
+        $schoolName = $user->role === 'admin' ? 'Semua Sekolah' : $sekolah->nama_sekolah;
+        
+        $pdf = PDF::loadView('exports.guru_pdf', [
+            'data' => $data,
+            'year' => $year,
+            'month' => $monthName,
+            'schoolName' => $schoolName
+        ]);
+        
+        return $pdf->download($fileName);
     }
 }

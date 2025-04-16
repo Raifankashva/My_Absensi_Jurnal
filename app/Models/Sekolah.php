@@ -29,6 +29,10 @@ class Sekolah extends Model
         'foto',
         'total_siswa',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     // Relationships with IndoRegion
     public function province()

@@ -62,7 +62,6 @@
             display: none !important;
         }
 
-        /* Animations */
         @keyframes slideIn {
             from {
                 transform: translateX(-100%);
@@ -144,7 +143,6 @@
             width: 100%;
         }
 
-        /* Glass morphism */
         .glass-morphism {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
@@ -159,7 +157,6 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
-        /* Card hover effects */
         .hover-card {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -169,7 +166,6 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
-        /* Task cards */
         .task-card {
             @apply p-4 rounded-xl shadow-sm transition-all duration-300;
         }
@@ -187,7 +183,6 @@
             @apply bg-white border-gray-200;
         }
 
-        /* Loading dots */
         .loading-dots {
             display: inline-block;
             animation: dotAnimation 1.5s infinite;
@@ -208,13 +203,11 @@
             }
         }
 
-        /* Loader fade out */
         .loader-fade-out {
             opacity: 0;
             pointer-events: none;
         }
 
-        /* Gradient text */
         .gradient-text {
             background: linear-gradient(90deg, #2563EB, #3B82F6, #60A5FA);
             -webkit-background-clip: text;
@@ -222,7 +215,6 @@
             color: transparent;
         }
 
-        /* Gradient borders */
         .gradient-border {
             position: relative;
             border-radius: 0.75rem;
@@ -243,14 +235,12 @@
             mask-composite: exclude;
         }
 
-        /* Sidebar active item */
         .sidebar-active {
             background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.05));
             border-left: 3px solid #3B82F6;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
         }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -270,7 +260,6 @@
             background: rgba(37, 99, 235, 0.7);
         }
 
-        /* Animated background */
         .animated-bg {
             background: linear-gradient(-45deg, #EFF6FF, #DBEAFE, #BFDBFE, #93C5FD);
             background-size: 400% 400%;
@@ -289,7 +278,6 @@
             }
         }
 
-        /* Dark mode styles */
         .dark {
             color-scheme: dark;
         }
@@ -304,7 +292,6 @@
             background-size: 400% 400%;
         }
 
-        /* Enhanced Sidebar Styles */
         .sidebar-bg {
             background-image: radial-gradient(circle at 0% 100%, #1E3A8A, #1E40AF 40%, #1D4ED8);
             position: relative;
@@ -418,7 +405,6 @@
         }
     }
 }" x-init="initTheme()">
-    <!-- Page Loader -->
     <div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center animated-bg transition-opacity duration-500">
         <div class="relative w-28 h-28 mb-6 animate-pulse-slow">
             <div class="absolute inset-0 rounded-full border-4 border-t-primary-600 border-r-primary-500 border-b-primary-400 border-l-primary-500 animate-spin"></div>
@@ -436,59 +422,11 @@
         </div>
     </div>
 
-    <!-- Theme Toggle -->
-    <button 
-        @click="toggleDarkMode()" 
-        class="fixed top-4 right-20 z-50 p-2 rounded-full shadow-lg transition transform hover:scale-110 active:scale-95 glass-morphism dark:glass-morphism-dark">
-        <i class="bx" :class="darkMode ? 'bx-sun text-yellow-400' : 'bx-moon text-primary-600'"></i>
-    </button>
+ 
+    
 
-    <!-- Notification Center -->
-    <div x-data="{ showNotifications: false }" class="fixed top-4 right-36 z-50">
-        <button
-            @click="showNotifications = !showNotifications"
-            class="p-2 rounded-full shadow-lg transition transform hover:scale-110 active:scale-95 glass-morphism dark:glass-morphism-dark"
-            :class="darkMode ? 'text-white' : 'text-primary-800'">
-            <i class="bx bx-bell"></i>
-        </button>
+  
 
-        <div x-show="showNotifications"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 transform scale-95"
-            x-transition:enter-end="opacity-100 transform scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 transform scale-100"
-            x-transition:leave-end="opacity-0 transform scale-95"
-            class="absolute right-0 mt-3 w-80 rounded-xl shadow-xl glass-morphism dark:glass-morphism-dark"
-            @click.away="showNotifications = false">
-            <div class="p-4">
-                <h3 class="text-lg font-semibold mb-3 gradient-text">Notifications</h3>
-                <template x-if="notifications.length === 0">
-                    <div class="py-8 text-center">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 mb-4">
-                            <i class="bx bx-bell-off text-2xl text-primary-500"></i>
-                        </div>
-                        <p class="text-gray-500 dark:text-gray-400">No new notifications</p>
-                    </div>
-                </template>
-                <template x-for="notification in notifications" :key="notification.id">
-                    <div class="p-3 mb-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-300">
-                        <p x-text="notification.message"></p>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Menu Toggle -->
-    <button
-        @click="sidebarOpen = !sidebarOpen"
-        class="md:hidden fixed top-4 right-4 z-50 bg-gradient-to-r from-primary-600 to-primary-700 text-white p-2 rounded-full shadow-lg 
-               transition transform hover:scale-110 hover:shadow-primary-500/20 active:scale-95">
-        <i class='bx' :class="sidebarOpen ? 'bx-x' : 'bx-menu'"></i>
-    </button>
-
-    <!-- Enhanced Sidebar -->
     <aside
         x-cloak
         :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
@@ -520,10 +458,8 @@
             </div>
         </div>
 
-        <!-- Enhanced Navigation -->
         <nav class="p-4 overflow-y-auto h-[calc(100vh-5rem)] scrollbar-thin scrollbar-thumb-primary-700 scrollbar-track-primary-900/30">
             @if (auth()->check())
-            <!-- Enhanced User Profile Section -->
             <div class="mb-6 animate-fade-in">
                 <div class="px-4 py-5 bg-gradient-to-r from-primary-800/80 to-primary-700/80 rounded-xl mb-4 
                             shadow-lg group hover:scale-[1.02] transition-all duration-300 backdrop-blur-sm border border-primary-600/20">
@@ -552,7 +488,6 @@
                     </div>
                 </div>
 
-                <!-- Enhanced Navigation Links with Better Structure -->
                 <div class="space-y-5 animate-slide-in" style="--delay: 0.2s">
                     @php
                     function renderEnhancedSidebarLink($routeName, $icon, $label, $badge = null) {
@@ -596,11 +531,7 @@
                             <i class='bx bx-cog mr-2'></i> Management
                         </h2>
                         <div class="space-y-1 pl-1">
-                            {!! renderEnhancedSidebarLink(('sekolahs.index'), 'bxs-school', 'Sekolah') !!}
-                            {!! renderEnhancedSidebarLink(('kelas.index'), 'bx-chalkboard', 'Kelas') !!}
-                            {!! renderEnhancedSidebarLink(('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
-                            {!! renderEnhancedSidebarLink(('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
-                            {!! renderEnhancedSidebarLink(('jurnal-guru.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
+                            {!! renderEnhancedSidebarLink(('adminsekolah.index'), 'bxs-school', 'Sekolah') !!}
                         </div>
                     </div>
                     @elseif (auth()->user()->role == 'guru')
@@ -652,10 +583,8 @@
         
     </aside>
 
-    <!-- Main Content -->
     <div :class="{'md:ml-72': sidebarOpen, 'ml-0': !sidebarOpen}"
         class="transition-all duration-300 ease-in-out">
-        <!-- Top Navigation -->
         <header class="h-16 glass-morphism dark:glass-morphism-dark border-b border-primary-100 dark:border-primary-800 flex items-center 
                        justify-between px-6 shadow-sm sticky top-0 z-30">
             <div class="flex items-center space-x-4">
@@ -664,47 +593,8 @@
 
             @if (auth()->check())
             <div class="flex items-center space-x-4">
-                <!-- Search Bar -->
-                <div class="relative hidden md:block">
-                    <input type="text"
-                        placeholder="Search..."
-                        class="w-64 px-4 py-2 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-primary-100 dark:border-primary-800
-                                  focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white dark:focus:bg-gray-800
-                                  transition-all duration-300">
-                    <i class="bx bx-search absolute right-3 top-2.5 text-gray-400"></i>
-                </div>
 
-                <!-- Quick Actions Dropdown -->
-                <div x-data="{ open: false }" class="relative">
-                    <button @click="open = !open"
-                        class="p-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-all duration-300">
-                        <i class="bx bx-grid-alt text-xl text-primary-600 dark:text-primary-400"></i>
-                    </button>
 
-                    <div x-show="open"
-                        @click.away="open = false"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 transform scale-95"
-                        x-transition:enter-end="opacity-100 transform scale-100"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100 transform scale-100"
-                        x-transition:leave-end="opacity-0 transform scale-95"
-                        class="absolute right-0 mt-3 w-56 rounded-xl shadow-xl glass-morphism dark:glass-morphism-dark">
-                        <div class="p-2">
-                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-all duration-300">
-                                <i class="bx bx-user mr-2 text-primary-500"></i> Profile
-                            </a>
-                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-all duration-300">
-                                <i class="bx bx-cog mr-2 text-primary-500"></i> Settings
-                            </a>
-                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-all duration-300">
-                                <i class="bx bx-help-circle mr-2 text-primary-500"></i> Help Center
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Logout Button -->
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit"
@@ -719,9 +609,7 @@
             @endif
         </header>
 
-        <!-- Page Content -->
         <main class="p-6 glass-morphism dark:glass-morphism-dark min-h-[calc(100vh-4rem)] animate-[fadeIn_0.5s_ease-in-out]">
-            <!-- Breadcrumbs -->
             <nav class="mb-6">
                 <ol class="flex items-center space-x-2 text-sm">
                     <li>
@@ -734,17 +622,15 @@
                 </ol>
             </nav>
 
-            <!-- Content Area -->
             <div class="space-y-6 animate-[slideUp_0.5s_ease-in-out]">
                 @yield('content')
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="glass-morphism dark:glass-morphism-dark border-t border-primary-100 dark:border-primary-800 py-4 px-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                    © 2024 School Management System. All rights reserved.
+                    © 2025 School Management System. All rights reserved.
                 </p>
                 <div class="flex items-center space-x-4 mt-4 md:mt-0">
                     <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
@@ -761,7 +647,6 @@
         </footer>
     </div>
 
-    <!-- Toast Notifications -->
     <div id="toast-container"
         class="fixed bottom-4 right-4 z-50 space-y-2"
         x-data="{ 
@@ -790,42 +675,34 @@
          }">
     </div>
 
-    <!-- Scripts -->
     <script>
-        // Initialize Alpine.js components
         document.addEventListener('alpine:init', () => {
             Alpine.store('app', {
-                // Add any global state here
+
             });
         });
 
-        // Handle responsive sidebar
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 768) {
                 Alpine.store('sidebarOpen', true);
             }
         });
 
-        // Example function to show a toast notification
         function showNotification(message, type = 'success') {
             Alpine.evaluate(document.getElementById('toast-container'), 'showToast')(message, type);
         }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Simulate loading time (you can remove this setTimeout in production)
             setTimeout(function() {
-                // Get the loader element
                 const loader = document.getElementById('page-loader');
 
-                // Add the fade-out class
                 loader.classList.add('loader-fade-out');
 
-                // Remove the loader from DOM after transition completes
                 setTimeout(() => {
                     loader.style.display = 'none';
                 }, 500);
-            }, 1500); // Adjust this value for desired loading time
+            }, 1500);
         });
     </script>
 </body>

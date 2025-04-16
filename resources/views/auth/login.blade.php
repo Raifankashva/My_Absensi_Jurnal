@@ -122,6 +122,13 @@
 
     <div class="w-full max-w-md relative z-10 opacity-0 animate-fade-in">
         <div class="text-center mb-8 opacity-0 animate-slide-up stagger-1">
+        @if (session('error'))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline">{{ session('error') }}</span>
+    </div>
+@endif
+
             <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg mb-4 transform transition-all duration-300 hover:scale-110">
                 <i class='bx bxs-school text-3xl text-white'></i>
             </div>

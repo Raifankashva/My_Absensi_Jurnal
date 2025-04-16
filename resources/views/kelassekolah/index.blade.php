@@ -3,6 +3,113 @@
 @section('content')
 <div class="py-6 sm:py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 flex items-center">
+        <h3 class="text-lg font-medium text-gray-800">Export Data</h3>
+    </div>
+    <div class="p-6">
+        <form action="{{ route('kelassekolah.export.excel') }}" method="get">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <label for="tingkat" class="block text-sm font-medium text-gray-700 mb-2">Tingkat:</label>
+                    <select name="tingkat" id="tingkat" class="w-full rounded-lg border-gray-200 shadow-sm focus:border-gray-300 focus:ring focus:ring-gray-200 focus:ring-opacity-50 transition-all">
+                        <option value="">Semua Tingkat</option>
+                        <option value="I">Kelas 1</option>
+                        <option value="II">Kelas 2</option>
+                        <option value="III">Kelas 3</option>
+                        <option value="IV">Kelas 4</option>
+                        <option value="V">Kelas 5</option>
+                        <option value="VI">Kelas 6</option>
+                        <option value="VII">Kelas 7</option>
+                        <option value="VIII">Kelas 8</option>
+                        <option value="IX">Kelas 9</option>
+                        <option value="X">Kelas 10</option>
+                        <option value="XI">Kelas 11</option>
+                        <option value="XII">Kelas 12</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="tahun_ajaran" class="block text-sm font-medium text-gray-700 mb-2">Tahun Ajaran:</label>
+                    <select name="tahun_ajaran" id="tahun_ajaran" class="w-full rounded-lg border-gray-200 shadow-sm focus:border-gray-300 focus:ring focus:ring-gray-200 focus:ring-opacity-50 transition-all">
+                        <option value="">Semua Tahun</option>
+                        @php
+                            $currentYear = date('Y');
+                            $startYear = $currentYear - 5;
+                        @endphp
+                        @for($year = $currentYear; $year >= $startYear; $year--)
+                            <option value="{{ $year }}/{{ $year + 1 }}">{{ $year }}/{{ $year + 1 }}</option>
+                        @endfor
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="semester" class="block text-sm font-medium text-gray-700 mb-2">Semester:</label>
+                    <select name="semester" id="semester" class="w-full rounded-lg border-gray-200 shadow-sm focus:border-gray-300 focus:ring focus:ring-gray-200 focus:ring-opacity-50 transition-all">
+                        <option value="">Semua Semester</option>
+                        <option value="Ganjil">Ganjil</option>
+                        <option value="Genap">Genap</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-end">
+                    <div class="flex flex-wrap gap-3">
+                        <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Excel
+                        </button>
+                        <a href="{{ route('kelassekolah.export.pdf') }}" 
+                           onclick="event.preventDefault(); document.getElementById('pdf-export-form').submit();" 
+                           class="inline-flex items-center px-4 py-2.5 bg-rose-500 text-white font-medium rounded-lg hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Hidden form for PDF export to maintain filter values -->
+        <form id="pdf-export-form" action="{{ route('kelassekolah.export.pdf') }}" method="get" class="hidden">
+            <input type="hidden" name="tingkat" id="pdf-tingkat">
+            <input type="hidden" name="tahun_ajaran" id="pdf-tahun-ajaran">
+            <input type="hidden" name="semester" id="pdf-semester">
+        </form>
+    </div>
+</div>
+
+<!-- Script to sync form values -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tingkatSelect = document.getElementById('tingkat');
+        const tahunAjaranSelect = document.getElementById('tahun_ajaran');
+        const semesterSelect = document.getElementById('semester');
+        
+        const pdfTingkat = document.getElementById('pdf-tingkat');
+        const pdfTahunAjaran = document.getElementById('pdf-tahun-ajaran');
+        const pdfSemester = document.getElementById('pdf-semester');
+        
+        // Function to update the hidden PDF form fields
+        function updatePdfForm() {
+            pdfTingkat.value = tingkatSelect.value;
+            pdfTahunAjaran.value = tahunAjaranSelect.value;
+            pdfSemester.value = semesterSelect.value;
+        }
+        
+        // Add event listeners to all select elements
+        tingkatSelect.addEventListener('change', updatePdfForm);
+        tahunAjaranSelect.addEventListener('change', updatePdfForm);
+        semesterSelect.addEventListener('change', updatePdfForm);
+        
+        // Initialize values
+        updatePdfForm();
+    });
+</script>
+
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-4 sm:p-6 bg-white border-b border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">

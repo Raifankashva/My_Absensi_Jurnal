@@ -515,7 +515,7 @@ private function calculateDateRange($periode, $tanggal_mulai = null, $tanggal_ak
         }
         
         // Redirect to the welcome page
-        return redirect()->route('welcome')
+        return redirect()->route('/')
             ->with('success', 'Berhasil keluar dari fitur scan.');
     }
 }

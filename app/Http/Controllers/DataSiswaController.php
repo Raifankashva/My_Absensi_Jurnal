@@ -601,37 +601,7 @@ public function showQR($id)
         }
     }
 
-    public function export() 
-    {
-        // Generate QR Code untuk semua siswa terlebih dahulu
-        $dataSiswa = DataSiswa::all();
-        foreach ($dataSiswa as $siswa) {
-            // Gunakan fungsi yang sudah ada untuk generate QR
-            $writer = new PngWriter();
-            $qrCode = QrCode::create($this->generateQRContent($siswa))
-                ->setEncoding(new Encoding('UTF-8'))
-                ->setErrorCorrectionLevel(new ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
-                ->setSize(300)
-                ->setMargin(10)
-                ->setRoundBlockSizeMode(new RoundBlockSizeMode\RoundBlockSizeModeMargin())
-                ->setForegroundColor(new Color(0, 0, 0))
-                ->setBackgroundColor(new Color(255, 255, 255));
     
-            // Add Logo if exists
-            $logoPath = public_path('images/logo.png');
-            if (file_exists($logoPath)) {
-                $logo = Logo::create($logoPath)->setResizeToWidth(50);
-            }
-    
-            $result = $writer->write($qrCode);
-            
-            // Store QR code
-            $qrCodePath = 'public/qrcodes/siswa-' . $siswa->id . '.png';
-            Storage::put($qrCodePath, $result->getString());
-        }
-    
-        return Excel::download(new DataSiswaExport, 'data_siswa.xlsx');
-    }
 
     public function downloadQRCodes(Request $request)
     {
@@ -908,4 +878,113 @@ public function update(Request $request, $id)
             ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
 }
+
+/**
+ * Export student data to Excel file
+ */
+public function exportExcel(Request $request)
+{
+    try {
+        // Get the current logged-in user's school
+        $user = auth()->user();
+        $sekolah = Sekolah::where('user_id', $user->id)->firstOrFail();
+        
+        // Build student query with filters
+        $dataSiswaQuery = DataSiswa::with(['kelas', 'province', 'city', 'district', 'village'])
+            ->where('sekolah_id', $sekolah->id);
+        
+        // Apply class filter if provided
+        if ($request->filled('kelas_id')) {
+            $dataSiswaQuery->where('kelas_id', $request->kelas_id);
+        }
+        
+        // Apply search filter if provided
+        if ($request->filled('search')) {
+            $keyword = $request->search;
+            $dataSiswaQuery->where(function ($query) use ($keyword) {
+                $query->where('nama_lengkap', 'like', "%{$keyword}%")
+                    ->orWhere('nisn', 'like', "%{$keyword}%")
+                    ->orWhere('nis', 'like', "%{$keyword}%");
+            });
+        }
+        
+        // Get filtered students
+        $dataSiswa = $dataSiswaQuery->get();
+        
+        // Export to Excel
+        return Excel::download(new DataSiswaExport($dataSiswa), 'data_siswa_' . $sekolah->nama_sekolah . '_' . date('Y-m-d') . '.xlsx');
+        
+    } catch (\Exception $e) {
+        Log::error('Error exporting student data to Excel', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        
+        return redirect()
+            ->back()
+            ->with('error', 'Terjadi kesalahan saat mengekspor data: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Export student data to PDF
+ */
+public function exportPDF(Request $request)
+{
+    try {
+        // Get the current logged-in user's school
+        $user = auth()->user();
+        $sekolah = Sekolah::where('user_id', $user->id)->firstOrFail();
+        
+        // Build student query with filters
+        $dataSiswaQuery = DataSiswa::with(['kelas', 'province', 'city', 'district', 'village'])
+            ->where('sekolah_id', $sekolah->id);
+        
+        // Apply class filter if provided
+        if ($request->filled('kelas_id')) {
+            $dataSiswaQuery->where('kelas_id', $request->kelas_id);
+        }
+        
+        // Apply search filter if provided
+        if ($request->filled('search')) {
+            $keyword = $request->search;
+            $dataSiswaQuery->where(function ($query) use ($keyword) {
+                $query->where('nama_lengkap', 'like', "%{$keyword}%")
+                    ->orWhere('nisn', 'like', "%{$keyword}%")
+                    ->orWhere('nis', 'like', "%{$keyword}%");
+            });
+        }
+        
+        // Get filtered students
+        $dataSiswa = $dataSiswaQuery->get();
+        
+        // Additional data for PDF
+        $today = date('d F Y');
+        $totalStudents = $dataSiswa->count();
+        $maleCount = $dataSiswa->where('jenis_kelamin', 'laki-laki')->count();
+        $femaleCount = $dataSiswa->where('jenis_kelamin', 'perempuan')->count();
+        
+        // Generate PDF
+        $pdf = Pdf::loadView('exports.siswa_pdf', compact(
+            'dataSiswa', 
+            'sekolah', 
+            'today', 
+            'totalStudents', 
+            'maleCount', 
+            'femaleCount'
+        ))->setPaper('a4', 'landscape');
+        
+        // Return the PDF for download
+        return $pdf->download('data_siswa_' . $sekolah->nama_sekolah . '_' . date('Y-m-d') . '.pdf');
+        
+    } catch (\Exception $e) {
+        Log::error('Error exporting student data to PDF', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        
+        return redirect()
+            ->back()
+            ->with('error', 'Terjadi kesalahan saat mengekspor data: ' . $e->getMessage());
+    }}
 }

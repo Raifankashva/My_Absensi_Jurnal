@@ -23,12 +23,19 @@
                 </svg>
                 Import Excel
             </a>
-            <a href="#" 
+            <a href="{{ route('adminsiswa.export.excel') }}" 
                class="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg shadow-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 13.293a1 1 0 010 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 111.414-1.414L1.586 14.586V7a1 1 0 112 0v7.586l1.293-1.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
                 Export Excel
+            </a>
+            <a href="{{ route('adminsiswa.export.pdf') }}"
+                class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 13.293a1 1 0 010 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 111.414-1.414L1.586 14.586V7a1 1 0 112 0v7.586l1.293-1.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Export PDF
             </a>
         </div>
     </div>
