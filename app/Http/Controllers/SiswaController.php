@@ -71,39 +71,6 @@ class SiswaController extends Controller
 
     return view('siswa.dashboard', compact('user', 'jadwalPerHari', 'absensi', 'qrCodeUrl'));
 }
-public function generateStudentCard()
-{
-    $user = auth()->user()->load('dataSiswa.sekolah', 'dataSiswa.kelas');
-    $dataSiswa = $user->dataSiswa;
-    
-    // Pastikan hanya data siswa yang sesuai yang dapat diunduh
-    if (!$dataSiswa) {
-        return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
-    }
-    
-    // Path QR Code
-    $qrCodePath = 'qrcodes/siswa-' . $dataSiswa->id . '.png';
-    
-    // Check if QR code exists, if not generate it
-    if (!Storage::exists('public/' . $qrCodePath)) {
-        Storage::makeDirectory('public/qrcodes');
-        $qrCode = QrCode::size(150)->generate($this->generateQRContent($dataSiswa));
-        Storage::put('public/' . $qrCodePath, $qrCode);
-    }
-    
-    // Prepare data for the PDF
-    $pdf = Pdf::loadView('siswa.kartu_pelajar', [
-        'user' => $user,
-        'dataSiswa' => $dataSiswa,
-        'qrCodePath' => Storage::url($qrCodePath)
-    ])->setPaper('a4', 'landscape');
-    
-    // Set file name
-    $fileName = 'Kartu_Pelajar_' . $dataSiswa->id . '.pdf';
-
-    // Return PDF for download
-    return $pdf->download($fileName);
-}
 
 
     
@@ -222,5 +189,117 @@ public function updateProfile(Request $request)
     }
 
     return redirect()->route('siswa.profile')->with('success', 'Profile updated successfully!');
+}
+
+public function cetakKartuPelajar()
+{
+    // Get logged in student data with relationships
+    $user = User::find(auth()->id())->load([
+        'dataSiswa.kelas',
+        'dataSiswa.sekolah'
+    ]);
+    
+    $dataSiswa = $user->dataSiswa;
+    
+    // Generate QR Code for the student
+    $qrCodePath = 'public/qrcodes/siswa-' . $dataSiswa->id . '.png';
+    
+    // Check if QR code already exists, if not generate it
+    if (!Storage::exists($qrCodePath)) {
+        // Generate QR content (student ID and other necessary info)
+        $qrContent = "ID:" . $dataSiswa->id . 
+                     "|NISN:" . $dataSiswa->nisn . 
+                     "|NAMA:" . $dataSiswa->nama_lengkap;
+                     
+        // Generate and store QR code
+        $qrImage = QrCode::format('png')
+                        ->size(300)
+                        ->margin(1)
+                        ->generate($qrContent);
+                        
+        Storage::put($qrCodePath, $qrImage);
+    }
+    
+    // Get the QR code path for PDF
+    $qrCodeFullPath = storage_path('app/' . $qrCodePath);
+    
+    // Get student photo path
+    $fotoPath = $dataSiswa->foto ? public_path(str_replace('/storage', 'storage/app/public', $dataSiswa->foto)) 
+                                : public_path('images/default-profile.png');
+    
+    // Card measurements (standard ID card size in mm - 85.6 x 54 mm)
+    $cardWidth = 85.6;
+    $cardHeight = 54;
+    
+    // Generate PDF with proper card size
+    $pdf = Pdf::loadView('siswa.kartu-pelajar', compact('dataSiswa', 'qrCodeFullPath', 'fotoPath'))
+        ->setPaper([0, 0, $cardWidth * 2.83, $cardHeight * 2.83], 'landscape'); // Convert mm to points (1mm ≈ 2.83pts)
+    
+    return $pdf->stream('kartu-pelajar-' . $dataSiswa->nisn . '.pdf');
+}
+
+/**
+ * Helper method to generate QR content
+ */
+private function generateQRContent($dataSiswa)
+{
+    // Generate a unique identifier for this student's QR code
+    $uniqueId = $dataSiswa->id . '-' . Str::random(10);
+    
+    // Create an array of essential student information
+    $studentData = [
+        'id' => $dataSiswa->id,
+        'nisn' => $dataSiswa->nisn,
+        'nama' => $dataSiswa->nama_lengkap,
+        'sekolah' => $dataSiswa->sekolah->nama_sekolah,
+        'kelas' => $dataSiswa->kelas->nama_kelas,
+        'unique' => $uniqueId
+    ];
+    
+    // Convert to JSON and encode
+    return json_encode($studentData);
+}
+
+public function cetakDataSiswa()
+{
+    // Get logged in student data with relationships
+    $user = User::find(auth()->id())->load([
+        'dataSiswa.kelas',
+        'dataSiswa.sekolah'
+    ]);
+    
+    $dataSiswa = $user->dataSiswa;
+    
+    // Generate QR Code for the student
+    $qrCodePath = 'public/qrcodes/siswa-' . $dataSiswa->id . '.png';
+    
+    // Check if QR code already exists, if not generate it
+    if (!Storage::exists($qrCodePath)) {
+        // Generate QR content (student ID and other necessary info)
+        $qrContent = "ID:" . $dataSiswa->id . 
+                     "|NISN:" . $dataSiswa->nisn . 
+                     "|NAMA:" . $dataSiswa->nama_lengkap . 
+                     "|SEKOLAH:" . $dataSiswa->sekolah->nama_sekolah;
+                     
+        // Generate and store QR code
+        $qrImage = QrCode::format('png')
+                        ->size(200)
+                        ->margin(1)
+                        ->generate($qrContent);
+                        
+        Storage::put($qrCodePath, $qrImage);
+    }
+    
+    // Get the QR code path for PDF
+    $qrCodeFullPath = storage_path('app/' . $qrCodePath);
+    
+    // Get student photo path
+    $fotoPath = $dataSiswa->foto ? public_path(str_replace('/storage', '/public', $dataSiswa->foto)) 
+                                : public_path('images/default-profile.png');
+    
+    // Generate PDF with A4 size
+    $pdf = Pdf::loadView('siswa.cetak-data-siswa', compact('dataSiswa', 'qrCodeFullPath', 'fotoPath'));
+    
+    return $pdf->stream('data-siswa-' . $dataSiswa->nisn . '.pdf');
 }
 }

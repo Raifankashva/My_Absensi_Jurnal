@@ -20,7 +20,6 @@ class SchoolRegistrationController extends Controller
      */
     public function showRegistrationForm()
     {
-        // Load provinces for dropdown
         $provinces = \App\Models\Province::all();
         return view('auth.school-register', compact('provinces'));
     }
@@ -31,7 +30,6 @@ class SchoolRegistrationController extends Controller
     
      public function register(Request $request)
      {
-         // Validate the request
          $validator = Validator::make($request->all(), [
              'name' => 'required|string|max:255',
              'email' => 'required|string|email|max:255|unique:users',
@@ -61,11 +59,9 @@ class SchoolRegistrationController extends Controller
                  ->withInput();
          }
  
-         // Begin database transaction
          DB::beginTransaction();
  
          try {
-             // Create user
              $user = User::create([
                  'name' => $request->name,
                  'email' => $request->email,
@@ -73,16 +69,14 @@ class SchoolRegistrationController extends Controller
                  'alamat' => $request->alamat,
                  'no_hp' => $request->no_hp,
                  'role' => 'sekolah',
-                 'email_verified_at' => null, // Email not verified yet
+                 'email_verified_at' => null, 
              ]);
  
-             // Handle file upload if provided
              $fotoPath = null;
              if ($request->hasFile('foto')) {
                  $fotoPath = $request->file('foto')->store('sekolah_foto', 'public');
              }
  
-             // Create sekolah
              $sekolah = Sekolah::create([
                  'user_id' => $user->id,
                  'npsn' => $request->npsn,
@@ -102,21 +96,17 @@ class SchoolRegistrationController extends Controller
                  'kepala_sekolah' => $request->kepala_sekolah,
                  'nip_kepala_sekolah' => $request->nip_kepala_sekolah,
                  'foto' => $fotoPath,
-                 'is_active' => false, // Default inactive until verified and approved
+                 'is_active' => false, 
              ]);
  
-             // Generate OTP code
              $otp = $this->generateOTPCode($user);
              
-             // Send OTP via email
              Mail::to($user->email)->send(new SchoolRegistrationOTP($user, $otp));
  
              DB::commit();
  
-             // Flash notification
              session()->flash('success', 'Pendaftaran sekolah berhasil! Silahkan periksa email untuk melakukan verifikasi akun.');
              
-             // Redirect to OTP verification page
              return redirect()->route('school.verify.otp.form', ['email' => $user->email]);
  
          } catch (\Exception $e) {
@@ -135,10 +125,8 @@ class SchoolRegistrationController extends Controller
     
     protected function generateOTPCode(User $user)
     {
-        // Generate a 6-digit OTP code
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         
-        // Store the OTP in the database with expiration time (15 minutes)
         DB::table('otp_codes')->updateOrInsert(
             ['user_id' => $user->id],
             [
@@ -186,17 +174,13 @@ class SchoolRegistrationController extends Controller
             return back()->withErrors(['otp' => 'Kode OTP tidak valid atau sudah kadaluarsa.']);
         }
         
-        // OTP is valid, mark user as verified
         $user->email_verified_at = now();
         $user->save();
         
-        // Delete used OTP
         $otpData->delete();
         
-        // Flash notification
         session()->flash('success', 'Verifikasi berhasil! Akun Anda sedang menunggu aktivasi dari admin.');
         
-        // Redirect to login page
         return redirect()->route('login');
     }
 
@@ -215,7 +199,6 @@ class SchoolRegistrationController extends Controller
             return back()->withErrors(['email' => 'Email tidak ditemukan.']);
         }
         
-        // Check if OTP was sent within last 2 minutes
         $lastOtp = OtpCode::where('user_id', $user->id)
             ->where('created_at', '>', now()->subMinutes(2))
             ->first();
@@ -224,11 +207,9 @@ class SchoolRegistrationController extends Controller
             return back()->withErrors(['otp' => 'Harap tunggu 2 menit sebelum meminta kode OTP baru.']);
         }
         
-        // Generate and send new OTP
         $otp = $this->generateOTPCode($user);
         $user->notify(new SchoolRegistrationOTP($otp));
         
-        // Flash notification
         session()->flash('success', 'Kode OTP baru telah dikirim ke email Anda.');
         
         return back();

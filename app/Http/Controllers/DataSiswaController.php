@@ -552,10 +552,7 @@ public function show($id)
 private function generateQRContent($dataSiswa)
 {
     return json_encode([
-        'id' => $dataSiswa->id,
         'nisn' => $dataSiswa->nisn,
-        'nama' => $dataSiswa->nama_lengkap,
-        'kelas' => $dataSiswa->kelas->nama_kelas ?? '',
         'sekolah' => $dataSiswa->sekolah->nama_sekolah ?? '',
     ]);
 }
@@ -699,6 +696,10 @@ public function printQRCodes(Request $request)
     }
 
     $students = DataSiswa::whereIn('id', $selectedStudents)->get();
+    
+    if ($students->isEmpty()) {
+        return back()->with('error', 'Data siswa yang dipilih tidak ditemukan.');
+    }
 
     $qrData = [];
 
@@ -723,10 +724,11 @@ public function printQRCodes(Request $request)
         ];
     }
 
-    $pdf = Pdf::loadView('adminsiswa.qr_pdf', compact('qrData'))->setPaper('A4');
+    $pdf = PDF::loadView('adminsiswa.qr_pdf', compact('qrData'))->setPaper('A4');
 
     return $pdf->download('qrcodes_siswa.pdf');
 }
+
 public function edit($id)
 {
     $dataSiswa = DataSiswa::findOrFail($id);

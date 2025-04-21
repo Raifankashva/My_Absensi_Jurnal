@@ -105,20 +105,8 @@ class AdminController extends Controller
         ]
     ];
 
-    // Get tasks and schedules
-    $tasks = Task::where('due_date', '>=', now()->subDays(7))->get();
     
-    $todaySchedules = Schedule::where('day', Carbon::now()->format('l'))
-        ->orderBy('time')
-        ->get();
     
-    $upcomingSchedules = Schedule::whereIn('day', collect(range(0, 6))->map(function($day) {
-            return Carbon::now()->addDays($day)->format('l');
-        }))
-        ->orderBy('day')
-        ->orderBy('time')
-        ->get()
-        ->groupBy('day');
 
     return view('admin.dashboard', compact(
         'cards',
@@ -126,9 +114,6 @@ class AdminController extends Controller
         'totalSiswa', 
         'latestUsers', 
         'totalSekolah', 
-        'tasks',
-        'todaySchedules',
-        'upcomingSchedules',
         'sekolah', 
     ));
 }

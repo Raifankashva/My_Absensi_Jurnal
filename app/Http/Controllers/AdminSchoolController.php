@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sekolah;
+use App\Models\Province;
+use App\Models\Regency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use PDF;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SchoolsExport;
 
 class AdminSchoolController extends Controller
 {
@@ -18,12 +23,76 @@ class AdminSchoolController extends Controller
     }
 
     /**
-     * Display a listing of the schools.
+     * Display a listing of the schools with filtering options.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $schools = Sekolah::with('user')->paginate(10);
-        return view('adminsekolah.index', compact('schools'));
+        $query = Sekolah::with('user', 'province', 'city');
+
+        // Apply filters if provided
+        if ($request->filled('province_id')) {
+            $query->where('province_id', $request->province_id);
+        }
+        
+        if ($request->filled('city_id')) {
+            $query->where('city_id', $request->city_id);
+        }
+        
+        if ($request->filled('jenjang')) {
+            $query->where('jenjang', $request->jenjang);
+        }
+        
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        if ($request->filled('search')) {
+            $query->where('nama_sekolah', 'like', '%' . $request->search . '%')
+                  ->orWhere('npsn', 'like', '%' . $request->search . '%');
+        }
+        
+        // Get data for filter dropdowns
+        $provinces = Province::orderBy('name')->get();
+        $cities = collect();
+        
+        if ($request->filled('province_id')) {
+            $cities = Regency::where('province_id', $request->province_id)
+                      ->orderBy('name')
+                      ->get();
+        }
+        
+        // Get paginated results
+        $schools = $query->orderBy('nama_sekolah')->paginate(10);
+        
+        // For export actions, we need to get all results without pagination
+        if ($request->has('export')) {
+            $allSchools = $query->get();
+            
+            if ($request->export === 'pdf') {
+                return $this->exportPdf($allSchools);
+            } elseif ($request->export === 'excel') {
+                return $this->exportExcel($allSchools);
+            }
+        }
+        
+        return view('adminsekolah.index', compact('schools', 'provinces', 'cities'));
+    }
+
+    /**
+     * Export schools data to PDF
+     */
+    protected function exportPdf($schools)
+    {
+        $pdf = PDF::loadView('adminsekolah.pdf', compact('schools'));
+        return $pdf->download('daftar-sekolah-' . date('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Export schools data to Excel
+     */
+    protected function exportExcel($schools)
+    {
+        return Excel::download(new SchoolsExport($schools), 'daftar-sekolah-' . date('Y-m-d') . '.xlsx');
     }
 
     /**
@@ -55,8 +124,8 @@ class AdminSchoolController extends Controller
     public function edit($id)
     {
         $school = Sekolah::with('user')->findOrFail($id);
-        $provinces = \App\Models\Province::all();
-        $cities = \App\Models\Regency::where('province_id', $school->province_id)->get();
+        $provinces = Province::all();
+        $cities = Regency::where('province_id', $school->province_id)->get();
         $districts = \App\Models\District::where('regency_id', $school->city_id)->get();
         $villages = \App\Models\Village::where('district_id', $school->district_id)->get();
         
@@ -153,5 +222,14 @@ class AdminSchoolController extends Controller
 
         return redirect()->route('adminsekolah.index')
             ->with('success', 'Sekolah berhasil dihapus.');
+    }
+
+    /**
+     * Get cities by province (for AJAX)
+     */
+    public function getCities($provinceId)
+    {
+        $cities = Regency::where('province_id', $provinceId)->orderBy('name')->get();
+        return response()->json($cities);
     }
 }

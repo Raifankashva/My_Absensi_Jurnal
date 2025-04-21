@@ -106,6 +106,15 @@ class SchoolDashboardController extends Controller
         ));
     }
 
+    public function show()
+    {
+        $user = Auth::user();
+        $sekolah = Sekolah::where('user_id', $user->id)->first();
+        
+        $school = Sekolah::with(['user', 'province', 'city', 'district', 'village'])->findOrFail($sekolah->id);
+        return view('school.profile', compact('school'));
+    }
+
     /**
      * Show class details.
      *

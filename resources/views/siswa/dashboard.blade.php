@@ -56,12 +56,19 @@
                 <h5 class="text-sm font-medium text-gray-800">Kartu Pelajar</h5>
                 <p class="text-xs text-gray-500">Unduh kartu pelajar resmi</p>
             </div>
-            <a href="{{ route('siswa.kartu-pelajar') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Download
-            </a>
+            
+            <!-- Add this in resources/views/siswa/profile.blade.php where appropriate -->
+<div class="mt-4">
+    <a href="{{ route('siswa.cetak-kartu-pelajar') }}" class="btn btn-primary" target="_blank">
+        <i class="fas fa-id-card mr-1"></i> Cetak Kartu Pelajar
+    </a>
+</div>
+<!-- Add this in resources/views/siswa/profile.blade.php where appropriate -->
+<div class="mt-4">
+    <a href="{{ route('siswa.cetak-data-siswa') }}" class="btn btn-primary" target="_blank">
+        <i class="fas fa-print mr-1"></i> Cetak Data Siswa
+    </a>
+</div>
         </div>
     </div>
 

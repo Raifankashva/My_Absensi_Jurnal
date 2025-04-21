@@ -80,18 +80,31 @@ Route::middleware(['auth', 'school.active'])->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
-    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::get('/tasks/{id}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
-    Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+    
     Route::get('/schools', [AdminSchoolController::class, 'index'])->name('adminsekolah.index');
         Route::get('/schools/{id}', [AdminSchoolController::class, 'show'])->name('adminsekolah.show');
         Route::get('/schools/{id}/edit', [AdminSchoolController::class, 'edit'])->name('adminsekolah.edit');
         Route::put('/schools/{id}', [AdminSchoolController::class, 'update'])->name('adminsekolah.update');
         Route::delete('/schools/{id}', [AdminSchoolController::class, 'destroy'])->name('adminsekolah.destroy');
         Route::put('/schools/{id}/toggle-active', [AdminSchoolController::class, 'toggleActive'])->name('adminsekolah.toggle-active');
-   
+        
+        // routes/web.php
+        
+        // School Export Routes
+        Route::get('/school/export', [App\Http\Controllers\SchoolExportController::class, 'showExportForm'])
+            ->name('school.export.form');
+        Route::post('/school/export/excel', [App\Http\Controllers\SchoolExportController::class, 'exportExcel'])
+            ->name('school.export.excel');
+        Route::post('/school/export/pdf', [App\Http\Controllers\SchoolExportController::class, 'exportPdf'])
+            ->name('school.export.pdf');
+        
+        // API Routes for Export Dropdowns
+        Route::prefix('api/export')->group(function () {
+            Route::get('/cities/{provinceId}', [App\Http\Controllers\SchoolExportController::class, 'getCities']);
+            Route::get('/districts/{cityId}', [App\Http\Controllers\SchoolExportController::class, 'getDistricts']);
+            Route::get('/villages/{districtId}', [App\Http\Controllers\SchoolExportController::class, 'getVillages']);
+        });
+
     Route::resource('sekolahs', SekolahController::class);
     Route::post('/sekolah/{id}/edit', [SekolahController::class, 'update'])->name('sekolah.update');
 
@@ -151,7 +164,10 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
     Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('siswa.dashboard');
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Menampilkan halaman riwayat absensi
     Route::get('/siswa/jadwal', [SiswaController::class, 'jadwal'])->name('siswa.jadwal');
-    Route::get('/siswa/kartu-pelajar', [SiswaController::class, 'generateStudentCard'])->name('siswa.kartu-pelajar');
+    Route::get('/siswa/cetak-kartu-pelajar', [SiswaController::class, 'cetakKartuPelajar'])
+        ->name('siswa.cetak-kartu-pelajar');
+        Route::get('/siswa/cetak-data-siswa', [SiswaController::class, 'cetakDataSiswa'])
+        ->name('siswa.cetak-data-siswa');
     Route::get('/profile', [SiswaController::class, 'profile'])->name('siswa.profile');
     Route::post('/profile/update', [SiswaController::class, 'updateProfile'])->name('siswa.profile.update');
 
@@ -193,6 +209,7 @@ Route::prefix('admin/siswa')->name('adminsiswa.')->group(function () {
 Route::get('/absensi/scan/auth', [AbsensiController::class, 'scanAuth'])->name('absensi.scan.auth');
 Route::get('/absensi/token/management', [AbsensiController::class, 'tokenManagement'])->name('absensi.token.management');
 Route::post('/absensi/token/create', [AbsensiController::class, 'createToken'])->name('absensi.token.create');
+Route::post('/absensi/token/create', [AbsensiController::class  , 'createToken'])->name('absensi.createToken');
 Route::post('/absensi/token/update', [AbsensiController::class, 'updateToken'])->name('absensi.token.update');
 Route::get('/absensi/select-school', [AbsensiController::class, 'selectSchool'])->name('absensi.select.school');
 Route::get('/absensi/scan/logout', [AbsensiController::class, 'logoutScan'])->name('absensi.scan.logout');
@@ -202,7 +219,8 @@ Route::middleware(['auth', 'role:sekolah'])->prefix('sekolah')->group(function (
 
 // Dashboard
 Route::get('/dashboard', [SchoolDashboardController::class, 'index'])->name('school.dashboard');
-        
+Route::get('/profile', [SchoolDashboardController::class, 'show'])->name('school.profile');
+
 // Class routes
 Route::get('/classes', [SchoolDashboardController::class, 'indexClasses'])->name('school.classes');
 Route::get('/classes/capacity', [SchoolDashboardController::class, 'classCapacity'])->name('school.classes.capacity');
@@ -314,3 +332,12 @@ Route::get('/siswa/import', [SiswaImportController::class, 'index'])->name('sisw
     Route::post('/siswa/import', [SiswaImportController::class, 'import'])->name('siswa.import');
     Route::get('/siswa/download-template', [SiswaImportController::class, 'downloadTemplate'])->name('siswa.download-template');
 });
+
+// Add these routes to your routes/web.php file
+
+// Export routes
+Route::get('/absensi/export/pdf', [App\Http\Controllers\AbsensiController::class, 'exportPDF'])->name('absensi.export.pdf');
+Route::get('/absensi/export/excel', [App\Http\Controllers\AbsensiController::class, 'exportExcel'])->name('absensi.export.excel');
+
+// Chart data route
+Route::get('/absensi/chart/data', [App\Http\Controllers\AbsensiController::class, 'getChartData'])->name('absensi.chart.data');

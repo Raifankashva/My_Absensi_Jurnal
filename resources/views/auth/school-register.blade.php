@@ -58,7 +58,6 @@
 
     
     <div class="w-full max-w-4xl">
-            <!-- Logo and Header -->
             <div class="text-center mb-10">
                 <div class="flex justify-center">
                     <div class="bg-primary-600 p-3 rounded-full shadow-lg">
@@ -73,7 +72,6 @@
                 </p>
             </div>
 
-            <!-- Progress Bar -->
             <div class="mb-8">
                 <div class="flex justify-between">
                     <div class="text-center" :class="activeStep >= 1 ? 'text-primary-600' : 'text-gray-400'">

@@ -1,80 +1,119 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="py-12 bg-gray-50">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-            <div class="p-6 bg-white border-b border-gray-200">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-bold text-gray-800">
-                        <span class="text-indigo-600"><i class="bi bi-building"></i></span> 
-                        Manajemen Sekolah
-                    </h1>
+<div class="py-6 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+            <div class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-200">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <h1 class="text-xl font-semibold text-gray-800">Daftar Sekolah</h1>
                 </div>
-
-                <!-- Search and Filter Section -->
-                <div class="mb-6 bg-gray-50 p-4 rounded-lg">
-                    <form action="{{ route('adminsekolah.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Cari</label>
-                            <input type="text" name="search" id="search" value="{{ request('search') }}" 
-                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
-                                placeholder="NPSN atau Nama Sekolah">
-                        </div>
-                        <div>
-                            <label for="jenjang" class="block text-sm font-medium text-gray-700 mb-1">Jenjang</label>
-                            <select name="jenjang" id="jenjang" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                <option value="">Semua Jenjang</option>
-                                <option value="SD" {{ request('jenjang') == 'SD' ? 'selected' : '' }}>SD</option>
-                                <option value="SMP" {{ request('jenjang') == 'SMP' ? 'selected' : '' }}>SMP</option>
-                                <option value="SMA" {{ request('jenjang') == 'SMA' ? 'selected' : '' }}>SMA</option>
-                                <option value="SMK" {{ request('jenjang') == 'SMK' ? 'selected' : '' }}>SMK</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select name="status" id="status" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                <option value="">Semua Status</option>
-                                <option value="Negeri" {{ request('status') == 'Negeri' ? 'selected' : '' }}>Negeri</option>
-                                <option value="Swasta" {{ request('status') == 'Swasta' ? 'selected' : '' }}>Swasta</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="is_active" class="block text-sm font-medium text-gray-700 mb-1">Status Akun</label>
-                            <select name="is_active" id="is_active" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                <option value="">Semua</option>
-                                <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>Aktif</option>
-                                <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>Tidak Aktif</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-4 flex justify-end">
-                            <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors duration-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                Filter
-                            </button>
-                            <a href="{{ route('adminsekolah.index') }}" class="ml-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200">
-                                Reset
-                            </a>
-                        </div>
-                    </form>
+                <div class="mt-4 sm:mt-0 flex space-x-2">
+                    <a href="{{ route('adminsekolah.index', ['export' => 'pdf'] + request()->all()) }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        Ekspor PDF
+                    </a>
+                    <a href="{{ route('adminsekolah.index', ['export' => 'excel'] + request()->all()) }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Ekspor Excel
+                    </a>
                 </div>
+            </div>
 
-                <!-- Flash Message -->
-                @if (session('success'))
-                    <div id="alert-success" class="relative px-4 py-3 mb-6 bg-green-100 border border-green-400 text-green-700 rounded-lg" role="alert">
-                        <strong class="font-bold">Berhasil!</strong>
-                        <span class="block sm:inline">{{ session('success') }}</span>
-                        <button type="button" class="absolute top-0 right-0 mt-3 mr-4" onclick="document.getElementById('alert-success').style.display = 'none'">
-                            <svg class="h-4 w-4 fill-current" role="button" viewBox="0 0 20 20">
-                                <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
-                            </svg>
-                        </button>
+            <!-- Alert Messages -->
+            @if (session('success'))
+                <div class="mx-6 mt-4 flex bg-green-50 rounded-md p-4 border-l-4 border-green-500" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
                     </div>
-                @endif
+                    <div class="ml-3">
+                        <p class="text-sm text-green-800">{{ session('success') }}</p>
+                    </div>
+                    <div class="ml-auto pl-3">
+                        <div class="-mx-1.5 -my-1.5">
+                            <button @click="show = false" class="inline-flex rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
-                <!-- Stats Cards -->
+            <!-- Filter Panel -->
+            <div class="p-4 sm:p-6">
+                <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden mb-6">
+                    <div class="px-4 py-3 bg-gray-100 border-b border-gray-200 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        <h2 class="text-sm font-medium text-gray-700">Filter Data</h2>
+                    </div>
+                    <div class="p-4">
+                        <form method="GET" action="{{ route('adminsekolah.index') }}" id="filter-form" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                
+                                <div>
+                                    <label for="jenjang" class="block text-sm font-medium text-gray-700 mb-1">Jenjang</label>
+                                    <select name="jenjang" id="jenjang" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                        <option value="">-- Semua Jenjang --</option>
+                                        <option value="SD" {{ request('jenjang') == 'SD' ? 'selected' : '' }}>SD</option>
+                                        <option value="SMP" {{ request('jenjang') == 'SMP' ? 'selected' : '' }}>SMP</option>
+                                        <option value="SMA" {{ request('jenjang') == 'SMA' ? 'selected' : '' }}>SMA</option>
+                                        <option value="SMK" {{ request('jenjang') == 'SMK' ? 'selected' : '' }}>SMK</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <select name="status" id="status" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                        <option value="">-- Semua Status --</option>
+                                        <option value="Negeri" {{ request('status') == 'Negeri' ? 'selected' : '' }}>Negeri</option>
+                                        <option value="Swasta" {{ request('status') == 'Swasta' ? 'selected' : '' }}>Swasta</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Cari (Nama/NPSN)</label>
+                                    <div class="flex">
+                                        <div class="relative flex-grow">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" name="search" id="search" class="block w-full pl-10 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ request('search') }}" placeholder="Cari nama sekolah atau NPSN...">
+                                        </div>
+                                        <button type="submit" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                            Cari
+                                        </button>
+                                        <a href="{{ route('adminsekolah.index') }}" class="ml-2 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
+                                            Reset
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
                         <div class="flex items-center">
@@ -130,8 +169,8 @@
                     </div>
                 </div>
 
-                <!-- Table Section -->
-                <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <!-- Data Table -->
+                <div class="overflow-x-auto rounded-lg shadow">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -140,16 +179,17 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Sekolah</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenjang</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Akun</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Provinsi</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kabupaten/Kota</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Aktif</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse ($schools as $index => $school)
-                            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $index + $schools->firstItem() }}
+                                    {{ ($schools->currentPage() - 1) * $schools->perPage() + $index + 1 }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ $school->npsn }}
@@ -158,43 +198,42 @@
                                     {{ $school->nama_sekolah }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                        @if($school->jenjang == 'SD') bg-blue-100 text-blue-800
-                                        @elseif($school->jenjang == 'SMP') bg-green-100 text-green-800
-                                        @elseif($school->jenjang == 'SMA') bg-yellow-100 text-yellow-800
-                                        @elseif($school->jenjang == 'SMK') bg-purple-100 text-purple-800
-                                        @else bg-gray-100 text-gray-800 @endif">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        {{ $school->jenjang == 'SD' ? 'bg-blue-100 text-blue-800' : 
+                                           ($school->jenjang == 'SMP' ? 'bg-purple-100 text-purple-800' : 
+                                           ($school->jenjang == 'SMA' ? 'bg-yellow-100 text-yellow-800' : 
+                                           'bg-pink-100 text-pink-800')) }}">
                                         {{ $school->jenjang }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                        {{ $school->status == 'Negeri' ? 'bg-indigo-100 text-indigo-800' : 'bg-pink-100 text-pink-800' }}">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        {{ $school->status == 'Negeri' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800' }}">
                                         {{ $school->status }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $school->email }}
+                                    {{ $school->province ? $school->province->name : '-' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ $school->city ? $school->city->name : '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
                                         {{ $school->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $school->is_active ? 'Aktif' : 'Tidak Aktif' }}
+                                        <span class="h-1.5 w-1.5 rounded-full {{ $school->is_active ? 'bg-green-600' : 'bg-red-600' }} mr-1.5"></span>
+                                        {{ $school->is_active ? 'Aktif' : 'Nonaktif' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex space-x-2">
-                                        <a href="{{ route('adminsekolah.show', $school->id) }}" 
-                                            class="text-blue-600 hover:text-blue-900 bg-blue-100 hover:bg-blue-200 p-1.5 rounded-md transition-colors duration-200"
-                                            title="Detail">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <div class="flex space-x-1">
+                                        <a href="{{ route('adminsekolah.show', $school->id) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-1.5 rounded-md transition-colors" title="Detail">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </a>
-                                        <a href="{{ route('adminsekolah.edit', $school->id) }}" 
-                                            class="text-yellow-600 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 p-1.5 rounded-md transition-colors duration-200"
-                                            title="Edit">
+                                        <a href="{{ route('adminsekolah.edit', $school->id) }}" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-1.5 rounded-md transition-colors" title="Edit">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
@@ -202,12 +241,10 @@
                                         <form action="{{ route('adminsekolah.toggle-active', $school->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('PUT')
-                                            <button type="submit" 
-                                                class="{{ $school->is_active ? 'text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200' : 'text-green-600 hover:text-green-900 bg-green-100 hover:bg-green-200' }} p-1.5 rounded-md transition-colors duration-200"
-                                                title="{{ $school->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
+                                            <button type="submit" class="{{ $school->is_active ? 'text-amber-600 hover:text-amber-900 bg-amber-50 hover:bg-amber-100' : 'text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100' }} p-1.5 rounded-md transition-colors" title="{{ $school->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
                                                 @if($school->is_active)
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                                 </svg>
                                                 @else
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -216,26 +253,27 @@
                                                 @endif
                                             </button>
                                         </form>
-                                        <button type="button" 
-                                            class="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 p-1.5 rounded-md transition-colors duration-200 delete-button"
-                                            data-id="{{ $school->id }}"
-                                            title="Hapus">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
+                                        <form action="{{ route('adminsekolah.destroy', $school->id) }}" method="POST" class="inline delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-1.5 rounded-md transition-colors" title="Hapus">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="8" class="px-6 py-10 text-center text-gray-500">
+                                <td colspan="9" class="px-6 py-10 text-center text-sm text-gray-500">
                                     <div class="flex flex-col items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        <p class="text-lg font-medium">Tidak ada data sekolah</p>
-                                        <p class="text-sm text-gray-400">Coba ubah filter atau tambahkan sekolah baru</p>
+                                        <p class="text-gray-500 text-base">Tidak ada data sekolah.</p>
+                                        <p class="text-gray-400 text-sm mt-1">Coba ubah filter pencarian Anda.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -245,81 +283,78 @@
                 </div>
 
                 <!-- Pagination -->
-                <div class="mt-4">
-                    {{ $schools->links() }}
+                <div class="mt-5 flex justify-center">
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        {{ $schools->appends(request()->except('page'))->links() }}
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-    <div class="bg-white rounded-lg max-w-md w-full">
-        <div class="p-6">
-            <div class="flex items-center justify-center mb-4 text-red-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-            </div>
-            <h3 class="text-xl font-bold text-center mb-2">Konfirmasi Penghapusan</h3>
-            <p class="text-gray-600 text-center mb-6">Apakah Anda yakin ingin menghapus sekolah ini? Tindakan ini akan menghapus akun pengguna terkait dan tidak dapat dibatalkan.</p>
-            <div class="flex justify-center space-x-3">
-                <button id="cancelDelete" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors duration-200">
-                    Batal
-                </button>
-                <form id="deleteForm" action="" method="POST">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200">
-                        Ya, Hapus
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Alpine.js for interactive components -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 <script>
-    // Flash message auto-hide
-    setTimeout(function() {
-        const alert = document.getElementById('alert-success');
-        if (alert) {
-            alert.style.display = 'none';
+    document.addEventListener('DOMContentLoaded', function() {
+        // Konfirmasi hapus dengan modal
+        const deleteForms = document.querySelectorAll('.delete-form');
+        deleteForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (confirm('Apakah Anda yakin ingin menghapus sekolah ini?')) {
+                    this.submit();
+                }
+            });
+        });
+
+        // Provinsi - Kota dependensi
+        const provinceSelect = document.getElementById('province_id');
+        if (provinceSelect) {
+            provinceSelect.addEventListener('change', function() {
+                const provinceId = this.value;
+                const citySelect = document.getElementById('city_id');
+                
+                if (provinceId) {
+                    // Show loading indicator
+                    citySelect.innerHTML = '<option value="">Loading...</option>';
+                    
+                    fetch(`/admin/get-cities/${provinceId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            citySelect.innerHTML = '<option value="">-- Semua Kabupaten/Kota --</option>';
+                            data.forEach(city => {
+                                const option = document.createElement('option');
+                                option.value = city.id;
+                                option.textContent = city.name;
+                                citySelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching cities:', error);
+                            citySelect.innerHTML = '<option value="">-- Error loading cities --</option>';
+                        });
+                } else {
+                    citySelect.innerHTML = '<option value="">-- Semua Kabupaten/Kota --</option>';
+                }
+                
+                // Auto submit form when province changes
+                document.getElementById('filter-form').submit();
+            });
         }
-    }, 5000);
 
-    // Delete confirmation modal
-    const deleteButtons = document.querySelectorAll('.delete-button');
-    const deleteModal = document.getElementById('deleteModal');
-    const deleteForm = document.getElementById('deleteForm');
-    const cancelDelete = document.getElementById('cancelDelete');
-
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const schoolId = this.getAttribute('data-id');
-            deleteForm.action = `/adminsekolah/${schoolId}`;
-            deleteModal.classList.remove('hidden');
+        // Auto submit form when filter changes
+        const autoSubmitFilters = ['city_id', 'jenjang', 'status'];
+        autoSubmitFilters.forEach(filterId => {
+            const element = document.getElementById(filterId);
+            if (element) {
+                element.addEventListener('change', function() {
+                    document.getElementById('filter-form').submit();
+                });
+            }
         });
     });
-
-    cancelDelete.addEventListener('click', function() {
-        deleteModal.classList.add('hidden');
-    });
-
-    // Close modal when clicking outside
-    deleteModal.addEventListener('click', function(e) {
-        if (e.target === deleteModal) {
-            deleteModal.classList.add('hidden');
-        }
-    });
-
-    // Escape key to close modal
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
-            deleteModal.classList.add('hidden');
-        }
-    });
 </script>
-
 @endsection
