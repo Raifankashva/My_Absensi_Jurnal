@@ -113,4 +113,27 @@ public function logout(Request $request)
     $request->session()->regenerateToken();
     return redirect('/');
 }
+protected function authenticated(Request $request, $user)
+    {
+        // Check if user is school and is_active status
+        if ($user->role === 'sekolah') {
+            $school = $user->sekolah;
+            
+            // If school is not active, log them out with a message
+            if (!$school || !$school->is_active) {
+                Auth::logout();
+                return redirect()->route('login')
+                    ->with('error', 'Akun sekolah Anda belum diaktifkan oleh admin. Silahkan hubungi admin untuk aktivasi.');
+            }
+        }
+
+        // Redirect based on role
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'sekolah') {
+            return redirect()->route('sekolah.dashboard');
+        }
+
+        return redirect('/');
+    }
 }

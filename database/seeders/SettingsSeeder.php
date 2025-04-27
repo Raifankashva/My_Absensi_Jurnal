@@ -18,17 +18,14 @@ class SettingsSeeder extends Seeder
         // Get all schools
         $sekolahList = Sekolah::all();
         
-        // Create global admin password
         SettingAbsensi::create([
-            'sekolah_id' => $sekolahList->first()->id, // Assign to first school for management
+            'sekolah_id' => $sekolahList->first()->id, 
             'key' => 'admin_password',
-            'value' => Hash::make('admin123'), // Default password, should be changed immediately
+            'value' => Hash::make('admin123'), 
             'description' => 'Password for administrative functions like token management'
         ]);
         
-        // Create a unique token for each school
         foreach ($sekolahList as $sekolah) {
-            // Create scan token for each school
             SettingAbsensi::create([
                 'sekolah_id' => $sekolah->id,
                 'key' => 'scan_access_token',
@@ -36,7 +33,6 @@ class SettingsSeeder extends Seeder
                 'description' => 'Token untuk akses fitur scan QR absensi sekolah ' . $sekolah->nama
             ]);
             
-            // Set jam masuk and batas_terlambat for each school if not exists
             if (!SettingAbsensi::where('sekolah_id', $sekolah->id)->where('key', 'jam_masuk')->exists()) {
                 SettingAbsensi::create([
                     'sekolah_id' => $sekolah->id,

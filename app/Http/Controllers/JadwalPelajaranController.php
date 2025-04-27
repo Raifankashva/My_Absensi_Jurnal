@@ -8,6 +8,10 @@ use App\Models\DataGuru;
 use App\Models\Sekolah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\JadwalPelajaranExport;
+use function PHPUnit\Framework\isEmpty;
 
 class JadwalPelajaranController extends Controller
 {
@@ -23,42 +27,45 @@ class JadwalPelajaranController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $sekolahId = $this->getSekolahId();
+{
+    $sekolahId = $this->getSekolahId();
 
-        $query = JadwalPelajaran::with(['kelas', 'guru'])
-            // Filter by school ID for both class and teacher
-            ->whereHas('kelas', function($q) use ($sekolahId) {
-                $q->where('sekolah_id', $sekolahId);
-            })
-            ->whereHas('guru', function($q) use ($sekolahId) {
-                $q->where('sekolah_id', $sekolahId);
-            });
-        
-        // Filter by class if selected
-        if ($request->filled('kelas_id')) {
-            $query->where('kelas_id', $request->kelas_id);
-        }
-        
-        // Filter by day if selected
-        if ($request->filled('hari')) {
-            $query->where('hari', $request->hari);
-        }
-        
-        // Get all schedules
-        $jadwalPelajaran = $query->get();
-        
-        // Group schedules by class
-        $jadwalPerKelas = $jadwalPelajaran->groupBy('kelas.nama_kelas');
-        
-        // Get classes for the specific school
-        $kelas = Kelas::where('sekolah_id', $sekolahId)->get();
-        
-        // Days array for filter
-        $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        
-        return view('jadwal_pelajaran.index', compact('jadwalPerKelas', 'kelas', 'hariList'));
+    $query = JadwalPelajaran::with(['kelas', 'guru'])
+        // Filter by school ID for both class and teacher
+        ->whereHas('kelas', function($q) use ($sekolahId) {
+            $q->where('sekolah_id', $sekolahId);
+        })
+        ->whereHas('guru', function($q) use ($sekolahId) {
+            $q->where('sekolah_id', $sekolahId);
+        });
+    
+    // Filter by class if selected
+    if ($request->filled('kelas_id')) {
+        $query->where('kelas_id', $request->kelas_id);
     }
+    
+    // Filter by day if selected
+    if ($request->filled('hari')) {
+        $query->where('hari', $request->hari);
+    }
+    
+    // Get all schedules
+    $jadwalPelajaran = $query->get();
+    
+    // Group schedules by class
+    $jadwalPerKelas = $jadwalPelajaran->groupBy('kelas.nama_kelas');
+    
+    // Get classes for the specific school
+    $kelas = Kelas::where('sekolah_id', $sekolahId)->get();
+    
+    // Get teachers for the specific school (for export filters)
+    $guru = DataGuru::where('sekolah_id', $sekolahId)->get();
+    
+    // Days array for filter
+    $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    
+    return view('jadwal_pelajaran.index', compact('jadwalPerKelas', 'kelas', 'hariList', 'guru'));
+}
 
     public function create()
     {
@@ -222,4 +229,104 @@ class JadwalPelajaranController extends Controller
                         ($kelasBentrok ? 'Kelas sudah memiliki jadwal pada waktu tersebut' : 'Tidak ada bentrok')
         ]);
     }
+    /**
+ * Export schedules to PDF format
+ * 
+ * @param Request $request
+ * @return \Illuminate\Http\Response
+ */
+public function exportPDF(Request $request)
+{
+    $sekolahId = $this->getSekolahId();
+    
+    // Build the query with filters
+    $query = JadwalPelajaran::with(['kelas', 'guru'])
+        ->whereHas('kelas', function($q) use ($sekolahId) {
+            $q->where('sekolah_id', $sekolahId);
+        })
+        ->whereHas('guru', function($q) use ($sekolahId) {
+            $q->where('sekolah_id', $sekolahId);
+        });
+    
+    // Apply filters
+    if ($request->filled('kelas_id')) {
+        $query->where('kelas_id', $request->kelas_id);
+    }
+    
+    if ($request->filled('hari')) {
+        $query->where('hari', $request->hari);
+    }
+    
+    if ($request->filled('guru_id')) {
+        $query->where('guru_id', $request->guru_id);
+    }
+    
+    // Get data
+    $jadwalPelajaran = $query->orderBy('hari')->orderBy('jam_mulai')->get();
+    
+    // Get school information
+    $sekolah = Sekolah::findOrFail($sekolahId);
+    
+    // Generate PDF with Dompdf
+    $pdf = \PDF::loadView('exports.jadwal_pelajaran_pdf', [
+        'jadwalPelajaran' => $jadwalPelajaran,
+        'sekolah' => $sekolah,
+        'filterKelas' => $request->filled('kelas_id') ? Kelas::find($request->kelas_id)->nama_kelas : 'Semua Kelas',
+        'filterHari' => $request->filled('hari') ? $request->hari : 'Semua Hari',
+        'filterGuru' => $request->filled('guru_id') ? DataGuru::find($request->guru_id)->nama : 'Semua Guru',
+    ]);
+    
+    // Set the PDF to download with a filename
+    $filename = 'jadwal_pelajaran_';
+    $filename .= $request->filled('kelas_id') ? Kelas::find($request->kelas_id)->nama_kelas . '_' : '';
+    $filename .= $request->filled('hari') ? $request->hari . '_' : '';
+    $filename .= date('Y-m-d') . '.pdf';
+    
+    return $pdf->download($filename);
+}
+
+/**
+ * Export schedules to Excel format
+ * 
+ * @param Request $request
+ * @return \Illuminate\Http\Response
+ */
+public function exportExcel(Request $request)
+{
+    $sekolahId = $this->getSekolahId();
+    
+    // Build the query with filters
+    $query = JadwalPelajaran::with(['kelas', 'guru'])
+        ->whereHas('kelas', function($q) use ($sekolahId) {
+            $q->where('sekolah_id', $sekolahId);
+        })
+        ->whereHas('guru', function($q) use ($sekolahId) {
+            $q->where('sekolah_id', $sekolahId);
+        });
+    
+    // Apply filters
+    if ($request->filled('kelas_id')) {
+        $query->where('kelas_id', $request->kelas_id);
+    }
+    
+    if ($request->filled('hari')) {
+        $query->where('hari', $request->hari);
+    }
+    
+    if ($request->filled('guru_id')) {
+        $query->where('guru_id', $request->guru_id);
+    }
+    
+    // Get data sorted by day and time
+    $jadwalPelajaran = $query->orderBy('hari')->orderBy('jam_mulai')->get();
+    
+    // Create a custom filename
+    $filename = 'jadwal_pelajaran_';
+    $filename .= $request->filled('kelas_id') ? Kelas::find($request->kelas_id)->nama_kelas . '_' : '';
+    $filename .= $request->filled('hari') ? $request->hari . '_' : '';
+    $filename .= date('Y-m-d') . '.xlsx';
+    
+    // Export to Excel using Laravel Excel
+    return \Excel::download(new \App\Exports\JadwalPelajaranExport($jadwalPelajaran), $filename);
+}
 }

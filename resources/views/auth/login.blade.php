@@ -122,6 +122,13 @@
 
     <div class="w-full max-w-md relative z-10 opacity-0 animate-fade-in">
         <div class="text-center mb-8 opacity-0 animate-slide-up stagger-1">
+        @if (session('error'))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline">{{ session('error') }}</span>
+    </div>
+@endif
+
             <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg mb-4 transform transition-all duration-300 hover:scale-110">
                 <i class='bx bxs-school text-3xl text-white'></i>
             </div>
@@ -236,40 +243,7 @@
                 </form>
 
                 <div class="relative my-6 opacity-0 animate-slide-up" style="animation-delay: 0.7s;">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-2 bg-white text-gray-500">Or continue with</span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-3 opacity-0 animate-slide-up" style="animation-delay: 0.8s;">
-                    <button
-                        type="button"
-                        class="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm 
-                               bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                               transition-all duration-300"
-                    >
-                        <i class='bx bxl-google text-xl text-red-500'></i>
-                    </button>
-                    <button
-                        type="button"
-                        class="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm 
-                               bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                               transition-all duration-300"
-                    >
-                        <i class='bx bxl-microsoft text-xl text-blue-500'></i>
-                    </button>
-                    <button
-                        type="button"
-                        class="flex justify-center items-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm 
-                               bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                               transition-all duration-300"
-                    >
-                        <i class='bx bxl-apple text-xl'></i>
-                    </button>
-                </div>
+                    
             </div>
         </div>
 

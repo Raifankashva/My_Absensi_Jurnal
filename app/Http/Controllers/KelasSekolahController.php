@@ -7,6 +7,9 @@ use App\Models\Sekolah;
 use App\Models\DataGuru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\KelasExport;
+use PDF;
 
 class KelasSekolahController extends Controller
 {
@@ -165,5 +168,117 @@ class KelasSekolahController extends Controller
             
         $kelas->delete();
         return redirect()->route('kelassekolah.index')->with('success', 'Data kelas berhasil dihapus');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        // Get current user's school
+        $userSchool = Sekolah::where('user_id', Auth::id())->first();
+        
+        if (!$userSchool) {
+            return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke data sekolah');
+        }
+        
+        // Start query with school filter automatically applied
+        $query = Kelas::with('sekolah', 'siswa')
+            ->where('sekolah_id', $userSchool->id);
+        
+        // Apply filters
+        if ($request->filled('tingkat')) {
+            $query->where('tingkat', $request->tingkat);
+        }
+        
+        if ($request->filled('tahun_ajaran')) {
+            $query->where('tahun_ajaran', $request->tahun_ajaran);
+        }
+        
+        if ($request->filled('semester')) {
+            $query->where('semester', $request->semester);
+        }
+        
+        // Get data
+        $data = $query->get();
+        
+        // Generate filename
+        $fileName = 'data_kelas_' . $userSchool->nama_sekolah;
+        
+        if ($request->filled('tahun_ajaran')) {
+            $fileName .= '_' . $request->tahun_ajaran;
+        }
+        
+        if ($request->filled('semester')) {
+            $fileName .= '_' . $request->semester;
+        }
+        
+        $fileName .= '.xlsx';
+        
+        // Download Excel file
+        return Excel::download(new KelasExport($data), $fileName);
+    }
+    
+    /**
+     * Export data kelas to PDF
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function exportPdf(Request $request)
+    {
+        // Get current user's school
+        $userSchool = Sekolah::where('user_id', Auth::id())->first();
+        
+        if (!$userSchool) {
+            return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke data sekolah');
+        }
+        
+        // Start query with school filter automatically applied
+        $query = Kelas::with('sekolah', 'siswa')
+            ->where('sekolah_id', $userSchool->id);
+        
+        // Apply filters
+        if ($request->filled('tingkat')) {
+            $query->where('tingkat', $request->tingkat);
+        }
+        
+        if ($request->filled('tahun_ajaran')) {
+            $query->where('tahun_ajaran', $request->tahun_ajaran);
+        }
+        
+        if ($request->filled('semester')) {
+            $query->where('semester', $request->semester);
+        }
+        
+        // Get data
+        $data = $query->get();
+        
+        // Generate filename
+        $fileName = 'data_kelas_' . $userSchool->nama_sekolah;
+        
+        if ($request->filled('tahun_ajaran')) {
+            $fileName .= '_' . $request->tahun_ajaran;
+        }
+        
+        if ($request->filled('semester')) {
+            $fileName .= '_' . $request->semester;
+        }
+        
+        $fileName .= '.pdf';
+        
+        // Get filter values for title display
+        $tahunAjaran = $request->filled('tahun_ajaran') ? $request->tahun_ajaran : 'Semua Tahun Ajaran';
+        $semester = $request->filled('semester') ? $request->semester : 'Semua Semester';
+        $tingkat = $request->filled('tingkat') ? $request->tingkat : 'Semua Tingkat';
+        
+        // Load PDF view
+        $pdf = PDF::loadView('exports.kelas_pdf', [
+            'data' => $data,
+            'sekolah' => $userSchool,
+            'tahunAjaran' => $tahunAjaran,
+            'semester' => $semester,
+            'tingkat' => $tingkat
+        ]);
+        
+        // Download PDF file
+        return $pdf->download($fileName);
     }
 }

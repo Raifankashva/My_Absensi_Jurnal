@@ -66,6 +66,6 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\CheckRole::class,
         'verify.school.token' => \App\Http\Middleware\VerifySchoolToken::class,
         'check.sekolah' => \App\Http\Middleware\CheckSekolah::class,
-
+        'school.active' => \App\Http\Middleware\CheckSchoolIsActive::class,
     ];
 }

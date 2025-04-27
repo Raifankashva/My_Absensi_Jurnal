@@ -47,6 +47,11 @@
                     <i class="bx bx-book-open mr-2"></i>
                     <span>Lihat Panduan</span>
                 </a>
+                <a href="{{ route('school.register.form')}}" class="px-8 py-4 bg-white text-blue-700 font-semibold rounded-xl shadow-lg hover:shadow-blue-500/20 transform hover:-translate-y-1 transition-all duration-300 border border-blue-100 flex items-center justify-center">
+                <i class="bx bxs-registered     ">
+                    <span>Daftar Sekolah</span>
+                </i>
+                </a>
             </div>
         </div>
 
@@ -225,19 +230,19 @@
                                 <li class="flex gap-3 items-start">
                                     <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 shadow-md shadow-blue-500/20">2</div>
                                     <div class="bg-blue-50 p-3 rounded-lg flex-1 transform transition-all duration-300 hover:translate-x-1 hover:shadow-md">
-                                        <p class="text-gray-700">Pilih menu "Absensi Digital" pada dashboard</p>
+                                        <p class="text-gray-700">Gunakan Qr Code untuk mengisi absensi yang berada pada halaman dashboard</p>
                                     </div>
                                 </li>
                                 <li class="flex gap-3 items-start">
                                     <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 shadow-md shadow-blue-500/20">3</div>
                                     <div class="bg-blue-50 p-3 rounded-lg flex-1 transform transition-all duration-300 hover:translate-x-1 hover:shadow-md">
-                                        <p class="text-gray-700">Pilih kelas dan tanggal yang sesuai</p>
+                                        <p class="text-gray-700">Jika sudah selesai dan muncul nama nisn dan kelas lalu tekan tombol konfirmasi absen</p>
                                     </div>
                                 </li>
                                 <li class="flex gap-3 items-start">
                                     <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 shadow-md shadow-blue-500/20">4</div>
                                     <div class="bg-blue-50 p-3 rounded-lg flex-1 transform transition-all duration-300 hover:translate-x-1 hover:shadow-md">
-                                        <p class="text-gray-700">Isi status kehadiran untuk setiap siswa</p>
+                                        <p class="text-gray-700">Status kehadiran tergantung pada jam anda masuk </p>
                                     </div>
                                 </li>
                             </ol>
@@ -256,12 +261,7 @@
                                     </div>
                                     <p class="text-gray-700 bg-blue-50 p-3 rounded-lg flex-1">Absensi real-time dengan status: Hadir, Izin, Sakit, dan Tanpa Keterangan</p>
                                 </li>
-                                <li class="flex items-start gap-3 group">
-                                    <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                                        <i class="bx bx-check-circle text-xl"></i>
-                                    </div>
-                                    <p class="text-gray-700 bg-blue-50 p-3 rounded-lg flex-1">Rekap absensi otomatis harian, mingguan, dan bulanan</p>
-                                </li>
+                                
                                 <li class="flex items-start gap-3 group">
                                     <div class="bg-blue-100 p-2 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                                         <i class="bx bx-check-circle text-xl"></i>
@@ -312,47 +312,7 @@
                                         <p class="text-gray-700">Isi detail pembelajaran termasuk materi, metode, dan evaluasi</p>
                                     </div>
                                 </li>
-                                <li class="flex gap-3 items-start">
-                                    <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 shadow-md shadow-indigo-500/20">4</div>
-                                    <div class="bg-indigo-50 p-3 rounded-lg flex-1 transform transition-all duration-300 hover:translate-x-1 hover:shadow-md">
-                                        <p class="text-gray-700">Unggah lampiran pendukung jika ada</p>
-                                    </div>
-                                </li>
                             </ol>
-                        </div>
-                        <div class="bg-white rounded-xl p-6 shadow-lg border border-blue-50 hover:shadow-xl transition-all duration-300 hover:border-blue-100">
-                            <h3 class="text-xl font-semibold text-indigo-800 mb-4 flex items-center">
-                                <div class="bg-indigo-100 p-2 rounded-lg mr-3">
-                                    <i class="bx bx-bulb text-xl text-indigo-600"></i>
-                                </div>
-                                Fitur Jurnal
-                            </h3>
-                            <ul class="space-y-4">
-                                <li class="flex items-start gap-3 group">
-                                    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                                        <i class="bx bx-check-circle text-xl"></i>
-                                    </div>
-                                    <p class="text-gray-700 bg-indigo-50 p-3 rounded-lg flex-1">Template jurnal yang dapat disesuaikan dengan kebutuhan</p>
-                                </li>
-                                <li class="flex items-start gap-3 group">
-                                    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                                        <i class="bx bx-check-circle text-xl"></i>
-                                    </div>
-                                    <p class="text-gray-700 bg-indigo-50 p-3 rounded-lg flex-1">Penyimpanan file lampiran (RPP, materi, dll)</p>
-                                </li>
-                                <li class="flex items-start gap-3 group">
-                                    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                                        <i class="bx bx-check-circle text-xl"></i>
-                                    </div>
-                                    <p class="text-gray-700 bg-indigo-50 p-3 rounded-lg flex-1">Analisis pencapaian pembelajaran otomatis</p>
-                                </li>
-                                <li class="flex items-start gap-3 group">
-                                    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                                        <i class="bx bx-check-circle text-xl"></i>
-                                    </div>
-                                    <p class="text-gray-700 bg-indigo-50 p-3 rounded-lg flex-1">Rekap jurnal untuk keperluan supervisi</p>
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -390,12 +350,6 @@
                                         <p class="text-gray-700">Tambah, edit, atau lihat detail data siswa</p>
                                     </div>
                                 </li>
-                                <li class="flex gap-3 items-start">
-                                    <div class="bg-gradient-to-br from-sky-500 to-sky-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 shadow-md shadow-sky-500/20">4</div>
-                                    <div class="bg-sky-50 p-3 rounded-lg flex-1 transform transition-all duration-300 hover:translate-x-1 hover:shadow-md">
-                                        <p class="text-gray-700">Kelola riwayat akademik dan dokumen siswa</p>
-                                    </div>
-                                </li>
                             </ol>
                         </div>
                         <div class="bg-white rounded-xl p-6 shadow-lg border border-blue-50 hover:shadow-xl transition-all duration-300 hover:border-blue-100">
@@ -410,25 +364,19 @@
                                     <div class="bg-sky-100 p-2 rounded-lg text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-all duration-300">
                                         <i class="bx bx-check-circle text-xl"></i>
                                     </div>
-                                    <p class="text-gray-700 bg-sky-50 p-3 rounded-lg flex-1">Manajemen data pribadi dan akademik siswa</p>
+                                    <p class="text-gray-700 bg-sky-50 p-3 rounded-lg flex-1">Manajemen data pribadi siswa</p>
                                 </li>
                                 <li class="flex items-start gap-3 group">
                                     <div class="bg-sky-100 p-2 rounded-lg text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-all duration-300">
                                         <i class="bx bx-check-circle text-xl"></i>
                                     </div>
-                                    <p class="text-gray-700 bg-sky-50 p-3 rounded-lg flex-1">Pengelompokan siswa berdasarkan kelas dan tahun ajaran</p>
+                                    <p class="text-gray-700 bg-sky-50 p-3 rounded-lg flex-1">Pengelompokan siswa berdasarkan kelas </p>
                                 </li>
                                 <li class="flex items-start gap-3 group">
                                     <div class="bg-sky-100 p-2 rounded-lg text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-all duration-300">
                                         <i class="bx bx-check-circle text-xl"></i>
                                     </div>
-                                    <p class="text-gray-700 bg-sky-50 p-3 rounded-lg flex-1">Riwayat prestasi dan kegiatan ekstrakurikuler</p>
-                                </li>
-                                <li class="flex items-start gap-3 group">
-                                    <div class="bg-sky-100 p-2 rounded-lg text-sky-600 group-hover:bg-sky-600 group-hover:text-white transition-all duration-300">
-                                        <i class="bx bx-check-circle text-xl"></i>
-                                    </div>
-                                    <p class="text-gray-700 bg-sky-50 p-3 rounded-lg flex-1">Sistem pengarsipan dokumen digital</p>
+                                    <p class="text-gray-700 bg-sky-50 p-3 rounded-lg flex-1">export data siswa dalam format Excel dan PDF</p>
                                 </li>
                             </ul>
                         </div>
@@ -496,7 +444,7 @@
                         ],
                         [
                             'question' => 'Apakah orang tua bisa memantau absensi siswa?',
-                            'answer' => 'Ya, orang tua dapat mengakses informasi absensi melalui portal orang tua dengan menggunakan akun yang telah diberikan oleh sekolah.'
+                            'answer' => 'Ya, orang tua dapat mengakses informasi absensi melalui email yang dikirimkan oleh sistem.'
                         ]
                     ];
                     @endphp

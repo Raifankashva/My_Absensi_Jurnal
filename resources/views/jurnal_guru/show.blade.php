@@ -1,7 +1,7 @@
 @extends('layouts.app3')
 
 @section('content')
-<div class="px-4 py-4">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header Section -->
     <div class="mb-4 flex items-center">
         <a href="{{ route('jurnal-guru.index') }}" class="mr-3 p-1.5 rounded-full bg-gray-100">

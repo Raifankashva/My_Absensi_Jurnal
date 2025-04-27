@@ -24,8 +24,6 @@ class AbsensiController extends Controller
     {
         $this->middleware('auth');
     }
-    
-    // Helper method to get authenticated school
     private function getAuthenticatedSchool()
     {
         return Sekolah::where('user_id', Auth::id())->first();
@@ -33,19 +31,18 @@ class AbsensiController extends Controller
     
     public function index(Request $request)
     {
-        // Get authenticated school
         $authSchool = $this->getAuthenticatedSchool();
         
         if (!$authSchool) {
             return redirect()->route('welcome')->with('error', 'Anda tidak memiliki akses ke data sekolah');
         }
         
-        // Force sekolah_id to be the authenticated school's ID
+        
         $sekolah_id = $authSchool->id;
         $kelas_id = $request->kelas_id;
         $tanggal = $request->tanggal ?? Carbon::now()->format('Y-m-d');
         
-        // Only get classes from the authenticated school
+        
         $kelas = Kelas::where('sekolah_id', $sekolah_id)->get();
         
         // Get all attendance data for the selected date and school
@@ -65,7 +62,6 @@ class AbsensiController extends Controller
         
         return view('absensi.index', compact('absensi', 'kelas', 'sekolah_id', 'kelas_id', 'tanggal', 'authSchool'));
     }
-    
     
 
     public function store(Request $request)
@@ -328,181 +324,7 @@ class AbsensiController extends Controller
     
     // Remove selectSchool method as it's no longer needed - schools can only see their own data
 
-    public function exportPDF(Request $request)
-    {
-        // Get authenticated school
-        $authSchool = $this->getAuthenticatedSchool();
-        
-        if (!$authSchool) {
-            return redirect()->route('welcome')->with('error', 'Anda tidak memiliki akses ke data sekolah');
-        }
-        
-        // Force sekolah_id to be the authenticated school's ID
-        $sekolah_id = $authSchool->id;
-        $kelas_id = $request->kelas_id;
-        $tanggal = $request->tanggal ?? Carbon::now()->format('Y-m-d');
-        
-        $absensi = Absensi::with('siswa.sekolah', 'siswa.kelas')
-            ->whereDate('waktu_scan', $tanggal)
-            ->whereHas('siswa', function($q) use ($sekolah_id) {
-                $q->where('sekolah_id', $sekolah_id);
-            })
-            ->when($kelas_id, function($query) use ($kelas_id) {
-                return $query->whereHas('siswa', function($q) use ($kelas_id) {
-                    $q->where('kelas_id', $kelas_id);
-                });
-            })
-            ->latest()
-            ->get();
-            
-        $sekolahName = $authSchool->nama;
-        $kelasName = $kelas_id ? Kelas::find($kelas_id)->nama : 'Semua Kelas';
-        
-        $pdf = PDF::loadView('absensi.pdf', compact('absensi', 'tanggal', 'sekolahName', 'kelasName'));
-        return $pdf->download('absensi-'.$tanggal.'.pdf');
-    }
-    
-    public function exportExcel(Request $request)
-    {
-        // Get authenticated school
-        $authSchool = $this->getAuthenticatedSchool();
-        
-        if (!$authSchool) {
-            return redirect()->route('welcome')->with('error', 'Anda tidak memiliki akses ke data sekolah');
-        }
-        
-        // Force sekolah_id to be the authenticated school's ID
-        $sekolah_id = $authSchool->id;
-        $kelas_id = $request->kelas_id;
-        $tanggal = $request->tanggal ?? Carbon::now()->format('Y-m-d');
-        
-        return Excel::download(new AbsensiExport($sekolah_id, $kelas_id, $tanggal), 'absensi-'.$tanggal.'.xlsx');
-    }
-    public function exportPeriodePDF(Request $request)
-{
-    // Get authenticated school
-    $authSchool = $this->getAuthenticatedSchool();
-    
-    if (!$authSchool) {
-        return redirect()->route('welcome')->with('error', 'Anda tidak memiliki akses ke data sekolah');
-    }
-    
-    // Force sekolah_id to be the authenticated school's ID
-    $sekolah_id = $authSchool->id;
-    $kelas_id = $request->kelas_id;
-    $periode = $request->periode ?? 'today';
-    $tanggal_mulai = $request->tanggal_mulai;
-    $tanggal_akhir = $request->tanggal_akhir;
-    
-    // Set date range based on selected period
-    list($startDate, $endDate, $periodeLabel) = $this->calculateDateRange($periode, $tanggal_mulai, $tanggal_akhir);
-    
-    $absensi = Absensi::with('siswa.sekolah', 'siswa.kelas')
-        ->whereBetween('waktu_scan', [$startDate.' 00:00:00', $endDate.' 23:59:59'])
-        ->whereHas('siswa', function($q) use ($sekolah_id) {
-            $q->where('sekolah_id', $sekolah_id);
-        })
-        ->when($kelas_id, function($query) use ($kelas_id) {
-            return $query->whereHas('siswa', function($q) use ($kelas_id) {
-                $q->where('kelas_id', $kelas_id);
-            });
-        })
-        ->latest()
-        ->get();
-        
-    $sekolahName = $authSchool->nama;
-    $kelasName = $kelas_id ? Kelas::find($kelas_id)->nama_kelas : 'Semua Kelas';
-    
-    $pdf = PDF::loadView('absensi.periode_pdf', compact('absensi', 'startDate', 'endDate', 'sekolahName', 'kelasName', 'periodeLabel'));
-    return $pdf->download('absensi-'.$periodeLabel.'.pdf');
-}
 
-public function exportPeriodeExcel(Request $request)
-{
-    // Get authenticated school
-    $authSchool = $this->getAuthenticatedSchool();
-    
-    if (!$authSchool) {
-        return redirect()->route('welcome')->with('error', 'Anda tidak memiliki akses ke data sekolah');
-    }
-    
-    // Force sekolah_id to be the authenticated school's ID
-    $sekolah_id = $authSchool->id;
-    $kelas_id = $request->kelas_id;
-    $periode = $request->periode ?? 'today';
-    $tanggal_mulai = $request->tanggal_mulai;
-    $tanggal_akhir = $request->tanggal_akhir;
-    
-    // Set date range based on selected period
-    list($startDate, $endDate, $periodeLabel) = $this->calculateDateRange($periode, $tanggal_mulai, $tanggal_akhir);
-    
-    return Excel::download(new AbsensiPeriodeExport($sekolah_id, $kelas_id, $startDate, $endDate), 'absensi-'.$periodeLabel.'.xlsx');
-}
-
-/**
- * Calculate date range based on selected period
- * 
- * @param string $periode
- * @param string|null $tanggal_mulai
- * @param string|null $tanggal_akhir
- * @return array
- */
-private function calculateDateRange($periode, $tanggal_mulai = null, $tanggal_akhir = null)
-{
-    $today = Carbon::now()->format('Y-m-d');
-    $label = '';
-    
-    switch ($periode) {
-        case 'today':
-            $startDate = $today;
-            $endDate = $today;
-            $label = 'hari-ini-'.Carbon::now()->format('d-m-Y');
-            break;
-            
-        case 'this_week':
-            $startDate = Carbon::now()->startOfWeek()->format('Y-m-d');
-            $endDate = Carbon::now()->endOfWeek()->format('Y-m-d');
-            $label = 'minggu-ini-'.Carbon::now()->startOfWeek()->format('d-m-Y').'-sampai-'.Carbon::now()->endOfWeek()->format('d-m-Y');
-            break;
-            
-        case 'last_week':
-            $startDate = Carbon::now()->subWeek()->startOfWeek()->format('Y-m-d');
-            $endDate = Carbon::now()->subWeek()->endOfWeek()->format('Y-m-d');
-            $label = 'minggu-lalu-'.Carbon::now()->subWeek()->startOfWeek()->format('d-m-Y').'-sampai-'.Carbon::now()->subWeek()->endOfWeek()->format('d-m-Y');
-            break;
-            
-        case 'this_month':
-            $startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
-            $endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
-            $label = 'bulan-ini-'.Carbon::now()->format('M-Y');
-            break;
-            
-        case 'last_month':
-            $startDate = Carbon::now()->subMonth()->startOfMonth()->format('Y-m-d');
-            $endDate = Carbon::now()->subMonth()->endOfMonth()->format('Y-m-d');
-            $label = 'bulan-lalu-'.Carbon::now()->subMonth()->format('M-Y');
-            break;
-            
-        case 'last_2_months':
-            $startDate = Carbon::now()->subMonths(2)->startOfMonth()->format('Y-m-d');
-            $endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
-            $label = '2-bulan-terakhir-'.Carbon::now()->subMonths(2)->format('M-Y').'-sampai-'.Carbon::now()->format('M-Y');
-            break;
-            
-        case 'custom':
-            $startDate = $tanggal_mulai;
-            $endDate = $tanggal_akhir;
-            $label = 'kustom-'.Carbon::parse($tanggal_mulai)->format('d-m-Y').'-sampai-'.Carbon::parse($tanggal_akhir)->format('d-m-Y');
-            break;
-            
-        default:
-            $startDate = $today;
-            $endDate = $today;
-            $label = 'hari-ini-'.Carbon::now()->format('d-m-Y');
-    }
-    
-    return [$startDate, $endDate, $label];
-}
     public function logoutScan(Request $request)
     {
         // Clear the token from the session
@@ -515,7 +337,9 @@ private function calculateDateRange($periode, $tanggal_mulai = null, $tanggal_ak
         }
         
         // Redirect to the welcome page
-        return redirect()->route('welcome')
+        return redirect()->route('/')
             ->with('success', 'Berhasil keluar dari fitur scan.');
     }
+
+    
 }

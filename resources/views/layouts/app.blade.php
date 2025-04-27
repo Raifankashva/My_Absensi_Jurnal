@@ -13,6 +13,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="shortcut icon" href="data:image/png;base64,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" type="image/x-icon">
     <script>
         tailwind.config = {
             theme: {
@@ -62,7 +64,6 @@
             display: none !important;
         }
 
-        /* Animations */
         @keyframes slideIn {
             from {
                 transform: translateX(-100%);
@@ -144,7 +145,6 @@
             width: 100%;
         }
 
-        /* Glass morphism */
         .glass-morphism {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
@@ -159,7 +159,6 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
-        /* Card hover effects */
         .hover-card {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -169,7 +168,6 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
-        /* Task cards */
         .task-card {
             @apply p-4 rounded-xl shadow-sm transition-all duration-300;
         }
@@ -187,7 +185,6 @@
             @apply bg-white border-gray-200;
         }
 
-        /* Loading dots */
         .loading-dots {
             display: inline-block;
             animation: dotAnimation 1.5s infinite;
@@ -208,13 +205,11 @@
             }
         }
 
-        /* Loader fade out */
         .loader-fade-out {
             opacity: 0;
             pointer-events: none;
         }
 
-        /* Gradient text */
         .gradient-text {
             background: linear-gradient(90deg, #2563EB, #3B82F6, #60A5FA);
             -webkit-background-clip: text;
@@ -222,7 +217,6 @@
             color: transparent;
         }
 
-        /* Gradient borders */
         .gradient-border {
             position: relative;
             border-radius: 0.75rem;
@@ -243,14 +237,12 @@
             mask-composite: exclude;
         }
 
-        /* Sidebar active item */
         .sidebar-active {
             background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.05));
             border-left: 3px solid #3B82F6;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
         }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -270,7 +262,6 @@
             background: rgba(37, 99, 235, 0.7);
         }
 
-        /* Animated background */
         .animated-bg {
             background: linear-gradient(-45deg, #EFF6FF, #DBEAFE, #BFDBFE, #93C5FD);
             background-size: 400% 400%;
@@ -289,7 +280,6 @@
             }
         }
 
-        /* Dark mode styles */
         .dark {
             color-scheme: dark;
         }
@@ -304,7 +294,6 @@
             background-size: 400% 400%;
         }
 
-        /* Enhanced Sidebar Styles */
         .sidebar-bg {
             background-image: radial-gradient(circle at 0% 100%, #1E3A8A, #1E40AF 40%, #1D4ED8);
             position: relative;
@@ -418,7 +407,6 @@
         }
     }
 }" x-init="initTheme()">
-    <!-- Page Loader -->
     <div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center animated-bg transition-opacity duration-500">
         <div class="relative w-28 h-28 mb-6 animate-pulse-slow">
             <div class="absolute inset-0 rounded-full border-4 border-t-primary-600 border-r-primary-500 border-b-primary-400 border-l-primary-500 animate-spin"></div>
@@ -436,59 +424,11 @@
         </div>
     </div>
 
-    <!-- Theme Toggle -->
-    <button 
-        @click="toggleDarkMode()" 
-        class="fixed top-4 right-20 z-50 p-2 rounded-full shadow-lg transition transform hover:scale-110 active:scale-95 glass-morphism dark:glass-morphism-dark">
-        <i class="bx" :class="darkMode ? 'bx-sun text-yellow-400' : 'bx-moon text-primary-600'"></i>
-    </button>
+ 
+    
 
-    <!-- Notification Center -->
-    <div x-data="{ showNotifications: false }" class="fixed top-4 right-36 z-50">
-        <button
-            @click="showNotifications = !showNotifications"
-            class="p-2 rounded-full shadow-lg transition transform hover:scale-110 active:scale-95 glass-morphism dark:glass-morphism-dark"
-            :class="darkMode ? 'text-white' : 'text-primary-800'">
-            <i class="bx bx-bell"></i>
-        </button>
+  
 
-        <div x-show="showNotifications"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 transform scale-95"
-            x-transition:enter-end="opacity-100 transform scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 transform scale-100"
-            x-transition:leave-end="opacity-0 transform scale-95"
-            class="absolute right-0 mt-3 w-80 rounded-xl shadow-xl glass-morphism dark:glass-morphism-dark"
-            @click.away="showNotifications = false">
-            <div class="p-4">
-                <h3 class="text-lg font-semibold mb-3 gradient-text">Notifications</h3>
-                <template x-if="notifications.length === 0">
-                    <div class="py-8 text-center">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 mb-4">
-                            <i class="bx bx-bell-off text-2xl text-primary-500"></i>
-                        </div>
-                        <p class="text-gray-500 dark:text-gray-400">No new notifications</p>
-                    </div>
-                </template>
-                <template x-for="notification in notifications" :key="notification.id">
-                    <div class="p-3 mb-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-300">
-                        <p x-text="notification.message"></p>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Menu Toggle -->
-    <button
-        @click="sidebarOpen = !sidebarOpen"
-        class="md:hidden fixed top-4 right-4 z-50 bg-gradient-to-r from-primary-600 to-primary-700 text-white p-2 rounded-full shadow-lg 
-               transition transform hover:scale-110 hover:shadow-primary-500/20 active:scale-95">
-        <i class='bx' :class="sidebarOpen ? 'bx-x' : 'bx-menu'"></i>
-    </button>
-
-    <!-- Enhanced Sidebar -->
     <aside
         x-cloak
         :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
@@ -520,10 +460,8 @@
             </div>
         </div>
 
-        <!-- Enhanced Navigation -->
         <nav class="p-4 overflow-y-auto h-[calc(100vh-5rem)] scrollbar-thin scrollbar-thumb-primary-700 scrollbar-track-primary-900/30">
             @if (auth()->check())
-            <!-- Enhanced User Profile Section -->
             <div class="mb-6 animate-fade-in">
                 <div class="px-4 py-5 bg-gradient-to-r from-primary-800/80 to-primary-700/80 rounded-xl mb-4 
                             shadow-lg group hover:scale-[1.02] transition-all duration-300 backdrop-blur-sm border border-primary-600/20">
@@ -552,7 +490,6 @@
                     </div>
                 </div>
 
-                <!-- Enhanced Navigation Links with Better Structure -->
                 <div class="space-y-5 animate-slide-in" style="--delay: 0.2s">
                     @php
                     function renderEnhancedSidebarLink($routeName, $icon, $label, $badge = null) {
@@ -596,11 +533,7 @@
                             <i class='bx bx-cog mr-2'></i> Management
                         </h2>
                         <div class="space-y-1 pl-1">
-                            {!! renderEnhancedSidebarLink(('sekolahs.index'), 'bxs-school', 'Sekolah') !!}
-                            {!! renderEnhancedSidebarLink(('kelas.index'), 'bx-chalkboard', 'Kelas') !!}
-                            {!! renderEnhancedSidebarLink(('adminguru.index'), 'bxs-user-detail', 'Guru') !!}
-                            {!! renderEnhancedSidebarLink(('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
-                            {!! renderEnhancedSidebarLink(('jurnal-guru.index'), 'bx-calendar', 'Jadwal Pelajaran') !!}
+                            {!! renderEnhancedSidebarLink(('adminsekolah.index'), 'bxs-school', 'Sekolah') !!}
                         </div>
                     </div>
                     @elseif (auth()->user()->role == 'guru')
@@ -640,7 +573,7 @@
                             {!! renderEnhancedSidebarLink(('jadwal-pelajaran.index'),'bx-calendar','Jadwal Pelajaran' ) !!}
                             {!! renderEnhancedSidebarLink(('absensi.index'), 'bx-calendar-check', 'Data Absensi') !!}
                             {!! renderEnhancedSidebarLink(('absensi.scan'), 'bx-scan', 'Scan Absensi') !!}
-                            {!! renderEnhancedSidebarLink(('settings.index'), 'bx-cog', 'Pengaturan') !!}
+                            {!! renderEnhancedSidebarLink(('settings.view'), 'bx-cog', 'Pengaturan') !!}
                         </div>
                     </div>
                     @endif
@@ -652,10 +585,8 @@
         
     </aside>
 
-    <!-- Main Content -->
     <div :class="{'md:ml-72': sidebarOpen, 'ml-0': !sidebarOpen}"
         class="transition-all duration-300 ease-in-out">
-        <!-- Top Navigation -->
         <header class="h-16 glass-morphism dark:glass-morphism-dark border-b border-primary-100 dark:border-primary-800 flex items-center 
                        justify-between px-6 shadow-sm sticky top-0 z-30">
             <div class="flex items-center space-x-4">
@@ -664,47 +595,8 @@
 
             @if (auth()->check())
             <div class="flex items-center space-x-4">
-                <!-- Search Bar -->
-                <div class="relative hidden md:block">
-                    <input type="text"
-                        placeholder="Search..."
-                        class="w-64 px-4 py-2 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-primary-100 dark:border-primary-800
-                                  focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white dark:focus:bg-gray-800
-                                  transition-all duration-300">
-                    <i class="bx bx-search absolute right-3 top-2.5 text-gray-400"></i>
-                </div>
 
-                <!-- Quick Actions Dropdown -->
-                <div x-data="{ open: false }" class="relative">
-                    <button @click="open = !open"
-                        class="p-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-all duration-300">
-                        <i class="bx bx-grid-alt text-xl text-primary-600 dark:text-primary-400"></i>
-                    </button>
 
-                    <div x-show="open"
-                        @click.away="open = false"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 transform scale-95"
-                        x-transition:enter-end="opacity-100 transform scale-100"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100 transform scale-100"
-                        x-transition:leave-end="opacity-0 transform scale-95"
-                        class="absolute right-0 mt-3 w-56 rounded-xl shadow-xl glass-morphism dark:glass-morphism-dark">
-                        <div class="p-2">
-                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-all duration-300">
-                                <i class="bx bx-user mr-2 text-primary-500"></i> Profile
-                            </a>
-                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-all duration-300">
-                                <i class="bx bx-cog mr-2 text-primary-500"></i> Settings
-                            </a>
-                            <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-800/50 transition-all duration-300">
-                                <i class="bx bx-help-circle mr-2 text-primary-500"></i> Help Center
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Logout Button -->
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit"
@@ -719,9 +611,7 @@
             @endif
         </header>
 
-        <!-- Page Content -->
         <main class="p-6 glass-morphism dark:glass-morphism-dark min-h-[calc(100vh-4rem)] animate-[fadeIn_0.5s_ease-in-out]">
-            <!-- Breadcrumbs -->
             <nav class="mb-6">
                 <ol class="flex items-center space-x-2 text-sm">
                     <li>
@@ -734,17 +624,15 @@
                 </ol>
             </nav>
 
-            <!-- Content Area -->
             <div class="space-y-6 animate-[slideUp_0.5s_ease-in-out]">
                 @yield('content')
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="glass-morphism dark:glass-morphism-dark border-t border-primary-100 dark:border-primary-800 py-4 px-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                    © 2024 School Management System. All rights reserved.
+                    © 2025 School Management System. All rights reserved.
                 </p>
                 <div class="flex items-center space-x-4 mt-4 md:mt-0">
                     <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
@@ -761,7 +649,6 @@
         </footer>
     </div>
 
-    <!-- Toast Notifications -->
     <div id="toast-container"
         class="fixed bottom-4 right-4 z-50 space-y-2"
         x-data="{ 
@@ -790,42 +677,34 @@
          }">
     </div>
 
-    <!-- Scripts -->
     <script>
-        // Initialize Alpine.js components
         document.addEventListener('alpine:init', () => {
             Alpine.store('app', {
-                // Add any global state here
+
             });
         });
 
-        // Handle responsive sidebar
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 768) {
                 Alpine.store('sidebarOpen', true);
             }
         });
 
-        // Example function to show a toast notification
         function showNotification(message, type = 'success') {
             Alpine.evaluate(document.getElementById('toast-container'), 'showToast')(message, type);
         }
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Simulate loading time (you can remove this setTimeout in production)
             setTimeout(function() {
-                // Get the loader element
                 const loader = document.getElementById('page-loader');
 
-                // Add the fade-out class
                 loader.classList.add('loader-fade-out');
 
-                // Remove the loader from DOM after transition completes
                 setTimeout(() => {
                     loader.style.display = 'none';
                 }, 500);
-            }, 1500); // Adjust this value for desired loading time
+            }, 1500);
         });
     </script>
 </body>

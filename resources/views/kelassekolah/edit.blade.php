@@ -38,9 +38,18 @@
                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" 
                                    required>
                                 <option value="">Pilih Tingkat</option>
-                                <option value="1" {{ old('tingkat', $kelas->tingkat) == '1' ? 'selected' : '' }}>Tingkat 1</option>
-                                <option value="2" {{ old('tingkat', $kelas->tingkat) == '2' ? 'selected' : '' }}>Tingkat 2</option>
-                                <option value="3" {{ old('tingkat', $kelas->tingkat) == '3' ? 'selected' : '' }}>Tingkat 3</option>
+                                <option value="I" {{ old('tingkat', $kelas->tingkat) == 'I' ? 'selected' : '' }}>Kelas 1</option>
+                                <option value="II" {{ old('tingkat', $kelas->tingkat) == 'II' ? 'selected' : '' }}>Kelas 2</option>
+                                <option value="III" {{ old('tingkat', $kelas->tingkat) == 'III' ? 'selected' : '' }}>Kelas 3</option>
+                                <option value="IV" {{ old('tingkat', $kelas->tingkat) == 'IV' ? 'selected' : '' }}>Kelas 4</option>
+                                <option value="V" {{ old('tingkat', $kelas->tingkat) == 'V' ? 'selected' : '' }}>Kelas 5</option>
+                                <option value="VI" {{ old('tingkat', $kelas->tingkat) == 'VI' ? 'selected' : '' }}>Kelas 6</option>
+                                <option value="VII" {{ old('tingkat', $kelas->tingkat) == 'VII' ? 'selected' : '' }}>Kelas 7</option>
+                                <option value="VIII" {{ old('tingkat', $kelas->tingkat) == 'VIII' ? 'selected' : '' }}>Kelas 8</option>
+                                <option value="IX" {{ old('tingkat', $kelas->tingkat) == 'IX' ? 'selected' : '' }}>Kelas 9</option>
+                                <option value="X" {{ old('tingkat', $kelas->tingkat) == 'X' ? 'selected' : '' }}>Kelas 10</option>
+                                <option value="XI" {{ old('tingkat', $kelas->tingkat) == 'XI' ? 'selected' : '' }}>Kelas 11</option>
+                                <option value="XII" {{ old('tingkat', $kelas->tingkat) == 'XII' ? 'selected' : '' }}>Kelas 12</option>
                             </select>
                         </div>
 
