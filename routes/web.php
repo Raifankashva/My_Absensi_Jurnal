@@ -341,3 +341,12 @@ Route::get('/absensi/export/excel', [App\Http\Controllers\AbsensiController::cla
 
 // Chart data route
 Route::get('/absensi/chart/data', [App\Http\Controllers\AbsensiController::class, 'getChartData'])->name('absensi.chart.data');
+// Manual Attendance Routes
+Route::get('/absensi/manual', [AbsensiController::class, 'manualForm'])->name('absensi.manual');
+Route::post('/absensi/manual/store', [AbsensiController::class, 'manualStore'])->name('absensi.manual.store');
+Route::get('/absensi/check-student', [AbsensiController::class, 'checkStudent'])->name('absensi.check.student');
+
+// Statistics Routes
+Route::get('/absensi/statistics', [AbsensiController::class, 'statistics'])->name('absensi.statistics');
+Route::get('/absensi/export', [AbsensiController::class, 'export'])->name('absensi.export');
+Route::get('/absensi/pdf', [AbsensiController::class, 'generatePDF'])->name('absensi.pdf');

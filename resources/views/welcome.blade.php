@@ -30,9 +30,12 @@
                     <i class="bx bxs-school text-5xl text-white"></i>
                 </div>
             </div>
-            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 bg-clip-text text-transparent mb-6 leading-tight">
-                Sistem Informasi Akademik Terpadu
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-800 mb-4">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700">My Absensi Jurnal</span>
             </h1>
+            <h2 class="text-3xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 bg-clip-text text-transparent mb-6 leading-tight">
+                Sistem Informasi Akademik Terpadu
+            </h2>
             <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
                 Platform digital untuk pengelolaan absensi, jurnal mengajar guru, dan data siswa secara efektif dan terintegrasi
             </p>

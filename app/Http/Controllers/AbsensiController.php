@@ -341,5 +341,302 @@ class AbsensiController extends Controller
             ->with('success', 'Berhasil keluar dari fitur scan.');
     }
 
+
+    public function manualForm()
+{
+    $authSchool = $this->getAuthenticatedSchool();
     
+    if (!$authSchool) {
+        return redirect()->route('welcome')->with('error', 'Anda tidak memiliki akses ke data sekolah');
+    }
+    
+    return view('absensi.manual', compact('authSchool'));
+}
+
+public function checkStudent(Request $request)
+{
+    $authSchool = $this->getAuthenticatedSchool();
+    
+    if (!$authSchool) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+    
+    $siswa = DataSiswa::where('nisn', $request->nisn)
+        ->where('sekolah_id', $authSchool->id)
+        ->first();
+    
+    if (!$siswa) {
+        return response()->json(['found' => false]);
+    }
+    
+    return response()->json([
+        'found' => true,
+        'siswa' => [
+            'id' => $siswa->id,
+            'nama_lengkap' => $siswa->nama_lengkap,
+            'kelas' => $siswa->kelas->nama_kelas ?? 'Tidak ada kelas'
+        ]
+    ]);
+}
+
+public function manualStore(Request $request)
+{
+    $request->validate([
+        'siswa_id' => 'required|exists:data_siswa,id',
+        'tanggal' => 'required|date',
+        'status' => 'required|in:Hadir,Terlambat,Sakit,Izin,Alpa'
+    ]);
+    
+    $authSchool = $this->getAuthenticatedSchool();
+    
+    if (!$authSchool) {
+        return redirect()->back()->with('error', 'Anda tidak memiliki akses ke data sekolah');
+    }
+    
+    // Check if student belongs to this school
+    $siswa = DataSiswa::where('id', $request->siswa_id)
+        ->where('sekolah_id', $authSchool->id)
+        ->first();
+        
+    if (!$siswa) {
+        return redirect()->back()->with('error', 'Siswa tidak ditemukan atau bukan dari sekolah Anda');
+    }
+    
+    // Check if student already has attendance for the selected date
+    $existingAttendance = Absensi::where('siswa_id', $siswa->id)
+        ->whereDate('waktu_scan', $request->tanggal)
+        ->first();
+        
+    if ($existingAttendance) {
+        // Update existing attendance
+        $existingAttendance->status = $request->status;
+        $existingAttendance->keterangan = $request->keterangan ?? null;
+        $existingAttendance->save();
+        
+        return redirect()->back()->with('success', 'Absensi siswa berhasil diperbarui');
+    }
+    
+    // Create new attendance record
+    Absensi::create([
+        'siswa_id' => $siswa->id,
+        'waktu_scan' => Carbon::parse($request->tanggal . ' ' . Carbon::now()->format('H:i:s')),
+        'status' => $request->status,
+        'keterangan' => $request->keterangan ?? null,
+        'manual_entry' => true
+    ]);
+    
+    return redirect()->back()->with('success', 'Absensi manual berhasil dicatat');
+}
+
+public function statistics(Request $request)
+{
+    $authSchool = $this->getAuthenticatedSchool();
+    
+    if (!$authSchool) {
+        return redirect()->route('welcome')->with('error', 'Anda tidak memiliki akses ke data sekolah');
+    }
+    
+    $sekolah_id = $authSchool->id;
+    $kelas_id = $request->kelas_id;
+    $bulan = $request->bulan ?? Carbon::now()->format('m');
+    $tahun = $request->tahun ?? Carbon::now()->format('Y');
+    
+    $kelas = Kelas::where('sekolah_id', $sekolah_id)->get();
+    
+    // Get all students from the school/class
+    $siswas = DataSiswa::where('sekolah_id', $sekolah_id)
+        ->when($kelas_id, function($query) use ($kelas_id) {
+            return $query->where('kelas_id', $kelas_id);
+        })
+        ->get();
+    
+    $statistics = [];
+    
+    foreach ($siswas as $siswa) {
+        // Get all attendance records for this student in the selected month/year
+        $absensiData = Absensi::where('siswa_id', $siswa->id)
+            ->whereYear('waktu_scan', $tahun)
+            ->whereMonth('waktu_scan', $bulan)
+            ->get();
+        
+        $hadir = $absensiData->where('status', 'Hadir')->count();
+        $terlambat = $absensiData->where('status', 'Terlambat')->count();
+        $sakit = $absensiData->where('status', 'Sakit')->count();
+        $izin = $absensiData->where('status', 'Izin')->count();
+        $alpa = $absensiData->where('status', 'Alpa')->count();
+        
+        // Calculate total days in the month
+        $daysInMonth = Carbon::createFromDate($tahun, $bulan, 1)->daysInMonth;
+        
+        // Count weekdays (assuming school days are Monday-Friday)
+        $totalSchoolDays = 0;
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = Carbon::createFromDate($tahun, $bulan, $day);
+            $dayOfWeek = $date->dayOfWeek;
+            
+            // If day is not Saturday (6) or Sunday (0)
+            if ($dayOfWeek !== 0 && $dayOfWeek !== 6) {
+                $totalSchoolDays++;
+            }
+        }
+        
+        // Count total recorded attendance
+        $totalRecorded = $hadir + $terlambat + $sakit + $izin + $alpa;
+        
+        // Calculate missing attendance records
+        $tidakAda = $totalSchoolDays - $totalRecorded;
+        if ($tidakAda < 0) $tidakAda = 0;
+        
+        $statistics[] = [
+            'siswa' => $siswa,
+            'hadir' => $hadir,
+            'terlambat' => $terlambat,
+            'sakit' => $sakit,
+            'izin' => $izin,
+            'alpa' => $alpa,
+            'tidak_ada' => $tidakAda,
+            'total_hari_sekolah' => $totalSchoolDays
+        ];
+    }
+    
+    // Get month names for dropdown
+    $bulanList = [
+        '01' => 'Januari',
+        '02' => 'Februari',
+        '03' => 'Maret',
+        '04' => 'April',
+        '05' => 'Mei',
+        '06' => 'Juni',
+        '07' => 'Juli',
+        '08' => 'Agustus',
+        '09' => 'September',
+        '10' => 'Oktober',
+        '11' => 'November',
+        '12' => 'Desember'
+    ];
+    
+    // Get years from current year minus 5 to current year plus 1
+    $tahunList = range(Carbon::now()->year - 5, Carbon::now()->year + 1);
+    
+    return view('absensi.statistics', compact(
+        'statistics', 'kelas', 'bulanList', 'tahunList', 
+        'sekolah_id', 'kelas_id', 'bulan', 'tahun', 'authSchool'
+    ));
+}
+public function export(Request $request)
+{
+    $authSchool = $this->getAuthenticatedSchool();
+    
+    if (!$authSchool) {
+        return redirect()->route('welcome')->with('error', 'Anda tidak memiliki akses ke data sekolah');
+    }
+    
+    $sekolah_id = $authSchool->id;
+    $kelas_id = $request->kelas_id;
+    $bulan = $request->bulan ?? Carbon::now()->format('m');
+    $tahun = $request->tahun ?? Carbon::now()->format('Y');
+    
+    $bulanName = [
+        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret',
+        '04' => 'April', '05' => 'Mei', '06' => 'Juni',
+        '07' => 'Juli', '08' => 'Agustus', '09' => 'September',
+        '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+    ][$bulan];
+    
+    $kelas = $kelas_id ? Kelas::find($kelas_id)->nama_kelas : 'Semua Kelas';
+    
+    $filename = "Absensi_{$authSchool->nama_sekolah}_{$kelas}_{$bulanName}_{$tahun}.xlsx";
+    
+    return Excel::download(new AbsensiExport($sekolah_id, $kelas_id, $bulan, $tahun), $filename);
+}
+public function generatePDF(Request $request)
+{
+    $authSchool = $this->getAuthenticatedSchool();
+    
+    if (!$authSchool) {
+        return redirect()->route('welcome')->with('error', 'Anda tidak memiliki akses ke data sekolah');
+    }
+    
+    $sekolah_id = $authSchool->id;
+    $kelas_id = $request->kelas_id;
+    $bulan = $request->bulan ?? Carbon::now()->format('m');
+    $tahun = $request->tahun ?? Carbon::now()->format('Y');
+    
+    // Get statistics data (same logic as statistics method)
+    $siswas = DataSiswa::where('sekolah_id', $sekolah_id)
+        ->when($kelas_id, function($query) use ($kelas_id) {
+            return $query->where('kelas_id', $kelas_id);
+        })
+        ->get();
+    
+    $statistics = [];
+    
+    foreach ($siswas as $siswa) {
+        // Get all attendance records for this student in the selected month/year
+        $absensiData = Absensi::where('siswa_id', $siswa->id)
+            ->whereYear('waktu_scan', $tahun)
+            ->whereMonth('waktu_scan', $bulan)
+            ->get();
+        
+        $hadir = $absensiData->where('status', 'Hadir')->count();
+        $terlambat = $absensiData->where('status', 'Terlambat')->count();
+        $sakit = $absensiData->where('status', 'Sakit')->count();
+        $izin = $absensiData->where('status', 'Izin')->count();
+        $alpa = $absensiData->where('status', 'Alpa')->count();
+        
+        // Calculate total days in the month
+        $daysInMonth = Carbon::createFromDate($tahun, $bulan, 1)->daysInMonth;
+        
+        // Count weekdays (assuming school days are Monday-Friday)
+        $totalSchoolDays = 0;
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = Carbon::createFromDate($tahun, $bulan, $day);
+            $dayOfWeek = $date->dayOfWeek;
+            
+            // If day is not Saturday (6) or Sunday (0)
+            if ($dayOfWeek !== 0 && $dayOfWeek !== 6) {
+                $totalSchoolDays++;
+            }
+        }
+        
+        // Count total recorded attendance
+        $totalRecorded = $hadir + $terlambat + $sakit + $izin + $alpa;
+        
+        // Calculate missing attendance records
+        $tidakAda = $totalSchoolDays - $totalRecorded;
+        if ($tidakAda < 0) $tidakAda = 0;
+        
+        $statistics[] = [
+            'siswa' => $siswa,
+            'hadir' => $hadir,
+            'terlambat' => $terlambat,
+            'sakit' => $sakit,
+            'izin' => $izin,
+            'alpa' => $alpa,
+            'tidak_ada' => $tidakAda,
+            'total_hari_sekolah' => $totalSchoolDays
+        ];
+    }
+    
+    $bulanName = [
+        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret',
+        '04' => 'April', '05' => 'Mei', '06' => 'Juni',
+        '07' => 'Juli', '08' => 'Agustus', '09' => 'September',
+        '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+    ][$bulan];
+    
+    $kelas = $kelas_id ? Kelas::find($kelas_id)->nama_kelas : 'Semua Kelas';
+    
+    $data = [
+        'statistics' => $statistics,
+        'sekolah' => $authSchool,
+        'kelas' => $kelas,
+        'bulan' => $bulanName,
+        'tahun' => $tahun
+    ];
+    
+    $pdf = PDF::loadView('absensi.pdf', $data);
+    
+    return $pdf->download("Laporan_Absensi_{$authSchool->nama_sekolah}_{$kelas}_{$bulanName}_{$tahun}.pdf");
+}
 }
