@@ -39,7 +39,7 @@
 
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Page Header -->
-    <div class="bg-gradient-to-r from-sky-500/80 to-indigo-500/80 rounded-2xl shadow-sm overflow-hidden mb-8">
+    <div class="bg-gradient-to-r from-sky-500/80 to-blue-500/80 rounded-2xl shadow-sm overflow-hidden mb-8">
         <div class="relative px-6 py-8 md:px-8 backdrop-blur-sm">
             <div class="absolute inset-0 bg-white/10"></div>
             <div class="relative flex flex-col md:flex-row justify-between items-center gap-4">
@@ -65,7 +65,7 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md">
         <div class="px-6 py-4 border-b border-gray-100">
             <div class="flex items-center text-gray-700">
-                <i class="fas fa-search text-indigo-500 mr-2"></i>
+                <i class="fas fa-search text-blue-500 mr-2"></i>
                 <h2 class="text-lg font-medium">Cari Data Siswa</h2>
             </div>
         </div>
@@ -87,14 +87,14 @@
             
             <div class="mb-8">
                 <div class="space-y-2 group">
-                    <label for="nisn" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">NISN Siswa</label>
+                    <label for="nisn" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">NISN Siswa</label>
                     <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors">
                             <i class="fas fa-id-card"></i>
                         </div>
-                        <input type="text" id="nisn" placeholder="Masukkan NISN Siswa" class="block w-full pl-10 pr-12 py-3 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
+                        <input type="text" id="nisn" placeholder="Masukkan NISN Siswa" class="block w-full pl-10 pr-12 py-3 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all">
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                            <button id="cek-siswa" class="inline-flex items-center px-3 py-1 bg-indigo-500 text-white text-sm font-medium rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                            <button id="cek-siswa" class="inline-flex items-center px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
                                 <i class="fas fa-search mr-1"></i>
                                 <span>Cek</span>
                             </button>
@@ -108,12 +108,12 @@
             <div id="siswa-info" class="hidden space-y-6">
                 <div class="border-b border-gray-200 pb-4">
                     <h3 class="text-lg font-medium text-gray-800 flex items-center">
-                        <i class="fas fa-user-graduate text-indigo-500 mr-2"></i>
+                        <i class="fas fa-user-graduate text-blue-500 mr-2"></i>
                         Data Siswa
                     </h3>
                 </div>
                 
-                <div class="bg-indigo-50 rounded-lg p-4">
+                <div class="bg-blue-50 rounded-lg p-4">
                     <dl class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="space-y-1">
                             <dt class="text-sm font-medium text-gray-500">NISN</dt>
@@ -136,22 +136,22 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2 group">
-                            <label for="tanggal" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Tanggal Absensi</label>
+                            <label for="tanggal" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Tanggal Absensi</label>
                             <div class="relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors">
                                     <i class="fas fa-calendar-alt"></i>
                                 </div>
-                                <input type="date" id="tanggal" name="tanggal" value="{{ date('Y-m-d') }}" class="block w-full pl-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all" required>
+                                <input type="date" id="tanggal" name="tanggal" value="{{ date('Y-m-d') }}" class="block w-full pl-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all" required>
                             </div>
                         </div>
                         
                         <div class="space-y-2 group">
-                            <label for="status" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Status Kehadiran</label>
+                            <label for="status" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Status Kehadiran</label>
                             <div class="relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors">
                                     <i class="fas fa-clipboard-check"></i>
                                 </div>
-                                <select id="status" name="status" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all" required>
+                                <select id="status" name="status" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all" required>
                                     <option value="Hadir">Hadir</option>
                                     <option value="Terlambat">Terlambat</option>
                                     <option value="Sakit">Sakit</option>
@@ -166,17 +166,17 @@
                     </div>
                     
                     <div class="space-y-2 group">
-                        <label for="keterangan" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Keterangan (Opsional)</label>
+                        <label for="keterangan" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Keterangan (Opsional)</label>
                         <div class="relative rounded-md shadow-sm">
-                            <div class="absolute top-3 left-3 text-gray-400 group-hover:text-indigo-500 transition-colors">
+                            <div class="absolute top-3 left-3 text-gray-400 group-hover:text-blue-500 transition-colors">
                                 <i class="fas fa-comment-alt"></i>
                             </div>
-                            <textarea id="keterangan" name="keterangan" rows="3" class="block w-full pl-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all"></textarea>
+                            <textarea id="keterangan" name="keterangan" rows="3" class="block w-full pl-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all"></textarea>
                         </div>
                     </div>
                     
                     <div class="pt-4">
-                        <button type="submit" class="w-full inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium rounded-lg shadow-sm hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 group">
+                        <button type="submit" class="w-full inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-500 text-white font-medium rounded-lg shadow-sm hover:from-blue-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 group">
                             <i class="fas fa-save mr-2 group-hover:scale-110 transition-transform"></i>
                             <span>Simpan Absensi</span>
                         </button>

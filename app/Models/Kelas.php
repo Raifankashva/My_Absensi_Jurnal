@@ -20,7 +20,7 @@ class Kelas extends Model
         'sisa_kapasitas',
         'tahun_ajaran',
         'semester',
-        'wali_kelas',
+        'wali_kelas_id',
     ];
 
     public function sekolah()
@@ -43,4 +43,10 @@ class Kelas extends Model
     {
         return $this->hasMany(JadwalPelajaran::class, 'kelas_id', 'id');
     }
+    // In Kelas Model
+public function waliKelas()
+{
+    return $this->belongsTo(DataGuru::class, 'wali_kelas_id');
+}
+
 }

@@ -86,7 +86,6 @@ class AbsensiController extends Controller
             return redirect()->back()->with('error', 'Pengaturan sekolah tidak ditemukan');
         }
     
-        // Check if student already has attendance for today
         $today = Carbon::now()->format('Y-m-d');
         $alreadyPresent = Absensi::where('siswa_id', $siswa->id)
             ->whereDate('waktu_scan', $today)
@@ -100,7 +99,6 @@ class AbsensiController extends Controller
         $jam_scan = $waktu_scan->format('H:i:s');
         $status = 'Tidak Hadir';
         
-        // Convert times to Carbon for easier comparison
         $jam_masuk = Carbon::createFromFormat('H:i:s', $setting->jam_masuk);
         $batas_terlambat = Carbon::createFromFormat('H:i:s', $setting->batas_terlambat);
         $batas_tidak_hadir = (clone $batas_terlambat)->addHour(); // 1 jam setelah batas terlambat
@@ -124,7 +122,6 @@ class AbsensiController extends Controller
             'status' => $status
         ]);
     
-        // Kirim Email ke Ayah, Ibu, dan Wali (jika ada emailnya)
         $emailRecipients = [];
     
         if (!empty($siswa->email_ayah)) {

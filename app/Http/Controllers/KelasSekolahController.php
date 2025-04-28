@@ -46,8 +46,14 @@ class KelasSekolahController extends Controller
             return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke data sekolah');
         }
         
-        // Get only teachers from the same school
-        $guru = DataGuru::where('sekolah_id', $userSchool->id)->get();
+        // Get only teachers from the same school who are not already assigned as wali kelas
+        $guru = DataGuru::where('sekolah_id', $userSchool->id)
+                ->whereNotIn('id', function($query) {
+                    $query->select('wali_kelas_id')
+                          ->from('kelas')
+                          ->whereNotNull('wali_kelas_id');
+                })
+                ->get();
         
         return view('kelassekolah.create', compact('userSchool', 'guru'));
     }
@@ -68,12 +74,25 @@ class KelasSekolahController extends Controller
             'kapasitas' => 'required|integer',
             'tahun_ajaran' => 'required|string',
             'semester' => 'required|string',
-            'wali_kelas' => 'nullable|string',
+            'wali_kelas_id' => [
+                'nullable',
+                'exists:data_guru,id',
+                function ($attribute, $value, $fail) {
+                    // Check if the teacher is already assigned as wali kelas in another class
+                    if ($value) {
+                        $existingAssignment = Kelas::where('wali_kelas_id', $value)->first();
+                        if ($existingAssignment) {
+                            $fail('Guru ini sudah menjadi wali kelas untuk kelas lain.');
+                        }
+                    }
+                },
+            ],
         ]);
         
         // Add school_id automatically
         $validated['sekolah_id'] = $userSchool->id;
         
+        // Create new class
         Kelas::create($validated);
         return redirect()->route('kelassekolah.index')->with('success', 'Data kelas berhasil ditambahkan');
     }
@@ -90,7 +109,7 @@ class KelasSekolahController extends Controller
         // Find class and ensure it belongs to the user's school
         $kelas = Kelas::where('id', $id)
             ->where('sekolah_id', $userSchool->id)
-            ->with('sekolah', 'siswa')
+            ->with('sekolah', 'siswa', 'waliKelas') // eager load waliKelas relationship
             ->firstOrFail();
             
         if ($kelas) {
@@ -115,8 +134,18 @@ class KelasSekolahController extends Controller
             ->where('sekolah_id', $userSchool->id)
             ->firstOrFail();
             
-        // Get only teachers from the same school
-        $guru = DataGuru::where('sekolah_id', $userSchool->id)->get();
+        // Get only teachers from the same school who are not already assigned as wali kelas
+        // excluding the current wali kelas of this class (if any)
+        $guru = DataGuru::where('sekolah_id', $userSchool->id)
+                ->where(function($query) use ($kelas) {
+                    $query->whereNotIn('id', function($subquery) {
+                        $subquery->select('wali_kelas_id')
+                                ->from('kelas')
+                                ->whereNotNull('wali_kelas_id');
+                    })
+                    ->orWhere('id', $kelas->wali_kelas_id); // Include current wali kelas in the options
+                })
+                ->get();
         
         return view('kelassekolah.edit', compact('kelas', 'userSchool', 'guru'));
     }
@@ -142,12 +171,27 @@ class KelasSekolahController extends Controller
             'kapasitas' => 'required|integer',
             'tahun_ajaran' => 'required|string',
             'semester' => 'required|string',
-            'wali_kelas' => 'nullable|string',
+            'wali_kelas_id' => [
+                'nullable',
+                'exists:data_guru,id',
+                function ($attribute, $value, $fail) use ($kelas) {
+                    // Check if the teacher is already assigned as wali kelas in another class
+                    if ($value) {
+                        $existingAssignment = Kelas::where('wali_kelas_id', $value)
+                                                   ->where('id', '!=', $kelas->id)
+                                                   ->first();
+                        if ($existingAssignment) {
+                            $fail('Guru ini sudah menjadi wali kelas untuk kelas lain.');
+                        }
+                    }
+                },
+            ],
         ]);
         
         // School ID cannot be changed, always use the logged-in user's school
         $validated['sekolah_id'] = $userSchool->id;
         
+        // Update the class record
         $kelas->update($validated);
         return redirect()->route('kelassekolah.index')->with('success', 'Data kelas berhasil diperbarui');
     }

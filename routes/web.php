@@ -25,6 +25,7 @@ use App\Http\Controllers\SiswaImportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SchoolRegistrationController;
 use App\Http\Controllers\AdminSchoolController;
+use App\Http\Controllers\RuanganController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -292,6 +293,8 @@ Route::get('/adminsiswa/export/pdf', [DataSiswaController::class, 'exportPDF'])-
 // Add these routes to your web.php routes file
 Route::get('/absensi/export-periode-pdf', [AbsensiController::class, 'exportPeriodePDF'])->name('absensi.exportPeriodePDF');
 Route::get('/absensi/export-periode-excel', [AbsensiController::class, 'exportPeriodeExcel'])->name('absensi.exportPeriodeExcel');
+Route::resource('ruangans', RuanganController::class);
+
 });
 Route::get('/jurnal-guru/laporan-absensi', [JurnalGuruController::class, 'laporanAbsensi'])->name('absensi.laporan');
 

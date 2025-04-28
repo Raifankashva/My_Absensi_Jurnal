@@ -12,12 +12,12 @@ class CreateKelasTable extends Migration
             $table->id();
             $table->foreignId('sekolah_id')->constrained('sekolahs')->onDelete('cascade');
             $table->string('nama_kelas');
-            $table->string('tingkat'); // 1,2,3,4,5,6 untuk SD, 7,8,9 untuk SMP, 10,11,12 untuk SMA/SMK
-            $table->string('jurusan')->nullable(); // Untuk SMA/SMK
+            $table->string('tingkat');
+            $table->string('jurusan')->nullable(); 
             $table->integer('kapasitas');
             $table->string('tahun_ajaran');
             $table->string('semester');
-            $table->string('wali_kelas')->nullable();
+            $table->foreignId('wali_kelas_id')->nullable()->constrained('data_gurus')->onDelete('set null');
             $table->timestamps();
         });
     }
