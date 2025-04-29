@@ -20,26 +20,36 @@ class SchoolProfileController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show()
-    {
-        // Get the authenticated user
-        $user = Auth::user();
-        
-        // Check if the user has a school profile
-        $sekolah = Sekolah::where('user_id', $user->id)->first();
-        
-        if (!$sekolah) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Profil sekolah tidak ditemukan.');
-        }
-        
-        // Get region data for display
-        $province = Province::find($sekolah->province_id);
-        $city = Regency::find($sekolah->city_id);
-        $district = District::find($sekolah->district_id);
-        $village = Village::find($sekolah->village_id);
-        
-        return view('school.profile', compact('sekolah', 'province', 'city', 'district', 'village'));
+{
+    // Get the authenticated user
+    $user = Auth::user();
+    
+    // Check if the user has a school profile
+    $sekolah = Sekolah::where('user_id', $user->id)->first();
+    
+    if (!$sekolah) {
+        return redirect()->route('dashboard')
+            ->with('error', 'Profil sekolah tidak ditemukan.');
     }
+    
+    // Get region data for display
+    $province = Province::find($sekolah->province_id);
+    $city = Regency::find($sekolah->city_id);
+    $district = District::find($sekolah->district_id);
+    $village = Village::find($sekolah->village_id);
+    
+    // Check if coordinates exist
+    $hasCoordinates = !is_null($sekolah->latitude) && !is_null($sekolah->longitude);
+    
+    return view('school.profile', compact(
+        'sekolah', 
+        'province', 
+        'city', 
+        'district', 
+        'village',
+        'hasCoordinates'
+    ));
+}
 
     /**
      * Show the form for editing the school profile.
@@ -101,6 +111,8 @@ class SchoolProfileController extends Controller
             'kepala_sekolah' => 'required|string|max:255',
             'nip_kepala_sekolah' => 'nullable|string|size:18',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ]);
         
         // Get the authenticated user
@@ -150,10 +162,12 @@ class SchoolProfileController extends Controller
         $sekolah->akreditasi = $request->akreditasi;
         $sekolah->kepala_sekolah = $request->kepala_sekolah;
         $sekolah->nip_kepala_sekolah = $request->nip_kepala_sekolah;
+        $sekolah->latitude = $request->latitude;
+        $sekolah->longitude = $request->longitude;
         
         $sekolah->save();
         
-        return redirect()->route('school.profile')
+        return redirect()->route('sekolah.profile')
             ->with('success', 'Profil sekolah berhasil diperbarui.');
     }
     

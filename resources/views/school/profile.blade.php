@@ -1,6 +1,37 @@
 @extends('layouts.app')
 
 @section('content')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    /* Custom Leaflet Controls Styling */
+    .leaflet-control-zoom {
+        border: none !important;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.2) !important;
+    }
+    .leaflet-control-zoom a {
+        background-color: white !important;
+        color: #4b5563 !important;
+        transition: all 0.2s ease;
+    }
+    .leaflet-control-zoom a:hover {
+        background-color: #f3f4f6 !important;
+        color: #1f2937 !important;
+    }
+    .leaflet-popup-content-wrapper {
+        border-radius: 0.5rem !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    }
+    .leaflet-popup-content {
+        margin: 0.75rem 1rem !important;
+    }
+    .leaflet-container a.leaflet-popup-close-button {
+        color: #6b7280 !important;
+        transition: color 0.2s ease;
+    }
+    .leaflet-container a.leaflet-popup-close-button:hover {
+        color: #1f2937 !important;
+    }
+</style>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header with breadcrumbs -->
     <div class="mb-6">
@@ -237,17 +268,112 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="h-48 md:h-full bg-gray-100 rounded-lg overflow-hidden">
-                                <!-- Map placeholder - could be replaced with an actual map -->
-                                <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                                    <div class="text-center p-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                        </svg>
-                                        <p class="mt-2 text-sm text-gray-600">Peta Lokasi</p>
-                                    </div>
-                                </div>
+                            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3">
+        <h5 class="text-white font-medium flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Lokasi Sekolah
+        </h5>
+    </div>
+    <div class="p-4">
+        @if($hasCoordinates)
+            <div id="school-map" class="h-80 w-full rounded-lg shadow-inner border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-lg"></div>
+            
+            <div class="mt-4 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <p class="text-sm font-semibold text-gray-700">Koordinat:</p>
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="text-sm"><span class="font-medium">Latitude:</span> {{ $sekolah->latitude }}</span>
                             </div>
+                            <div class="flex items-center space-x-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="text-sm"><span class="font-medium">Longitude:</span> {{ $sekolah->longitude }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <p class="text-sm font-semibold text-gray-700">Alamat:</p>
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <div class="flex">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span class="text-sm text-gray-700">
+                                    {{ $sekolah->alamat }}, 
+                                    {{ $village->name }}, 
+                                    {{ $district->name }}, 
+                                    {{ $city->name }}, 
+                                    {{ $province->name }}, 
+                                    {{ $sekolah->kode_pos }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mt-4">
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ $sekolah->latitude }},{{ $sekolah->longitude }}" 
+                       target="_blank" 
+                       class="inline-flex items-center px-4 py-2 bg-white border border-blue-500 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        Buka di Google Maps
+                    </a>
+                    
+                    @if(Auth::user()->role === 'sekolah')
+                        <a href="{{ route('sekolah.edit') }}" 
+                           class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                            Perbarui Lokasi
+                        </a>
+                    @endif
+                </div>
+            </div>
+        @else
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                            Belum ada data lokasi yang tersimpan untuk sekolah ini.
+                        </p>
+                        @if(Auth::user()->role === 'sekolah')
+                            <div class="mt-3">
+                                <a href="{{ route('sekolah.edit') }}" 
+                                   class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Tambahkan Lokasi Sekolah
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+    </div>
+</div>
                         </div>
                     </div>
                 </div>
@@ -334,4 +460,125 @@
 
 <!-- Alpine.js for notifications -->
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+@if($hasCoordinates)
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the map centered on the school's location
+        var schoolMap = L.map('school-map', {
+            zoomControl: true,
+            scrollWheelZoom: false // Disable scroll wheel zoom for better UX
+        }).setView([{{ $sekolah->latitude }}, {{ $sekolah->longitude }}], 16);
+        
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(schoolMap);
+        
+        // Custom icon for the marker
+        var schoolIcon = L.divIcon({
+            html: `<div class="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full shadow-lg border-2 border-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                        <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                    </svg>
+                  </div>`,
+            className: '',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
+        
+        // Add a marker for the school's location with custom icon
+        var marker = L.marker([{{ $sekolah->latitude }}, {{ $sekolah->longitude }}], {
+            icon: schoolIcon
+        }).addTo(schoolMap)
+            .bindPopup(`
+                <div class="min-w-[250px]">
+                    <h6 class="text-base font-semibold text-gray-900 mb-1">{{ $sekolah->nama_sekolah }}</h6>
+                    <p class="text-xs text-blue-600 font-medium mb-2">{{ $sekolah->jenjang }} {{ $sekolah->status }}</p>
+                    <div class="h-px bg-gray-200 my-2"></div>
+                    <div class="text-xs text-gray-600 space-y-1">
+                        <p>{{ $sekolah->alamat }}</p>
+                        <p>{{ $village->name }}, {{ $district->name }}</p>
+                        <p>{{ $city->name }}, {{ $province->name }}</p>
+                    </div>
+                </div>
+            `)
+            .openPopup();
+        
+        // Add a circle to indicate the area with a pulsing animation
+        var circle = L.circle([{{ $sekolah->latitude }}, {{ $sekolah->longitude }}], {
+            color: '#3b82f6',
+            fillColor: '#60a5fa',
+            fillOpacity: 0.2,
+            radius: 200,
+            weight: 2
+        }).addTo(schoolMap);
+        
+        // Add a second pulsing circle for effect
+        var pulsingCircle = L.circle([{{ $sekolah->latitude }}, {{ $sekolah->longitude }}], {
+            color: 'rgba(59, 130, 246, 0.5)',
+            fillColor: 'rgba(96, 165, 250, 0.3)',
+            fillOpacity: 0.3,
+            radius: 200,
+            weight: 1
+        }).addTo(schoolMap);
+        
+        // Pulsing animation for the circle
+        function pulseCircle() {
+            var radius = 200;
+            var opacity = 0.3;
+            
+            var interval = setInterval(function() {
+                radius += 5;
+                opacity -= 0.01;
+                
+                if (radius > 300) {
+                    clearInterval(interval);
+                    pulsingCircle.setRadius(200);
+                    pulsingCircle.setStyle({
+                        fillOpacity: 0.3,
+                        opacity: 0.5
+                    });
+                    setTimeout(pulseCircle, 2000);
+                } else {
+                    pulsingCircle.setRadius(radius);
+                    pulsingCircle.setStyle({
+                        fillOpacity: opacity > 0 ? opacity : 0,
+                        opacity: opacity > 0 ? opacity + 0.2 : 0
+                    });
+                }
+            }, 50);
+        }
+        
+        pulseCircle();
+        
+        // Enable map interaction on click/touch
+        schoolMap.on('focus', function() {
+            schoolMap.scrollWheelZoom.enable();
+        });
+        
+        // Disable scroll wheel zoom when mouse leaves the map
+        schoolMap.on('blur', function() {
+            schoolMap.scrollWheelZoom.disable();
+        });
+        
+        // Make the map resize properly when shown
+        setTimeout(function() {
+            schoolMap.invalidateSize();
+        }, 0);
+        
+        // Add a fullscreen control
+        schoolMap.on('click', function() {
+            setTimeout(function() {
+                schoolMap.invalidateSize();
+            }, 100);
+        });
+    });
+</script>
+@endif
 @endsection

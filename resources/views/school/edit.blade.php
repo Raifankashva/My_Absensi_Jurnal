@@ -1,6 +1,75 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.8.0/dist/geosearch.css" />
+<style>
+    /* Custom Leaflet Controls Styling */
+    .leaflet-control-zoom {
+        border: none !important;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.2) !important;
+    }
+    .leaflet-control-zoom a {
+        background-color: white !important;
+        color: #4b5563 !important;
+        transition: all 0.2s ease;
+    }
+    .leaflet-control-zoom a:hover {
+        background-color: #f3f4f6 !important;
+        color: #1f2937 !important;
+    }
+    .leaflet-popup-content-wrapper {
+        border-radius: 0.5rem !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    }
+    .leaflet-popup-content {
+        margin: 0.75rem 1rem !important;
+    }
+    .leaflet-container a.leaflet-popup-close-button {
+        color: #6b7280 !important;
+        transition: color 0.2s ease;
+    }
+    .leaflet-container a.leaflet-popup-close-button:hover {
+        color: #1f2937 !important;
+    }
+    
+    /* Custom marker pulse animation */
+    .map-marker-pulse {
+        animation: map-marker-pulse 1.5s ease-out infinite;
+    }
+    @keyframes map-marker-pulse {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(1.6);
+        }
+    }
+    
+    /* Search results styling */
+    .leaflet-geosearch-bar {
+        z-index: 1000 !important;
+    }
+    .leaflet-control-geosearch form {
+        border-radius: 0.375rem !important;
+        overflow: hidden !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+    }
+    .leaflet-control-geosearch form input {
+        border-radius: 0.375rem !important;
+        border: 1px solid #d1d5db !important;
+        padding: 0.5rem 1rem !important;
+        font-size: 0.875rem !important;
+    }
+    .leaflet-control-geosearch form input:focus {
+        outline: none !important;
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+    }
+</style>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header with breadcrumbs -->
     <div class="mb-6">
@@ -360,6 +429,87 @@
                     </div>
                 </div>
 
+                <!-- Location Map Section -->
+                <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Lokasi Sekolah
+                    </h2>
+                    
+                    <div class="space-y-4" x-data="locationPicker()">
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md mb-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-blue-700">
+                                        Klik pada peta untuk menentukan lokasi sekolah atau masukkan koordinat secara manual.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Interactive Map -->
+                        <div class="h-96 w-full rounded-lg shadow-md overflow-hidden border border-gray-200" id="location-map"></div>
+                        
+                        <!-- Search Location -->
+                        <div class="flex flex-col md:flex-row gap-4 mt-4">
+                            <div class="flex-grow">
+                                <div class="relative">
+                                    <input type="text" id="search-location" placeholder="Cari lokasi..." 
+                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md">
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" id="search-button" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Cari
+                            </button>
+                            <button type="button" id="current-location" 
+                                class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                </svg>
+                                Lokasi Saya
+                            </button>
+                        </div>
+                        
+                        <!-- Coordinates Input -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label for="latitude" class="block text-sm font-medium text-gray-700">Latitude</label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <input type="text" id="latitude" name="latitude" x-model="latitude" required
+                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="longitude" class="block text-sm font-medium text-gray-700">Longitude</label>
+                                <div class="mt-1 relative rounded-md shadow-sm">
+                                    <input type="text" id="longitude" name="longitude" x-model="longitude" required
+                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Address Preview -->
+                        <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200" x-show="hasLocation">
+                            <h3 class="text-sm font-medium text-gray-700 mb-2">Alamat dari Koordinat:</h3>
+                            <p class="text-sm text-gray-600" id="reverse-geocode-result">Memuat alamat...</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Additional Information Section -->
                 <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                     <h2 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b flex items-center">
@@ -405,9 +555,12 @@
         </div>
     </div>
 </div>
-
 <!-- Alpine.js for interactive components -->
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.2/dist/alpine.min.js" defer></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet GeoSearch -->
+<script src="https://unpkg.com/leaflet-geosearch@3.8.0/dist/geosearch.umd.js"></script>
 
 <!-- Image preview script -->
 <script>
@@ -545,5 +698,335 @@
             }
         });
     });
+    
+    // Location Picker with Alpine.js
+    function locationPicker() {
+        return {
+            latitude: "{{ old('latitude', $sekolah->latitude ?? '-6.2088') }}",
+            longitude: "{{ old('longitude', $sekolah->longitude ?? '106.8456') }}",
+            map: null,
+            marker: null,
+            searchControl: null,
+            hasLocation: {{ !empty($sekolah->latitude) && !empty($sekolah->longitude) ? 'true' : 'false' }},
+            
+            init() {
+                // Initialize map
+                this.initMap();
+                
+                // Watch for manual coordinate changes
+                this.$watch('latitude', value => {
+                    if (value && this.longitude && this.marker) {
+                        const newLatLng = [parseFloat(value), parseFloat(this.longitude)];
+                        this.marker.setLatLng(newLatLng);
+                        this.map.setView(newLatLng, 16);
+                        this.reverseGeocode(newLatLng[0], newLatLng[1]);
+                    }
+                });
+                
+                this.$watch('longitude', value => {
+                    if (value && this.latitude && this.marker) {
+                        const newLatLng = [parseFloat(this.latitude), parseFloat(value)];
+                        this.marker.setLatLng(newLatLng);
+                        this.map.setView(newLatLng, 16);
+                        this.reverseGeocode(newLatLng[0], newLatLng[1]);
+                    }
+                });
+                
+                // Set up search functionality
+                document.getElementById('search-button').addEventListener('click', () => {
+                    const searchText = document.getElementById('search-location').value;
+                    if (searchText) {
+                        this.searchLocation(searchText);
+                    }
+                });
+                
+                // Search on Enter key
+                document.getElementById('search-location').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const searchText = document.getElementById('search-location').value;
+                        if (searchText) {
+                            this.searchLocation(searchText);
+                        }
+                    }
+                });
+                
+                // Current location button
+                document.getElementById('current-location').addEventListener('click', () => {
+                    this.getCurrentLocation();
+                });
+            },
+            
+            initMap() {
+                // Create map
+                this.map = L.map('location-map').setView(
+                    [parseFloat(this.latitude), parseFloat(this.longitude)], 
+                    16
+                );
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(this.map);
+                
+                // Create custom icon
+                const schoolIcon = L.divIcon({
+                    html: `<div class="relative">
+                            <div class="absolute w-6 h-6 bg-indigo-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                </svg>
+                            </div>
+                            <div class="w-24 h-24 rounded-full bg-indigo-500 opacity-20 map-marker-pulse absolute -top-9 -left-9"></div>
+                          </div>`,
+                    className: '',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+                
+                // Add marker if coordinates exist
+                if (this.latitude && this.longitude) {
+                    this.marker = L.marker(
+                        [parseFloat(this.latitude), parseFloat(this.longitude)], 
+                        { icon: schoolIcon, draggable: true }
+                    ).addTo(this.map);
+                    
+                    // Update coordinates when marker is dragged
+                    this.marker.on('dragend', (event) => {
+                        const marker = event.target;
+                        const position = marker.getLatLng();
+                        this.latitude = position.lat.toFixed(6);
+                        this.longitude = position.lng.toFixed(6);
+                        this.hasLocation = true;
+                        this.reverseGeocode(position.lat, position.lng);
+                    });
+                    
+                    // Initial reverse geocoding
+                    this.reverseGeocode(parseFloat(this.latitude), parseFloat(this.longitude));
+                }
+                
+                // Click on map to set marker
+                this.map.on('click', (e) => {
+                    const { lat, lng } = e.latlng;
+                    
+                    // Update or create marker
+                    if (this.marker) {
+                        this.marker.setLatLng([lat, lng]);
+                    } else {
+                        this.marker = L.marker([lat, lng], { 
+                            icon: schoolIcon, 
+                            draggable: true 
+                        }).addTo(this.map);
+                        
+                        // Update coordinates when marker is dragged
+                        this.marker.on('dragend', (event) => {
+                            const marker = event.target;
+                            const position = marker.getLatLng();
+                            this.latitude = position.lat.toFixed(6);
+                            this.longitude = position.lng.toFixed(6);
+                            this.hasLocation = true;
+                            this.reverseGeocode(position.lat, position.lng);
+                        });
+                    }
+                    
+                    // Update form values
+                    this.latitude = lat.toFixed(6);
+                    this.longitude = lng.toFixed(6);
+                    this.hasLocation = true;
+                    
+                    // Get address from coordinates
+                    this.reverseGeocode(lat, lng);
+                });
+                
+                // Add GeoSearch control
+                const provider = new GeoSearch.OpenStreetMapProvider();
+                
+                const searchControl = new GeoSearch.GeoSearchControl({
+                    provider: provider,
+                    style: 'bar',
+                    showMarker: false,
+                    showPopup: false,
+                    autoClose: true,
+                    retainZoomLevel: false,
+                    animateZoom: true,
+                    keepResult: true,
+                    searchLabel: 'Cari lokasi...'
+                });
+                
+                this.map.addControl(searchControl);
+                
+                // Handle search result selection
+                this.map.on('geosearch/showlocation', (e) => {
+                    const { location } = e;
+                    
+                    // Update or create marker
+                    if (this.marker) {
+                        this.marker.setLatLng([location.y, location.x]);
+                    } else {
+                        this.marker = L.marker([location.y, location.x], { 
+                            icon: schoolIcon, 
+                            draggable: true 
+                        }).addTo(this.map);
+                        
+                        // Update coordinates when marker is dragged
+                        this.marker.on('dragend', (event) => {
+                            const marker = event.target;
+                            const position = marker.getLatLng();
+                            this.latitude = position.lat.toFixed(6);
+                            this.longitude = position.lng.toFixed(6);
+                            this.hasLocation = true;
+                            this.reverseGeocode(position.lat, position.lng);
+                        });
+                    }
+                    
+                    // Update form values
+                    this.latitude = location.y.toFixed(6);
+                    this.longitude = location.x.toFixed(6);
+                    this.hasLocation = true;
+                    
+                    // Get address from coordinates
+                    this.reverseGeocode(location.y, location.x);
+                });
+            },
+            
+            searchLocation(query) {
+                const provider = new GeoSearch.OpenStreetMapProvider();
+                
+                provider.search({ query: query }).then(results => {
+                    if (results.length > 0) {
+                        const result = results[0];
+                        
+                        // Update map view
+                        this.map.setView([result.y, result.x], 16);
+                        
+                        // Update or create marker
+                        if (this.marker) {
+                            this.marker.setLatLng([result.y, result.x]);
+                        } else {
+                            const schoolIcon = L.divIcon({
+                                html: `<div class="relative">
+                                        <div class="absolute w-6 h-6 bg-indigo-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                                                <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                            </svg>
+                                        </div>
+                                        <div class="w-24 h-24 rounded-full bg-indigo-500 opacity-20 map-marker-pulse absolute -top-9 -left-9"></div>
+                                      </div>`,
+                                className: '',
+                                iconSize: [24, 24],
+                                iconAnchor: [12, 12]
+                            });
+                            
+                            this.marker = L.marker([result.y, result.x], { 
+                                icon: schoolIcon, 
+                                draggable: true 
+                            }).addTo(this.map);
+                            
+                            // Update coordinates when marker is dragged
+                            this.marker.on('dragend', (event) => {
+                                const marker = event.target;
+                                const position = marker.getLatLng();
+                                this.latitude = position.lat.toFixed(6);
+                                this.longitude = position.lng.toFixed(6);
+                                this.hasLocation = true;
+                                this.reverseGeocode(position.lat, position.lng);
+                            });
+                        }
+                        
+                        // Update form values
+                        this.latitude = result.y.toFixed(6);
+                        this.longitude = result.x.toFixed(6);
+                        this.hasLocation = true;
+                        
+                        // Get address from coordinates
+                        this.reverseGeocode(result.y, result.x);
+                    }
+                });
+            },
+            
+            getCurrentLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            // Update map view
+                            this.map.setView([lat, lng], 16);
+                            
+                            // Update or create marker
+                            if (this.marker) {
+                                this.marker.setLatLng([lat, lng]);
+                            } else {
+                                const schoolIcon = L.divIcon({
+                                    html: `<div class="relative">
+                                            <div class="absolute w-6 h-6 bg-indigo-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                                                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                                </svg>
+                                            </div>
+                                            <div class="w-24 h-24 rounded-full bg-indigo-500 opacity-20 map-marker-pulse absolute -top-9 -left-9"></div>
+                                          </div>`,
+                                    className: '',
+                                    iconSize: [24, 24],
+                                    iconAnchor: [12, 12]
+                                });
+                                
+                                this.marker = L.marker([lat, lng], { 
+                                    icon: schoolIcon, 
+                                    draggable: true 
+                                }).addTo(this.map);
+                                
+                                // Update coordinates when marker is dragged
+                                this.marker.on('dragend', (event) => {
+                                    const marker = event.target;
+                                    const position = marker.getLatLng();
+                                    this.latitude = position.lat.toFixed(6);
+                                    this.longitude = position.lng.toFixed(6);
+                                    this.hasLocation = true;
+                                    this.reverseGeocode(position.lat, position.lng);
+                                });
+                            }
+                            
+                            // Update form values
+                            this.latitude = lat.toFixed(6);
+                            this.longitude = lng.toFixed(6);
+                            this.hasLocation = true;
+                            
+                            // Get address from coordinates
+                            this.reverseGeocode(lat, lng);
+                        },
+                        (error) => {
+                            console.error("Error getting current location:", error);
+                            alert("Tidak dapat mengakses lokasi Anda. Pastikan Anda telah memberikan izin lokasi.");
+                        }
+                    );
+                } else {
+                    alert("Geolocation tidak didukung oleh browser Anda.");
+                }
+            },
+            
+            reverseGeocode(lat, lng) {
+                // Use Nominatim for reverse geocoding
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.display_name) {
+                            document.getElementById('reverse-geocode-result').textContent = data.display_name;
+                        } else {
+                            document.getElementById('reverse-geocode-result').textContent = "Alamat tidak ditemukan";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error in reverse geocoding:", error);
+                        document.getElementById('reverse-geocode-result').textContent = "Gagal mendapatkan alamat";
+                    });
+            }
+        };
+    }
 </script>
+
 @endsection
