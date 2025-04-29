@@ -17,6 +17,7 @@ class CreateJadwalPelajaranTable extends Migration
             $table->id();
             $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
             $table->foreignId('guru_id')->constrained('data_guru')->onDelete('cascade');
+            $table->foreignId('ruangan_id')->constrained('ruangans')->onDelete('cascade');
             $table->string('mata_pelajaran');
             $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']);
             $table->time('waktu_mulai');

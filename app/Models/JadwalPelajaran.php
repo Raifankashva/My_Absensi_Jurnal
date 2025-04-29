@@ -18,6 +18,7 @@ class JadwalPelajaran extends Model
         'hari',
         'jam_mulai',
         'jam_selesai',
+        'ruangan_id'
     ];
     
     public function kelas()
@@ -34,4 +35,9 @@ class JadwalPelajaran extends Model
     {
         return $this->hasMany(JurnalGuru::class);
     }
+    // Add this to your JadwalPelajaran model
+public function ruangan()
+{
+    return $this->belongsTo(Ruangan::class);
+}
 }

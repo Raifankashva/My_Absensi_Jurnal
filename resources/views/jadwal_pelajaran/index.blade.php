@@ -341,6 +341,7 @@
                                     <th class="px-6 py-3.5 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Mata Pelajaran</th>
                                     <th class="px-6 py-3.5 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Guru</th>
                                     <th class="px-6 py-3.5 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Jam</th>
+                                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Ruangan</th>
                                     <th class="px-6 py-3.5 text-left text-xs font-semibold text-blue-700 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
@@ -355,6 +356,7 @@
                                             {{ $item->jam_mulai }} - {{ $item->jam_selesai }}
                                         </span>
                                     </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $item->ruangan->nama }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
                                             <a href="{{ route('jadwal-pelajaran.edit', $item->id) }}"

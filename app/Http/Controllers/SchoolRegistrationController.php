@@ -51,6 +51,8 @@ class SchoolRegistrationController extends Controller
              'kepala_sekolah' => 'required|string|max:255',
              'nip_kepala_sekolah' => 'nullable|string|size:18',
              'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+             'latitude' => 'required|numeric|between:-90,90',
+        'longitude' => 'required|numeric|between:-180,180',
          ]);
  
          if ($validator->fails()) {
@@ -96,7 +98,9 @@ class SchoolRegistrationController extends Controller
                  'kepala_sekolah' => $request->kepala_sekolah,
                  'nip_kepala_sekolah' => $request->nip_kepala_sekolah,
                  'foto' => $fotoPath,
-                 'is_active' => false, 
+                 'is_active' => false,
+                 'latitude' => $request->latitude,
+        'longitude' => $request->longitude, 
              ]);
  
              $otp = $this->generateOTPCode($user);
@@ -244,4 +248,51 @@ class SchoolRegistrationController extends Controller
             ->get();
         return response()->json($villages);
     }
+    public function reverseGeocode(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'latitude' => 'required|numeric|between:-90,90',
+        'longitude' => 'required|numeric|between:-180,180',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
+
+    try {
+        $lat = $request->latitude;
+        $lng = $request->longitude;
+        
+        // Use OpenStreetMap's Nominatim service for reverse geocoding
+        $url = "https://nominatim.openstreetmap.org/reverse?format=json&lat={$lat}&lon={$lng}&zoom=18&addressdetails=1";
+        
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'YourAppName/1.0');
+        $response = curl_exec($ch);
+        curl_close($ch);
+        
+        $data = json_decode($response, true);
+        
+        if (!$data || isset($data['error'])) {
+            return response()->json(['error' => 'Failed to get location data'], 422);
+        }
+        
+        // Extract useful address components
+        $address = [
+            'full_address' => $data['display_name'] ?? null,
+            'road' => $data['address']['road'] ?? null,
+            'village' => $data['address']['village'] ?? $data['address']['suburb'] ?? null,
+            'district' => $data['address']['district'] ?? $data['address']['city_district'] ?? null,
+            'city' => $data['address']['city'] ?? $data['address']['town'] ?? $data['address']['county'] ?? null,
+            'province' => $data['address']['state'] ?? null,
+            'postal_code' => $data['address']['postcode'] ?? null,
+        ];
+        
+        return response()->json($address);
+        
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred: ' . $e->getMessage()], 500);
+    }
+}
 }

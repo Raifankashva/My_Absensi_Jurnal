@@ -40,7 +40,7 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
     <!-- Page Header -->
-    <div class="bg-gradient-to-r from-sky-500/80 to-indigo-500/80 rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-gradient-to-r from-sky-500/80 to-blue-500/80 rounded-2xl shadow-sm overflow-hidden">
         <div class="relative px-6 py-8 md:px-8 backdrop-blur-sm">
             <div class="absolute inset-0 bg-white/10"></div>
             <div class="relative flex flex-col md:flex-row justify-between items-center gap-4">
@@ -95,7 +95,7 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md">
         <div class="px-6 py-4 border-b border-gray-100">
             <div class="flex items-center text-gray-700">
-                <i class="fas fa-filter text-indigo-500 mr-2"></i>
+                <i class="fas fa-filter text-blue-500 mr-2"></i>
                 <h2 class="text-lg font-medium">Filter Data</h2>
             </div>
         </div>
@@ -103,12 +103,12 @@
         <div class="p-6">
             <form action="{{ route('absensi.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="space-y-2 group">
-                    <label for="kelas_id" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Kelas</label>
+                    <label for="kelas_id" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Kelas</label>
                     <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors">
                             <i class="fas fa-school"></i>
                         </div>
-                        <select name="kelas_id" id="kelas_id" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
+                        <select name="kelas_id" id="kelas_id" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all">
                             <option value="">Semua Kelas</option>
                             @foreach($kelas as $k)
                             <option value="{{ $k->id }}" {{ $kelas_id == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
@@ -121,22 +121,22 @@
                 </div>
                 
                 <div class="space-y-2 group">
-                    <label for="tanggal" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Tanggal</label>
+                    <label for="tanggal" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Tanggal</label>
                     <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors">
                             <i class="fas fa-calendar-alt"></i>
                         </div>
-                        <input type="date" name="tanggal" id="tanggal" value="{{ $tanggal }}" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
+                        <input type="date" name="tanggal" id="tanggal" value="{{ $tanggal }}" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all">
                     </div>
                 </div>
                 
                 <div class="space-y-2 group">
-                    <label for="periode" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Periode</label>
+                    <label for="periode" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Periode</label>
                     <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors">
                             <i class="fas fa-calendar-week"></i>
                         </div>
-                        <select name="periode" id="periode" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
+                        <select name="periode" id="periode" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all">
                             <option value="today">Hari Ini</option>
                             <option value="yesterday">Kemarin</option>
                             <option value="this_week">Minggu Ini</option>
@@ -153,28 +153,28 @@
                 
                 <div id="customDateRange" class="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
                     <div class="space-y-2 group">
-                        <label for="start_date" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Tanggal Mulai</label>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Tanggal Mulai</label>
                         <div class="relative rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors">
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
-                            <input type="date" name="start_date" id="start_date" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
+                            <input type="date" name="start_date" id="start_date" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all">
                         </div>
                     </div>
                     
                     <div class="space-y-2 group">
-                        <label for="end_date" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Tanggal Akhir</label>
+                        <label for="end_date" class="block text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Tanggal Akhir</label>
                         <div class="relative rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors">
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
-                            <input type="date" name="end_date" id="end_date" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
+                            <input type="date" name="end_date" id="end_date" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all">
                         </div>
                     </div>
                 </div>
                 
                 <div class="md:col-span-3 flex justify-end">
-                    <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium rounded-lg shadow-sm hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 group">
+                    <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-500 text-white font-medium rounded-lg shadow-sm hover:from-blue-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 group">
                         <i class="fas fa-search mr-2 group-hover:scale-110 transition-transform"></i>
                         <span>Tampilkan Data</span>
                     </button>
@@ -268,16 +268,16 @@
             @endphp
             
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md" x-data="{ expanded: true }">
-                <div class="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 cursor-pointer" @click="expanded = !expanded">
+                <div class="bg-gradient-to-r from-blue-50 to-blue-50 px-6 py-4 cursor-pointer" @click="expanded = !expanded">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
-                            <span class="p-2 bg-indigo-100 rounded-lg text-indigo-500">
+                            <span class="p-2 bg-blue-100 rounded-lg text-blue-500">
                                 <i class="fas fa-users text-lg"></i>
                             </span>
                             <h3 class="text-lg font-medium text-gray-800">Kelas: {{ $k->nama_kelas }}</h3>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <span class="px-3 py-1 bg-indigo-100 text-indigo-600 text-sm rounded-full">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 text-sm rounded-full">
                                 {{ $classAttendance->count() }} Siswa
                             </span>
                             <button class="text-gray-500 focus:outline-none transition-transform duration-200" :class="{'rotate-180': !expanded}">
@@ -334,7 +334,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $a->keterangan ?? '-' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <div class="flex space-x-2">
-                                            <button type="button" class="text-indigo-600 hover:text-indigo-900 transition-colors" title="Edit">
+                                            <button type="button" class="text-blue-600 hover:text-blue-900 transition-colors" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button type="button" class="text-red-600 hover:text-red-900 transition-colors" title="Hapus">

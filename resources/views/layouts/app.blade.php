@@ -424,10 +424,6 @@
         </div>
     </div>
 
- 
-    
-
-  
 
     <aside
         x-cloak
@@ -570,6 +566,7 @@
                             {!! renderEnhancedSidebarLink('adminguru.index', 'bxs-user-detail', 'Guru') !!}
                             {!! renderEnhancedSidebarLink(('kelassekolah.index'), 'bx-chalkboard', 'Kelas') !!}
                             {!! renderEnhancedSidebarLink(('adminsiswa.index'), 'bxs-group', 'Siswa') !!}
+                            {!! renderEnhancedSidebarLink(('ruangans.index'), 'bx-building', 'Ruangan') !!} 
                             {!! renderEnhancedSidebarLink(('jadwal-pelajaran.index'),'bx-calendar','Jadwal Pelajaran' ) !!}
                             {!! renderEnhancedSidebarLink(('absensi.index'), 'bx-calendar-check', 'Data Absensi') !!}
                             {!! renderEnhancedSidebarLink(('absensi.scan'), 'bx-scan', 'Scan Absensi') !!}

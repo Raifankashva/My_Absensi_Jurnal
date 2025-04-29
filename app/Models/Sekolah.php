@@ -28,6 +28,7 @@ class Sekolah extends Model
         'nip_kepala_sekolah',
         'foto',
         'total_siswa',
+        'latitude', 'longitude',
     ];
     public function user()
     {

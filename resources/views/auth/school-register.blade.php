@@ -42,6 +42,37 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .map-instructions {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        .coordinates-display {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Geocoder CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    
+    <!-- Font Awesome (for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8" x-data="{ activeStep: 1 }">
@@ -497,6 +528,65 @@
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
+                                <div class="form-group row mt-4">
+                                <div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">Lokasi Sekolah pada Peta</h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Tandai lokasi sekolah pada peta untuk mendapatkan koordinat yang akurat. Klik pada peta atau gunakan fitur pencarian untuk menandai lokasi.
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <button type="button" id="get-current-location" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-map-marker-alt"></i> Gunakan Lokasi Saat Ini
+                </button>
+            </div>
+            <div class="col-md-6 text-right">
+                <button type="button" id="search-address-button" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-search"></i> Cari Alamat di Peta
+                </button>
+            </div>
+        </div>
+        
+        <!-- Map Container -->
+        <div id="map" style="height: 450px; border-radius: 5px; border: 1px solid #ddd;"></div>
+        
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="card bg-light">
+                    <div class="card-body py-2">
+                        <div class="mb-0" id="selected-coordinates">
+                            <strong>Koordinat belum dipilih</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-light">
+                    <div class="card-body py-2">
+                        <div class="mb-0" id="address-from-map">
+                            <strong>Alamat dari peta akan muncul di sini</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hidden fields for form submission -->
+        <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude') }}">
+        <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude') }}">
+        
+        <div class="mt-3">
+            <small class="text-muted">
+                <i class="fas fa-exclamation-circle"></i> Pastikan lokasi yang ditandai sudah benar sebelum melanjutkan pendaftaran.
+            </small>
+        </div>
+    </div>
+</div>
+                        </div>
                             </div>
                         </div>
                     </div>
@@ -794,5 +884,362 @@
     }
 });
     </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+    
+    <!-- Add Leaflet Geocoder for search capability -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the map (centered on Indonesia)
+            var map = L.map('map').setView([-2.5489, 118.0149], 5);
+            
+            // Add OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add search control
+            L.Control.geocoder().addTo(map);
+            
+            // Add a marker if we have saved coordinates
+            var marker;
+            var latitude = "{{ old('latitude') }}";
+            var longitude = "{{ old('longitude') }}";
+            
+            if (latitude && longitude) {
+                map.setView([latitude, longitude], 15);
+                marker = L.marker([latitude, longitude]).addTo(map);
+                document.getElementById('selected-coordinates').textContent = 'Latitude: ' + latitude + ', Longitude: ' + longitude;
+            }
+            
+            // Handle map click event
+            map.on('click', function(e) {
+                var lat = e.latlng.lat.toFixed(7);
+                var lng = e.latlng.lng.toFixed(7);
+                
+                // Update hidden form fields
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lng;
+                
+                // Update the coordinates display
+                document.getElementById('selected-coordinates').textContent = 'Latitude: ' + lat + ', Longitude: ' + lng;
+                
+                // Update or add marker
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng).addTo(map);
+                }
+            });
+            
+            // Try to get user's location to center the map
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    map.setView([position.coords.latitude, position.coords.longitude], 13);
+                });
+            }
+            
+            // When address fields change, try to update the map
+            function updateMapFromAddress() {
+                var address = [
+                    document.querySelector('input[name="alamat"]').value,
+                    document.querySelector('select[name="village_id"] option:checked').text,
+                    document.querySelector('select[name="district_id"] option:checked').text,
+                    document.querySelector('select[name="city_id"] option:checked').text,
+                    document.querySelector('select[name="province_id"] option:checked').text,
+                    'Indonesia'
+                ].filter(Boolean).join(', ');
+                
+                if (address) {
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                var lat = parseFloat(data[0].lat);
+                                var lon = parseFloat(data[0].lon);
+                                map.setView([lat, lon], 15);
+                            }
+                        })
+                        .catch(error => console.error('Error geocoding address:', error));
+                }
+            }
+            
+            // Call this when address fields are fully populated
+            document.querySelector('select[name="village_id"]').addEventListener('change', updateMapFromAddress);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the map (centered on Indonesia)
+    var map = L.map('map').setView([-2.5489, 118.0149], 5);
+    
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Add search control with more options
+    var geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false,
+        placeholder: 'Cari lokasi...',
+        errorMessage: 'Lokasi tidak ditemukan.',
+        suggestMinLength: 3,
+        suggestTimeout: 250,
+        queryMinLength: 3
+    }).addTo(map);
+    
+    geocoder.on('markgeocode', function(e) {
+        var bbox = e.geocode.bbox;
+        var poly = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest()
+        ]).addTo(map);
+        
+        map.fitBounds(poly.getBounds());
+        
+        // Select this point
+        updateMarkerPosition(e.geocode.center);
+    });
+    
+    // Add zoom control
+    L.control.zoom({
+        position: 'bottomright'
+    }).addTo(map);
+    
+    // Add scale control
+    L.control.scale({
+        imperial: false,
+        metric: true
+    }).addTo(map);
+    
+    // Add fullscreen control (if needed)
+    // Note: This requires the Leaflet.fullscreen plugin
+    
+    // Initialize marker variable
+    var marker;
+    var latitude = document.getElementById('latitude').value;
+    var longitude = document.getElementById('longitude').value;
+    
+    // If we have saved coordinates, set the marker and map view
+    if (latitude && longitude) {
+        map.setView([latitude, longitude], 15);
+        marker = L.marker([latitude, longitude], {
+            draggable: true
+        }).addTo(map);
+        updateCoordinatesDisplay(latitude, longitude);
+        
+        // Add drag event to update coordinates
+        marker.on('dragend', function(e) {
+            updateMarkerPosition(e.target.getLatLng());
+        });
+    }
+    
+    // Function to update the marker position and form values
+    function updateMarkerPosition(latlng) {
+        var lat = latlng.lat.toFixed(7);
+        var lng = latlng.lng.toFixed(7);
+        
+        // Update hidden form fields
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+        
+        // Update the coordinates display
+        updateCoordinatesDisplay(lat, lng);
+        
+        // Update or add marker
+        if (marker) {
+            marker.setLatLng(latlng);
+        } else {
+            marker = L.marker(latlng, {
+                draggable: true
+            }).addTo(map);
+            
+            // Add drag event to update coordinates
+            marker.on('dragend', function(e) {
+                updateMarkerPosition(e.target.getLatLng());
+            });
+        }
+        
+        // Try to get address information from the coordinates
+        fetchAddressFromCoordinates(lat, lng);
+    }
+    
+    // Function to update the coordinates display
+    function updateCoordinatesDisplay(lat, lng) {
+        document.getElementById('selected-coordinates').innerHTML = 
+            '<strong>Latitude:</strong> ' + lat + '<br>' +
+            '<strong>Longitude:</strong> ' + lng;
+    }
+    
+    // Handle map click event
+    map.on('click', function(e) {
+        updateMarkerPosition(e.latlng);
+    });
+    
+    // Try to get user's location to center the map
+    document.getElementById('get-current-location').addEventListener('click', function() {
+        if (navigator.geolocation) {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mencari...';
+            this.disabled = true;
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    
+                    map.setView([lat, lng], 16);
+                    updateMarkerPosition(L.latLng(lat, lng));
+                    
+                    document.getElementById('get-current-location').innerHTML = 
+                        '<i class="fas fa-map-marker-alt"></i> Gunakan Lokasi Saat Ini';
+                    document.getElementById('get-current-location').disabled = false;
+                },
+                function(error) {
+                    console.error('Error getting location:', error);
+                    alert('Gagal mendapatkan lokasi: ' + error.message);
+                    
+                    document.getElementById('get-current-location').innerHTML = 
+                        '<i class="fas fa-map-marker-alt"></i> Gunakan Lokasi Saat Ini';
+                    document.getElementById('get-current-location').disabled = false;
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        } else {
+            alert('Geolocation tidak didukung oleh browser Anda.');
+        }
+    });
+    
+    // Function to get address from coordinates
+    function fetchAddressFromCoordinates(lat, lng) {
+        // Show loading indicator
+        document.getElementById('address-from-map').innerHTML = 'Mencari alamat...';
+        
+        // Use your backend endpoint or direct Nominatim
+        fetch(`/reverse-geocode?latitude=${lat}&longitude=${lng}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('address-from-map').innerHTML = 
+                        'Tidak dapat menemukan alamat untuk lokasi ini.';
+                    return;
+                }
+                
+                document.getElementById('address-from-map').innerHTML = 
+                    `<strong>Alamat terdeteksi:</strong><br>${data.full_address}`;
+                
+                // Optionally update form fields if needed
+                // Uncomment and adapt the lines below if you want to update the address fields
+                /*
+                if (data.road) document.querySelector('input[name="alamat"]').value = data.road;
+                if (data.postal_code) document.querySelector('input[name="kode_pos"]').value = data.postal_code;
+                
+                // You might need to add logic to find and select the right options in your select boxes
+                // for province, city, district and village
+                */
+            })
+            .catch(error => {
+                console.error('Error fetching address:', error);
+                document.getElementById('address-from-map').innerHTML = 
+                    'Gagal mendapatkan alamat. Coba lagi nanti.';
+            });
+    }
+    
+    // Update map when address fields change (for convenience)
+    function updateMapFromAddressFields() {
+        var addressParts = [];
+        
+        // Get values from address fields
+        var alamat = document.querySelector('input[name="alamat"]').value;
+        if (alamat) addressParts.push(alamat);
+        
+        var villageSelect = document.querySelector('select[name="village_id"]');
+        if (villageSelect && villageSelect.selectedIndex >= 0) {
+            var villageName = villageSelect.options[villageSelect.selectedIndex].text;
+            if (villageName) addressParts.push(villageName);
+        }
+        
+        var districtSelect = document.querySelector('select[name="district_id"]');
+        if (districtSelect && districtSelect.selectedIndex >= 0) {
+            var districtName = districtSelect.options[districtSelect.selectedIndex].text;
+            if (districtName) addressParts.push(districtName);
+        }
+        
+        var citySelect = document.querySelector('select[name="city_id"]');
+        if (citySelect && citySelect.selectedIndex >= 0) {
+            var cityName = citySelect.options[citySelect.selectedIndex].text;
+            if (cityName) addressParts.push(cityName);
+        }
+        
+        var provinceSelect = document.querySelector('select[name="province_id"]');
+        if (provinceSelect && provinceSelect.selectedIndex >= 0) {
+            var provinceName = provinceSelect.options[provinceSelect.selectedIndex].text;
+            if (provinceName) addressParts.push(provinceName);
+        }
+        
+        addressParts.push('Indonesia');
+        
+        var fullAddress = addressParts.join(', ');
+        if (fullAddress) {
+            document.getElementById('search-address-button').disabled = true;
+            document.getElementById('search-address-button').innerHTML = 
+                '<i class="fas fa-spinner fa-spin"></i> Mencari...';
+            
+            // Use the geocoder to search for the address
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('search-address-button').disabled = false;
+                    document.getElementById('search-address-button').innerHTML = 
+                        '<i class="fas fa-search"></i> Cari di Peta';
+                    
+                    if (data && data.length > 0) {
+                        var lat = parseFloat(data[0].lat);
+                        var lon = parseFloat(data[0].lon);
+                        
+                        map.setView([lat, lon], 15);
+                        updateMarkerPosition(L.latLng(lat, lon));
+                    } else {
+                        alert('Alamat tidak ditemukan di peta. Silakan coba dengan alamat yang lebih spesifik atau tandai lokasi secara manual.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error searching address:', error);
+                    document.getElementById('search-address-button').disabled = false;
+                    document.getElementById('search-address-button').innerHTML = 
+                        '<i class="fas fa-search"></i> Cari di Peta';
+                    alert('Gagal mencari alamat. Silakan coba lagi nanti.');
+                });
+        }
+    }
+    
+    // Add handler for searching address on the map
+    document.getElementById('search-address-button').addEventListener('click', function(e) {
+        e.preventDefault();
+        updateMapFromAddressFields();
+    });
+    
+    // Make the map resize properly when shown in tabs/accordions
+    setTimeout(function() {
+        map.invalidateSize();
+    }, 0);
+});
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Geocoder JS -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    
+    <!-- Load your map script -->
+    <script src="{{ asset('js/school-map.js') }}"></script>
 </body>
 </html>

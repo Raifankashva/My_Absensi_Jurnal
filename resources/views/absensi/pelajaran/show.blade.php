@@ -26,7 +26,7 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-600">Guru</p>
-                            <p class="font-semibold">{{ $jadwal->guru->nama }}</p>
+                            <p class="font-semibold">{{ $jadwal->guru->nama_lengkap }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-600">Tanggal</p>
@@ -50,7 +50,7 @@
                                             </svg>
                                         </div>
                                         <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">{{ $absensi->siswa->nama }}</div>
+                                            <div class="text-sm font-medium text-gray-900">{{ $absensi->siswa->nama_lengkap }}</div>
                                             <div class="text-sm text-gray-500">NIS: {{ $absensi->siswa->nis }}</div>
                                         </div>
                                     </div>
@@ -99,7 +99,7 @@
                                             {{ $absensi->siswa->nis }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {{ $absensi->siswa->nama }}
+                                            {{ $absensi->siswa->nama_lengkap }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($absensi->status == 'Izin')

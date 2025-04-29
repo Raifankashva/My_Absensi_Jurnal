@@ -25,6 +25,7 @@ use App\Http\Controllers\SiswaImportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SchoolRegistrationController;
 use App\Http\Controllers\AdminSchoolController;
+use App\Http\Controllers\RuanganController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -292,6 +293,27 @@ Route::get('/adminsiswa/export/pdf', [DataSiswaController::class, 'exportPDF'])-
 // Add these routes to your web.php routes file
 Route::get('/absensi/export-periode-pdf', [AbsensiController::class, 'exportPeriodePDF'])->name('absensi.exportPeriodePDF');
 Route::get('/absensi/export-periode-excel', [AbsensiController::class, 'exportPeriodeExcel'])->name('absensi.exportPeriodeExcel');
+Route::resource('ruangans', RuanganController::class);
+Route::get('/profile', [App\Http\Controllers\SchoolProfileController::class, 'show'])
+        ->name('sekolah.profile');
+    
+    // Edit school profile
+    Route::get('/profile/edit', [App\Http\Controllers\SchoolProfileController::class, 'edit'])
+        ->name('sekolah.edit');
+    
+    // Update school profile
+    Route::put('/profile/update', [App\Http\Controllers\SchoolProfileController::class, 'update'])
+        ->name('sekolah.update');
+    
+    // AJAX routes for cascading dropdowns
+    Route::get('/get-cities', [App\Http\Controllers\SchoolProfileController::class, 'getCities'])
+        ->name('sekolah.getCities');
+    
+    Route::get('/get-districts', [App\Http\Controllers\SchoolProfileController::class, 'getDistricts'])
+        ->name('sekolah.getDistricts');
+    
+    Route::get('/get-villages', [App\Http\Controllers\SchoolProfileController::class, 'getVillages'])
+        ->name('sekolah.getVillages');
 });
 Route::get('/jurnal-guru/laporan-absensi', [JurnalGuruController::class, 'laporanAbsensi'])->name('absensi.laporan');
 
