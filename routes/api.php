@@ -19,6 +19,9 @@ use App\Http\Controllers\API\RegionController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+use App\Http\Controllers\API\SettingDailyApiController;
+
+Route::get('settings/daily/{sekolahId}', [SettingDailyApiController::class, 'getSettingsBySchool']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

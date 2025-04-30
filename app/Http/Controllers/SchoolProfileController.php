@@ -40,16 +40,22 @@ class SchoolProfileController extends Controller
     
     // Check if coordinates exist
     $hasCoordinates = !is_null($sekolah->latitude) && !is_null($sekolah->longitude);
-    
+
+    // Get prestasi data
+    $prestasis = $sekolah->prestasis; // or Prestasi::where('sekolah_id', $sekolah->id)->get();
+    $fasilitas = $sekolah->fasilitas; // or FasilitasSekolah::where('sekolah_id', $sekolah->id)->get();
     return view('school.profile', compact(
         'sekolah', 
         'province', 
         'city', 
         'district', 
         'village',
-        'hasCoordinates'
+        'hasCoordinates',
+        'prestasis',
+        'fasilitas'
     ));
 }
+
 
     /**
      * Show the form for editing the school profile.

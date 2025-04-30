@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AbsensiNotification;
 use Illuminate\Support\Facades\Auth;
+use App\Models\SettingDaily;
 
 class AbsensiController extends Controller
 {
@@ -65,85 +66,197 @@ class AbsensiController extends Controller
     
 
     public function store(Request $request)
-    {
-        // Get authenticated school
-        $authSchool = $this->getAuthenticatedSchool();
-        
-        if (!$authSchool) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki akses ke data sekolah');
-        }
-        
-        $siswa = DataSiswa::where('nisn', $request->nisn)
-            ->where('sekolah_id', $authSchool->id)
-            ->first();
-            
-        if (!$siswa) {
-            return redirect()->back()->with('error', 'Siswa tidak ditemukan atau bukan dari sekolah Anda');
-        }
+{
+    // Get authenticated school
+    $authSchool = $this->getAuthenticatedSchool();
     
-        $setting = Setting::where('sekolah_id', $authSchool->id)->first();
-        if (!$setting) {
-            return redirect()->back()->with('error', 'Pengaturan sekolah tidak ditemukan');
-        }
-    
-        $today = Carbon::now()->format('Y-m-d');
-        $alreadyPresent = Absensi::where('siswa_id', $siswa->id)
-            ->whereDate('waktu_scan', $today)
-            ->exists();
-            
-        if ($alreadyPresent) {
-            return redirect()->back()->with('error', 'Siswa sudah melakukan absensi hari ini');
-        }
-    
-        $waktu_scan = Carbon::now();
-        $jam_scan = $waktu_scan->format('H:i:s');
-        $status = 'Tidak Hadir';
-        
-        $jam_masuk = Carbon::createFromFormat('H:i:s', $setting->jam_masuk);
-        $batas_terlambat = Carbon::createFromFormat('H:i:s', $setting->batas_terlambat);
-        $batas_tidak_hadir = (clone $batas_terlambat)->addHour(); // 1 jam setelah batas terlambat
-        
-        $jam_scan_carbon = Carbon::createFromFormat('H:i:s', $jam_scan);
-    
-        // Determine status based on time
-        if ($jam_scan_carbon <= $jam_masuk) {
-            $status = 'Hadir';
-        } elseif ($jam_scan_carbon <= $batas_terlambat) {
-            $status = 'Terlambat';
-        } elseif ($jam_scan_carbon <= $batas_tidak_hadir) {
-            $status = 'Terlambat';
-        } else {
-            $status = 'Tidak Hadir';
-        }
-    
-        Absensi::create([
-            'siswa_id' => $siswa->id,
-            'waktu_scan' => $waktu_scan,
-            'status' => $status
-        ]);
-    
-        $emailRecipients = [];
-    
-        if (!empty($siswa->email_ayah)) {
-            $emailRecipients[] = $siswa->email_ayah;
-        }
-    
-        if (!empty($siswa->email_ibu)) {
-            $emailRecipients[] = $siswa->email_ibu;
-        }
-    
-        if (!empty($siswa->email_wali)) {
-            $emailRecipients[] = $siswa->email_wali;
-        }
-    
-        if (!empty($emailRecipients)) {
-            Mail::to($emailRecipients)->send(new AbsensiNotification($siswa, $status, $waktu_scan));
-        }
-    
-        return redirect()->back()->with('success', 'Absensi berhasil dicatat dan notifikasi telah dikirim ke email orang tua/wali.');
+    if (!$authSchool) {
+        return redirect()->back()->with('error', 'Anda tidak memiliki akses ke data sekolah');
     }
     
-    public function scanQR(Request $request)
+    $siswa = DataSiswa::where('nisn', $request->nisn)
+        ->where('sekolah_id', $authSchool->id)
+        ->first();
+        
+    if (!$siswa) {
+        return redirect()->back()->with('error', 'Siswa tidak ditemukan atau bukan dari sekolah Anda');
+    }
+
+    $today = Carbon::now();
+    $dayName = $this->getDayNameIndonesian($today->dayOfWeek);
+    
+    // Ambil pengaturan untuk hari ini dari setting_daily
+    $settingDaily = SettingDaily::where('sekolah_id', $authSchool->id)
+        ->where('hari', $dayName)
+        ->first();
+    
+    if (!$settingDaily) {
+        return redirect()->back()->with('error', 'Pengaturan jadwal untuk hari '.$dayName.' tidak ditemukan');
+    }
+    
+    // Cek apakah jadwal hari ini aktif
+    if (!$settingDaily->is_active) {
+        return redirect()->back()->with('error', 'Jadwal untuk hari '.$dayName.' tidak aktif');
+    }
+
+    // Cek apakah siswa sudah absen hari ini
+    $alreadyPresent = Absensi::where('siswa_id', $siswa->id)
+        ->whereDate('waktu_scan', $today->format('Y-m-d'))
+        ->exists();
+        
+    if ($alreadyPresent) {
+        return redirect()->back()->with('error', 'Siswa sudah melakukan absensi hari ini');
+    }
+
+    $waktu_scan = Carbon::now();
+    $jam_scan = $waktu_scan->format('H:i:s');
+    $status = 'Tidak Hadir';
+    
+    // Format jam dari setting_daily
+    $jam_masuk = Carbon::createFromFormat('H:i:s', $settingDaily->jam_masuk);
+    $batas_terlambat = Carbon::createFromFormat('H:i:s', $settingDaily->batas_terlambat);
+    $batas_tidak_hadir = (clone $batas_terlambat)->addHour(); // 1 jam setelah batas terlambat
+    
+    $jam_scan_carbon = Carbon::createFromFormat('H:i:s', $jam_scan);
+
+    // Determine status based on time
+    if ($jam_scan_carbon <= $jam_masuk) {
+        $status = 'Hadir';
+    } elseif ($jam_scan_carbon <= $batas_terlambat) {
+        $status = 'Terlambat';
+    } elseif ($jam_scan_carbon <= $batas_tidak_hadir) {
+        $status = 'Terlambat';
+    } else {
+        $status = 'Tidak Hadir';
+    }
+
+    Absensi::create([
+        'siswa_id' => $siswa->id,
+        'waktu_scan' => $waktu_scan,
+        'status' => $status
+    ]);
+
+    $emailRecipients = [];
+
+    if (!empty($siswa->email_ayah)) {
+        $emailRecipients[] = $siswa->email_ayah;
+    }
+
+    if (!empty($siswa->email_ibu)) {
+        $emailRecipients[] = $siswa->email_ibu;
+    }
+
+    if (!empty($siswa->email_wali)) {
+        $emailRecipients[] = $siswa->email_wali;
+    }
+
+    if (!empty($emailRecipients)) {
+        Mail::to($emailRecipients)->send(new AbsensiNotification($siswa, $status, $waktu_scan));
+    }
+
+    return redirect()->back()->with('success', 'Absensi berhasil dicatat dan notifikasi telah dikirim ke email orang tua/wali.');
+}
+
+/**
+ * Mendapatkan nama hari dalam bahasa Indonesia berdasarkan index hari
+ *
+ * @param int $dayOfWeek Carbon day of week (0 = Sunday, 6 = Saturday)
+ * @return string Nama hari dalam bahasa Indonesia
+ */
+private function getDayNameIndonesian($dayOfWeek)
+{
+    $days = [
+        0 => 'Minggu',
+        1 => 'Senin',
+        2 => 'Selasa',
+        3 => 'Rabu',
+        4 => 'Kamis',
+        5 => 'Jumat',
+        6 => 'Sabtu',
+    ];
+    
+    return $days[$dayOfWeek];
+}
+public function scanqr()
+{
+    // Get school session value
+    $sekolahId = session('scan_sekolah_id');
+    
+    if (!$sekolahId) {
+        return redirect()->route('school.dashboard');
+    }
+    
+    // Get school information
+    $sekolah = Sekolah::find($sekolahId);
+    
+    if (!$sekolah) {
+        return redirect()->route('school.dashboard')
+            ->with('error', 'Sekolah tidak ditemukan, silakan pilih kembali');
+    }
+    
+    // Get current day name
+    $today = Carbon::now();
+    $dayName = $this->getDayNameIndonesian($today->dayOfWeek);
+    
+    // Get daily settings for today
+    $settingDaily = SettingDaily::where('sekolah_id', $sekolahId)
+        ->where('hari', $dayName)
+        ->first();
+    
+    // If no settings found for today, create a default
+    if (!$settingDaily) {
+        return redirect()->route('school.dashboard')
+            ->with('error', 'Pengaturan jadwal untuk hari '.$dayName.' tidak ditemukan');
+    }
+    
+    // Check if today's schedule is active
+    if (!$settingDaily->is_active) {
+        return redirect()->route('school.dashboard')
+            ->with('error', 'Jadwal untuk hari '.$dayName.' tidak aktif. Tidak ada absensi hari ini.');
+    }
+    
+    // Calculate current attendance status
+    $currentStatus = $this->calculateAttendanceStatus($settingDaily);
+    
+    return view('absensi.scan', compact('sekolah', 'settingDaily', 'dayName', 'currentStatus'));
+}
+
+/**
+ * Mendapatkan nama hari dalam bahasa Indonesia berdasarkan index hari
+ *
+ * @param int $dayOfWeek Carbon day of week (0 = Sunday, 6 = Saturday)
+ * @return string Nama hari dalam bahasa Indonesia
+ */
+
+/**
+ * Menghitung status kehadiran berdasarkan waktu saat ini
+ *
+ * @param SettingDaily $settingDaily
+ * @return string Status kehadiran (Hadir/Terlambat/Tidak Hadir)
+ */
+private function calculateAttendanceStatus($settingDaily)
+{
+    $now = Carbon::now();
+    $currentTime = $now->format('H:i:s');
+    
+    $jamMasuk = Carbon::createFromFormat('H:i:s', $settingDaily->jam_masuk);
+    $batasTerlambat = Carbon::createFromFormat('H:i:s', $settingDaily->batas_terlambat);
+    $batasTidakHadir = (clone $batasTerlambat)->addHour(); // 1 jam setelah batas terlambat
+    
+    $currentTimeCarbon = Carbon::createFromFormat('H:i:s', $currentTime);
+    
+    if ($currentTimeCarbon <= $jamMasuk) {
+        return 'Hadir';
+    } elseif ($currentTimeCarbon <= $batasTerlambat) {
+        return 'Terlambat';
+    } elseif ($currentTimeCarbon <= $batasTidakHadir) {
+        return 'Terlambat';
+    } else {
+        return 'Tidak Hadir';
+    }
+}
+
+    public function showScanPage(Request $request)
     {
         
         if (!$request->has('sekolah_id') && !session()->has('scan_sekolah_id')) {

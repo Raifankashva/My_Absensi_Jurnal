@@ -12,15 +12,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="shortcut icon" href="data:image/png;base64,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" type="image/x-icon">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Poppins', 'Inter', 'sans-serif'],
                     },
                     colors: {
                         primary: {
@@ -36,6 +35,32 @@
                             900: '#1E3A8A',
                             950: '#172554',
                         },
+                        secondary: {
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            300: '#CBD5E1',
+                            400: '#94A3B8',
+                            500: '#64748B',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1E293B',
+                            900: '#0F172A',
+                            950: '#020617',
+                        },
+                        accent: {
+                            50: '#ECFDF5',
+                            100: '#D1FAE5',
+                            200: '#A7F3D0',
+                            300: '#6EE7B7',
+                            400: '#34D399',
+                            500: '#10B981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065F46',
+                            900: '#064E3B',
+                            950: '#022C22',
+                        },
                     },
                     animation: {
                         'float': 'float 3s ease-in-out infinite',
@@ -44,6 +69,9 @@
                         'slide-in': 'slideIn 0.5s ease-out',
                         'slide-up': 'slideUp 0.5s ease-out',
                         'fade-in': 'fadeIn 0.5s ease-out',
+                        'scale-in': 'scaleIn 0.5s ease-out',
+                        'bounce-in': 'bounceIn 0.5s ease-out',
+                        'spin-slow': 'spin 3s linear infinite',
                     },
                     keyframes: {
                         float: {
@@ -54,6 +82,25 @@
                             '0%': { backgroundPosition: '-1000px 0' },
                             '100%': { backgroundPosition: '1000px 0' },
                         },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: '0' },
+                            '50%': { transform: 'scale(1.05)', opacity: '0.9' },
+                            '70%': { transform: 'scale(0.9)', opacity: '1' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                    },
+                    boxShadow: {
+                        'glow': '0 0 15px rgba(59, 130, 246, 0.5)',
+                        'glow-lg': '0 0 25px rgba(59, 130, 246, 0.5)',
+                        'inner-glow': 'inset 0 0 15px rgba(59, 130, 246, 0.3)',
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
                     },
                 },
             },
@@ -124,6 +171,25 @@
             }
         }
 
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.9;
+            }
+            70% {
+                transform: scale(0.9);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         /* Menu hover effect */
         .menu-item-hover {
             position: relative;
@@ -146,14 +212,14 @@
         }
 
         .glass-morphism {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
 
         .glass-morphism-dark {
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(30, 41, 59, 0.3);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -285,7 +351,7 @@
         }
 
         .dark .glass-morphism {
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.85);
             border-color: rgba(30, 41, 59, 0.3);
         }
 
@@ -383,6 +449,66 @@
         .sidebar-quick-action:hover {
             transform: translateY(-3px);
         }
+
+        /* New 3D card effect */
+        .card-3d {
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .card-3d:hover {
+            transform: rotateY(5deg) rotateX(5deg);
+            box-shadow: 
+                -5px 5px 15px rgba(0, 0, 0, 0.1),
+                10px 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Floating animation for cards */
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Glowing border effect */
+        .glow-border {
+            position: relative;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .glow-border::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 2px;
+            border-radius: 0.75rem;
+            background: linear-gradient(45deg, #3B82F6, #60A5FA, #93C5FD, #3B82F6);
+            background-size: 200% 200%;
+            animation: shimmer 3s linear infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Improved notification badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(to bottom right, #EF4444, #DC2626);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(239, 68, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
     </style>
     <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
 </head>
@@ -407,24 +533,25 @@
         }
     }
 }" x-init="initTheme()">
+    <!-- Page Loader with Enhanced Animation -->
     <div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center animated-bg transition-opacity duration-500">
-        <div class="relative w-28 h-28 mb-6 animate-pulse-slow">
+        <div class="relative w-28 h-28 mb-6">
             <div class="absolute inset-0 rounded-full border-4 border-t-primary-600 border-r-primary-500 border-b-primary-400 border-l-primary-500 animate-spin"></div>
             <div class="absolute inset-[8px] rounded-full bg-primary-600/20 animate-pulse flex items-center justify-center">
-                <i class='bx bxs-school text-4xl text-primary-600'></i>
+                <i class='bx bxs-school text-4xl text-primary-600 animate-bounce-in'></i>
             </div>
         </div>
 
         <div class="text-center">
-            <h2 class="text-2xl font-bold gradient-text mb-3 relative overflow-hidden">
+            <h2 class="text-2xl font-bold gradient-text mb-3 relative overflow-hidden animate-pulse-slow">
                 Memuat Sistem Sekolah
                 <span class="loading-dots">...</span>
             </h2>
-            <p class="text-sm text-primary-700/70 dark:text-primary-300/70">Harap tunggu sementara kami menyiapkan</p>
+            <p class="text-sm text-primary-700/70 dark:text-primary-300/70 animate-fade-in">Harap tunggu sementara kami menyiapkan sistem</p>
         </div>
     </div>
 
-
+    <!-- Sidebar with Enhanced Design -->
     <aside
         x-cloak
         :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
@@ -456,9 +583,11 @@
             </div>
         </div>
 
+        <!-- Sidebar Navigation with Enhanced Design -->
         <nav class="p-4 overflow-y-auto h-[calc(100vh-5rem)] scrollbar-thin scrollbar-thumb-primary-700 scrollbar-track-primary-900/30">
             @if (auth()->check())
             <div class="mb-6 animate-fade-in">
+                <!-- User Profile Card with Enhanced Design -->
                 <div class="px-4 py-5 bg-gradient-to-r from-primary-800/80 to-primary-700/80 rounded-xl mb-4 
                             shadow-lg group hover:scale-[1.02] transition-all duration-300 backdrop-blur-sm border border-primary-600/20">
                     <div class="flex items-center space-x-4">
@@ -486,34 +615,33 @@
                     </div>
                 </div>
 
+                <!-- Enhanced Sidebar Menu -->
                 <div class="space-y-5 animate-slide-in" style="--delay: 0.2s">
                     @php
                     function renderEnhancedSidebarLink($routeName, $icon, $label, $badge = null) {
-    $isActive = request()->routeIs($routeName);
-    $activeClass = $isActive ? 'sidebar-active shadow-lg bg-primary-700 text-white' : '';
-    $url = route($routeName);
-    $badgeHtml = $badge ? "<span class='px-2 py-0.5 bg-red-500 rounded-full text-xs text-white animate-pulse ml-auto'>$badge</span>" : '';
+                        $isActive = request()->routeIs($routeName);
+                        $activeClass = $isActive ? 'sidebar-active shadow-lg bg-primary-700/70 text-white' : 'text-primary-100 hover:bg-primary-700/30';
+                        $url = route($routeName);
+                        $badgeHtml = $badge ? "<span class='notification-badge'>$badge</span>" : '';
 
-    return <<< HTML
-        <a href="$url"
-           class="sidebar-menu-item flex items-center px-4 py-3 rounded-xl transition-all duration-300 
-                  $activeClass hover:text-white group relative overflow-hidden">
-            <div class="sidebar-icon-container bg-primary-800/50 p-2.5 rounded-lg shadow-inner mr-3 
-                        group-hover:bg-primary-700 transition-all duration-300">
-                <i class='bx $icon text-xl'></i>
-            </div>
-            <span class="font-medium">$label</span>
-            $badgeHtml
-            <div class="ml-auto opacity-0 transform translate-x-2 
-                        group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                <i class='bx bx-chevron-right'></i>
-            </div>
-        </a>
-    HTML;
-}
-
+                        return <<< HTML
+                            <a href="$url"
+                            class="sidebar-menu-item flex items-center px-4 py-3 rounded-xl transition-all duration-300 
+                                    $activeClass group relative overflow-hidden">
+                                <div class="sidebar-icon-container bg-primary-800/50 p-2.5 rounded-lg shadow-inner mr-3 
+                                            group-hover:bg-primary-700/70 transition-all duration-300 relative">
+                                    <i class='bx $icon text-xl'></i>
+                                    $badgeHtml
+                                </div>
+                                <span class="font-medium">$label</span>
+                                <div class="ml-auto opacity-0 transform translate-x-2 
+                                            group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                                    <i class='bx bx-chevron-right'></i>
+                                </div>
+                            </a>
+                        HTML;
+                    }
                     @endphp
-
                     @if (auth()->user()->role == 'admin')
                     <div class="mb-6">
                         <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
@@ -570,7 +698,11 @@
                             {!! renderEnhancedSidebarLink(('jadwal-pelajaran.index'),'bx-calendar','Jadwal Pelajaran' ) !!}
                             {!! renderEnhancedSidebarLink(('absensi.index'), 'bx-calendar-check', 'Data Absensi') !!}
                             {!! renderEnhancedSidebarLink(('absensi.scan'), 'bx-scan', 'Scan Absensi') !!}
-                            {!! renderEnhancedSidebarLink(('settings.view'), 'bx-cog', 'Pengaturan') !!}
+                            {!! renderEnhancedSidebarLink(('absensi.pelajaran.index'), 'bx-calendar-check', 'Absensi Mata Pelajaran') !!}
+                            {!! renderEnhancedSidebarLink(('prestasi.index'), 'bx-trophy', 'Prestasi') !!}
+                            {!! renderEnhancedSidebarLink(('fasilitas.index'), 'bx-home', 'Fasilitas') !!}
+                            {!! renderEnhancedSidebarLink(('pemeliharaan_fasilitas.index'), 'bx-home', 'Pemeliharaan Fasilitas') !!}
+                            {!! renderEnhancedSidebarLink(('settings.daily.view'), 'bx-cog', 'Pengaturan') !!}
                         </div>
                     </div>
                     @endif

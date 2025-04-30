@@ -4,11 +4,35 @@
 @section('content')
 <div class="max-w-lg mx-auto bg-white shadow-lg p-6 rounded-lg">
     <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Scan QR Code Absensi - {{$sekolah->nama_sekolah}}</h2>
-<div class="mt-6 text-center">
-    <a href="{{ route('absensi.scan.logout') }}" class="text-gray-600 hover:text-red-600">
-        Pilih Sekolah Lain
-    </a>
-</div>
+    
+    <div class="mb-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded shadow-md">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="font-bold">Jadwal Hari {{ $dayName }}</p>
+                <p class="text-sm">Jam Masuk: {{ $settingDaily->jam_masuk }}</p>
+                <p class="text-sm">Batas Terlambat: {{ $settingDaily->batas_terlambat }}</p>
+                <p class="text-sm">Jam Pulang: {{ $settingDaily->jam_pulang }}</p>
+                <p class="text-sm font-medium mt-1">
+                    Status Sekarang: 
+                    <span id="currentStatusBadge" class="px-2 py-1 rounded text-xs font-semibold {{ $currentStatus == 'Hadir' ? 'bg-green-200 text-green-800' : ($currentStatus == 'Terlambat' ? 'bg-yellow-200 text-yellow-800' : 'bg-red-200 text-red-800') }}">
+                        {{ $currentStatus }}
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-6 text-center">
+        <a href="{{ route('absensi.scan.logout') }}" class="text-gray-600 hover:text-red-600">
+            Pilih Sekolah Lain
+        </a>
+    </div>
+    
     @if (session('error'))
         <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
             <span class="block sm:inline">{{ session('error') }}</span>
@@ -59,6 +83,7 @@
                 <div class="ml-3">
                     <p class="font-bold">QR Code terdeteksi!</p>
                     <p id="siswaInfo" class="text-sm"></p>
+                    <p id="absensiStatus" class="text-sm font-medium mt-1"></p>
                 </div>
             </div>
         </div>
@@ -96,6 +121,11 @@
         const scanAgainBtn = document.getElementById("scanAgainBtn");
         let currentCamera = 'environment'; // Default to back camera
         
+        // Get time settings for status calculation
+        const jamMasuk = "{{ $settingDaily->jam_masuk }}";
+        const batasTerlambat = "{{ $settingDaily->batas_terlambat }}";
+        const jamPulang = "{{ $settingDaily->jam_pulang }}";
+        
         const config = { 
             fps: 10,
             qrbox: { width: 250, height: 250 },
@@ -103,6 +133,32 @@
                 useBarCodeDetectorIfSupported: true
             }
         };
+        
+        // Function to determine attendance status based on current time
+        function getAttendanceStatus() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const currentTime = `${hours}:${minutes}:${seconds}`;
+            
+            // Convert time strings to Date objects for comparison
+            const currentDate = new Date(`1970-01-01T${currentTime}`);
+            const masukDate = new Date(`1970-01-01T${jamMasuk}`);
+            const terlambatDate = new Date(`1970-01-01T${batasTerlambat}`);
+            const batasTidakHadirDate = new Date(terlambatDate);
+            batasTidakHadirDate.setHours(batasTidakHadirDate.getHours() + 1);
+            
+            if (currentDate <= masukDate) {
+                return { status: 'Hadir', color: 'green' };
+            } else if (currentDate <= terlambatDate) {
+                return { status: 'Terlambat', color: 'yellow' };
+            } else if (currentDate <= batasTidakHadirDate) {
+                return { status: 'Terlambat', color: 'yellow' };
+            } else {
+                return { status: 'Tidak Hadir', color: 'red' };
+            }
+        }
         
         function startScanner() {
             statusMessage.textContent = "Memulai kamera...";
@@ -126,9 +182,16 @@
                         // Set the NISN value in the form
                         document.getElementById("nisn").value = data.nisn;
                         
+                        // Get current attendance status
+                        const attendanceStatus = getAttendanceStatus();
+                        
                         // Display student info
                         document.getElementById("siswaInfo").textContent = 
                             `Nama: ${data.nama}, NISN: ${data.nisn}, Kelas: ${data.kelas}`;
+                        
+                        // Add attendance status
+                        const absensiStatusEl = document.getElementById("absensiStatus");
+                        absensiStatusEl.innerHTML = `Status Kehadiran: <span class="px-2 py-1 rounded text-xs font-semibold bg-${attendanceStatus.color}-200 text-${attendanceStatus.color}-800">${attendanceStatus.status}</span>`;
                         
                         // Show result and enable submit button
                         document.getElementById("result").classList.remove("hidden");
@@ -189,6 +252,15 @@
         scanAgainBtn.addEventListener('click', () => {
             startScanner();
         });
+        
+        // Update current status badge every minute
+        setInterval(() => {
+            const currentStatusBadge = document.getElementById('currentStatusBadge');
+            const newStatus = getAttendanceStatus();
+            
+            currentStatusBadge.textContent = newStatus.status;
+            currentStatusBadge.className = `px-2 py-1 rounded text-xs font-semibold bg-${newStatus.color}-200 text-${newStatus.color}-800`;
+        }, 60000); // Update every minute
     });
 </script>
 @endsection

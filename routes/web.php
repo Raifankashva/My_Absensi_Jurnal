@@ -26,6 +26,11 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SchoolRegistrationController;
 use App\Http\Controllers\AdminSchoolController;
 use App\Http\Controllers\RuanganController;
+use App\Http\Controllers\FasilitasSekolahController;
+use App\Http\Controllers\PrestasiSekolahController;
+use App\Http\Controllers\PemeliharaanFasilitasController;
+use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\SettingDailyController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -314,6 +319,12 @@ Route::get('/profile', [App\Http\Controllers\SchoolProfileController::class, 'sh
     
     Route::get('/get-villages', [App\Http\Controllers\SchoolProfileController::class, 'getVillages'])
         ->name('sekolah.getVillages');
+
+        Route::resource('prestasi', PrestasiSekolahController::class);
+        Route::resource('fasilitas', FasilitasSekolahController::class);
+        Route::resource('pemeliharaan_fasilitas', PemeliharaanFasilitasController::class);
+        Route::resource('pengumuman', PengumumanController::class);
+
 });
 Route::get('/jurnal-guru/laporan-absensi', [JurnalGuruController::class, 'laporanAbsensi'])->name('absensi.laporan');
 
@@ -372,3 +383,7 @@ Route::get('/absensi/check-student', [AbsensiController::class, 'checkStudent'])
 Route::get('/absensi/statistics', [AbsensiController::class, 'statistics'])->name('absensi.statistics');
 Route::get('/absensi/export', [AbsensiController::class, 'export'])->name('absensi.export');
 Route::get('/absensi/pdf', [AbsensiController::class, 'generatePDF'])->name('absensi.pdf');
+Route::get('/settings/daily', [App\Http\Controllers\SettingDailyController::class, 'index'])->name('settings.daily.index');
+    Route::post('/settings/daily', [App\Http\Controllers\SettingDailyController::class, 'store'])->name('settings.daily.store');
+Route::get('/settings/view1', [SettingDailyController::class, 'viewSettings'])->name('settings.daily.view');
+Route::get('/scan/selector', [AbsensiController::class, 'scanSelector'])->name('absensi.scan.selector');

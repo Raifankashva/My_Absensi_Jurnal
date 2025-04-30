@@ -70,4 +70,15 @@ class Sekolah extends Model
         $this->total_siswa = $this->dataSiswa()->count();
         $this->save();
     }
+    // app/Models/Sekolah.php
+
+public function prestasis()
+{
+    return $this->hasMany(PrestasiSekolah::class);
+}
+
+public function fasilitas()
+{
+    return $this->hasMany(FasilitasSekolah::class);
+}
 }
