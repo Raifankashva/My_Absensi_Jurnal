@@ -240,7 +240,7 @@
                                 <div class="sm:col-span-1">
                                     <dt class="text-sm font-medium text-gray-500">Provinsi / Kota</dt>
                                     <dd class="mt-1 text-sm text-gray-900">
-                                        {{ $provinsi ?? '-' }} / {{ $kota ?? '-' }}
+                                        {{ $dataSiswa->provinsi->name ?? '-' }} / {{ $kota ?? '-' }}
                                     </dd>
                                 </div>
                                 <div class="sm:col-span-1">
@@ -286,6 +286,10 @@
                                     <dd class="mt-1 text-sm text-gray-900">{{ $dataSiswa->kerja_ayah ?? '-' }}</dd>
                                 </div>
                                 <div class="sm:col-span-1">
+                                    <dt class="text-sm font-medium text-gray-500">Email Ayah</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ $dataSiswa->email_ayah ?? '-' }}</dd>
+                                </div>
+                                <div class="sm:col-span-1">
                                     <dt class="text-sm font-medium text-gray-500">Nama Ibu</dt>
                                     <dd class="mt-1 text-sm text-gray-900">{{ $dataSiswa->ibu ?? '-' }}</dd>
                                 </div>
@@ -294,12 +298,20 @@
                                     <dd class="mt-1 text-sm text-gray-900">{{ $dataSiswa->kerja_ibu ?? '-' }}</dd>
                                 </div>
                                 <div class="sm:col-span-1">
+                                    <dt class="text-sm font-medium text-gray-500">Email Ibu</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ $dataSiswa->email_ibu ?? '-' }}</dd>
+                                </div>
+                                <div class="sm:col-span-1">
                                     <dt class="text-sm font-medium text-gray-500">Nama Wali</dt>
                                     <dd class="mt-1 text-sm text-gray-900">{{ $dataSiswa->wali ?? '-' }}</dd>
                                 </div>
                                 <div class="sm:col-span-1">
                                     <dt class="text-sm font-medium text-gray-500">Pekerjaan Wali</dt>
                                     <dd class="mt-1 text-sm text-gray-900">{{ $dataSiswa->kerja_wali ?? '-' }}</dd>
+                                </div>
+                                <div class="sm:col-span-1">
+                                    <dt class="text-sm font-medium text-gray-500">Email Wali</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ $dataSiswa->email_wali ?? '-' }}</dd>
                                 </div>
                             </dl>
                         </div>
@@ -354,17 +366,17 @@
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                             <div class="mb-4 md:mb-0">
                                 <h4 class="text-sm font-medium text-gray-700">Kelas Saat Ini</h4>
-                                <p class="text-lg font-semibold text-blue-700">{{ $kelas ?? 'Belum ditentukan' }}</p>
+                                <p class="text-lg font-semibold text-blue-700">{{ $dataSiswa->kelas->nama_kelas ?? 'Belum ditentukan' }}</p>
                             </div>
                             
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 <div class="bg-blue-50 p-3 rounded-lg text-center">
                                     <p class="text-xs text-gray-500">Semester</p>
-                                    <p class="text-lg font-semibold text-blue-700">{{ $semester ?? '-' }}</p>
+                                    <p class="text-lg font-semibold text-blue-700">{{ $dataSiswa->kelas->semester ?? '-' }}</p>
                                 </div>
                                 <div class="bg-blue-50 p-3 rounded-lg text-center">
                                     <p class="text-xs text-gray-500">Tahun Ajaran</p>
-                                    <p class="text-lg font-semibold text-blue-700">{{ $tahun_ajaran ?? '-' }}</p>
+                                    <p class="text-lg font-semibold text-blue-700">{{ $dataSiswa->kelas->tahun_ajaran ?? '-' }}</p>
                                 </div>
                                 <div class="bg-blue-50 p-3 rounded-lg text-center col-span-2 md:col-span-1">
                                     <p class="text-xs text-gray-500">Status</p>

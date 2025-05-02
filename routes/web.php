@@ -175,6 +175,7 @@ Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->group(function () {
         Route::get('/siswa/cetak-data-siswa', [SiswaController::class, 'cetakDataSiswa'])
         ->name('siswa.cetak-data-siswa');
     Route::get('/profile', [SiswaController::class, 'profile'])->name('siswa.profile');
+    Route::get('/profile/edit', [SiswaController::class, 'editProfile'])->name('siswa.edit.profile');
     Route::post('/profile/update', [SiswaController::class, 'updateProfile'])->name('siswa.profile.update');
 
 });

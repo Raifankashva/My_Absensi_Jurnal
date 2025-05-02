@@ -702,6 +702,7 @@
                             {!! renderEnhancedSidebarLink(('prestasi.index'), 'bx-trophy', 'Prestasi') !!}
                             {!! renderEnhancedSidebarLink(('fasilitas.index'), 'bx-home', 'Fasilitas') !!}
                             {!! renderEnhancedSidebarLink(('pemeliharaan_fasilitas.index'), 'bx-home', 'Pemeliharaan Fasilitas') !!}
+                            {!! renderEnhancedSidebarLink(('pengumuman.index'), 'bx-bell-ring', 'Pengumuman') !!}
                             {!! renderEnhancedSidebarLink(('settings.daily.view'), 'bx-cog', 'Pengaturan') !!}
                         </div>
                     </div>
@@ -758,24 +759,7 @@
             </div>
         </main>
 
-        <footer class="glass-morphism dark:glass-morphism-dark border-t border-primary-100 dark:border-primary-800 py-4 px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                    © 2025 School Management System. All rights reserved.
-                </p>
-                <div class="flex items-center space-x-4 mt-4 md:mt-0">
-                    <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
-                        <i class="bx bxl-facebook text-xl"></i>
-                    </a>
-                    <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
-                        <i class="bx bxl-twitter text-xl"></i>
-                    </a>
-                    <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300">
-                        <i class="bx bxl-instagram text-xl"></i>
-                    </a>
-                </div>
-            </div>
-        </footer>
+        
     </div>
 
     <div id="toast-container"

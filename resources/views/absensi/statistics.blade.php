@@ -131,68 +131,111 @@
         </div>
         
         <div class="p-6">
-            <form action="{{ route('absensi.statistics') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="space-y-2 group">
-                    <label for="kelas_id" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Kelas</label>
-                    <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
-                            <i class="fas fa-school"></i>
-                        </div>
-                        <select name="kelas_id" id="kelas_id" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
-                            <option value="">Semua Kelas</option>
-                            @foreach($kelas as $k)
-                                <option value="{{ $k->id }}" {{ $kelas_id == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </div>
-                    </div>
+    <form action="{{ route('absensi.statistics') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="space-y-2 group">
+            <label for="kelas_id" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Kelas</label>
+            <div class="relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                    <i class="fas fa-school"></i>
                 </div>
-                
-                <div class="space-y-2 group">
-                    <label for="bulan" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Bulan</label>
-                    <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
-                            <i class="fas fa-calendar-alt"></i>
-                        </div>
-                        <select name="bulan" id="bulan" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
-                            @foreach($bulanList as $key => $value)
-                                <option value="{{ $key }}" {{ $bulan == $key ? 'selected' : '' }}>{{ $value }}</option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </div>
-                    </div>
+                <select name="kelas_id" id="kelas_id" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
+                    <option value="">Semua Kelas</option>
+                    @foreach($kelas as $k)
+                        <option value="{{ $k->id }}" {{ $kelas_id == $k->id ? 'selected' : '' }}>{{ $k->nama_kelas }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                    <i class="fas fa-chevron-down text-xs"></i>
                 </div>
-                
-                <div class="space-y-2 group">
-                    <label for="tahun" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Tahun</label>
-                    <div class="relative rounded-md shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
-                            <i class="fas fa-calendar-day"></i>
-                        </div>
-                        <select name="tahun" id="tahun" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
-                            @foreach($tahunList as $t)
-                                <option value="{{ $t }}" {{ $tahun == $t ? 'selected' : '' }}>{{ $t }}</option>
-                            @endforeach
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex items-end">
-                    <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium rounded-lg shadow-sm hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 group">
-                        <i class="fas fa-search mr-2 group-hover:scale-110 transition-transform"></i>
-                        <span>Filter</span>
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+        
+        <div class="space-y-2 group">
+            <label for="bulan" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Bulan</label>
+            <div class="relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <select name="bulan" id="bulan" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all" {{ $semester != 'none' ? 'disabled' : '' }}>
+                    @foreach($bulanList as $key => $value)
+                        <option value="{{ $key }}" {{ $bulan == $key ? 'selected' : '' }}>{{ $value }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-y-2 group">
+            <label for="semester" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Semester</label>
+            <div class="relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <select name="semester" id="semester" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all" {{ $bulan != 'all' && $bulan != '' ? 'disabled' : '' }}>
+                    @foreach($semesterList as $key => $value)
+                        <option value="{{ $key }}" {{ $semester == $key ? 'selected' : '' }}>{{ $value }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-y-2 group">
+            <label for="tahun" class="block text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">Tahun</label>
+            <div class="relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <select name="tahun" id="tahun" class="block w-full pl-10 pr-10 py-2.5 text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-all">
+                    @foreach($tahunList as $t)
+                        <option value="{{ $t }}" {{ $tahun == $t ? 'selected' : '' }}>{{ $t }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex items-end">
+            <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium rounded-lg shadow-sm hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 group">
+                <i class="fas fa-search mr-2 group-hover:scale-110 transition-transform"></i>
+                <span>Filter</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get dropdown elements
+    const bulanSelect = document.getElementById('bulan');
+    const semesterSelect = document.getElementById('semester');
+    
+    // Add event listeners
+    bulanSelect.addEventListener('change', function() {
+        if (this.value !== 'all' && this.value !== '') {
+            semesterSelect.disabled = true;
+            semesterSelect.value = 'none';
+        } else {
+            semesterSelect.disabled = false;
+        }
+    });
+    
+    semesterSelect.addEventListener('change', function() {
+        if (this.value !== 'none') {
+            bulanSelect.disabled = true;
+            bulanSelect.value = 'all';
+        } else {
+            bulanSelect.disabled = false;
+        }
+    });
+});
+</script>
     
     <!-- Statistics Overview Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

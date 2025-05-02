@@ -81,4 +81,9 @@ public function fasilitas()
 {
     return $this->hasMany(FasilitasSekolah::class);
 }
+public function pengumuman()
+{
+    return $this->hasMany(Pengumuman::class);
+}
+
 }

@@ -550,6 +550,7 @@ public function statistics(Request $request)
     $kelas_id = $request->kelas_id;
     $bulan = $request->bulan ?? Carbon::now()->format('m');
     $tahun = $request->tahun ?? Carbon::now()->format('Y');
+    $semester = $request->semester ?? 'none';
     
     $kelas = Kelas::where('sekolah_id', $sekolah_id)->get();
     
@@ -563,11 +564,47 @@ public function statistics(Request $request)
     $statistics = [];
     
     foreach ($siswas as $siswa) {
-        // Get all attendance records for this student in the selected month/year
-        $absensiData = Absensi::where('siswa_id', $siswa->id)
-            ->whereYear('waktu_scan', $tahun)
-            ->whereMonth('waktu_scan', $bulan)
-            ->get();
+        // Check filter type
+        $isAllMonths = $bulan === 'all';
+        $isSemester = $semester !== 'none';
+        
+        // Get all attendance records based on filter
+        $absensiQuery = Absensi::where('siswa_id', $siswa->id);
+        
+        if ($isSemester) {
+            // Filter by semester (academic year, not calendar year)
+            $absensiQuery->whereYear('waktu_scan', $tahun);
+            
+            if ($semester === 'semester1') {
+                // Semester 1: July-December
+                $absensiQuery->whereIn('waktu_scan', function($query) use ($tahun) {
+                    $query->selectRaw('waktu_scan')
+                          ->from('absensis')
+                          ->whereMonth('waktu_scan', '>=', 7)
+                          ->whereMonth('waktu_scan', '<=', 12)
+                          ->whereYear('waktu_scan', $tahun);
+                });
+            } else if ($semester === 'semester2') {
+                // Semester 2: January-June
+                $absensiQuery->whereIn('waktu_scan', function($query) use ($tahun) {
+                    $query->selectRaw('waktu_scan')
+                          ->from('absensis')
+                          ->whereMonth('waktu_scan', '>=', 1)
+                          ->whereMonth('waktu_scan', '<=', 6)
+                          ->whereYear('waktu_scan', $tahun);
+                });
+            }
+        } else {
+            // Filter by year
+            $absensiQuery->whereYear('waktu_scan', $tahun);
+            
+            // Filter by month if not "all months"
+            if (!$isAllMonths) {
+                $absensiQuery->whereMonth('waktu_scan', $bulan);
+            }
+        }
+        
+        $absensiData = $absensiQuery->get();
         
         $hadir = $absensiData->where('status', 'Hadir')->count();
         $terlambat = $absensiData->where('status', 'Terlambat')->count();
@@ -575,18 +612,40 @@ public function statistics(Request $request)
         $izin = $absensiData->where('status', 'Izin')->count();
         $alpa = $absensiData->where('status', 'Alpa')->count();
         
-        // Calculate total days in the month
-        $daysInMonth = Carbon::createFromDate($tahun, $bulan, 1)->daysInMonth;
-        
-        // Count weekdays (assuming school days are Monday-Friday)
+        // Calculate total school days based on filter
         $totalSchoolDays = 0;
-        for ($day = 1; $day <= $daysInMonth; $day++) {
-            $date = Carbon::createFromDate($tahun, $bulan, $day);
-            $dayOfWeek = $date->dayOfWeek;
+        
+        // Define months to process based on filter
+        $monthsToProcess = [];
+        
+        if ($isSemester) {
+            if ($semester === 'semester1') {
+                // Semester 1: July-December
+                $monthsToProcess = range(7, 12);
+            } else if ($semester === 'semester2') {
+                // Semester 2: January-June
+                $monthsToProcess = range(1, 6);
+            }
+        } else if ($isAllMonths) {
+            // All months
+            $monthsToProcess = range(1, 12);
+        } else {
+            // Specific month
+            $monthsToProcess = [(int)$bulan];
+        }
+        
+        // Calculate school days for the selected months
+        foreach ($monthsToProcess as $monthNum) {
+            $daysInMonth = Carbon::createFromDate($tahun, $monthNum, 1)->daysInMonth;
             
-            // If day is not Saturday (6) or Sunday (0)
-            if ($dayOfWeek !== 0 && $dayOfWeek !== 6) {
-                $totalSchoolDays++;
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $date = Carbon::createFromDate($tahun, $monthNum, $day);
+                $dayOfWeek = $date->dayOfWeek;
+                
+                // If day is not Saturday (6) or Sunday (0)
+                if ($dayOfWeek !== 0 && $dayOfWeek !== 6) {
+                    $totalSchoolDays++;
+                }
             }
         }
         
@@ -611,6 +670,7 @@ public function statistics(Request $request)
     
     // Get month names for dropdown
     $bulanList = [
+        'all' => 'Semua Bulan',
         '01' => 'Januari',
         '02' => 'Februari',
         '03' => 'Maret',
@@ -625,12 +685,19 @@ public function statistics(Request $request)
         '12' => 'Desember'
     ];
     
+    // Semester options
+    $semesterList = [
+        'none' => 'Pilih Semester',
+        'semester1' => 'Semester 1 (Juli-Desember)',
+        'semester2' => 'Semester 2 (Januari-Juni)'
+    ];
+    
     // Get years from current year minus 5 to current year plus 1
     $tahunList = range(Carbon::now()->year - 5, Carbon::now()->year + 1);
     
     return view('absensi.statistics', compact(
-        'statistics', 'kelas', 'bulanList', 'tahunList', 
-        'sekolah_id', 'kelas_id', 'bulan', 'tahun', 'authSchool'
+        'statistics', 'kelas', 'bulanList', 'tahunList', 'semesterList',
+        'sekolah_id', 'kelas_id', 'bulan', 'tahun', 'semester', 'authSchool'
     ));
 }
 public function export(Request $request)
@@ -645,20 +712,36 @@ public function export(Request $request)
     $kelas_id = $request->kelas_id;
     $bulan = $request->bulan ?? Carbon::now()->format('m');
     $tahun = $request->tahun ?? Carbon::now()->format('Y');
+    $semester = $request->semester ?? 'none';
     
-    $bulanName = [
-        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret',
-        '04' => 'April', '05' => 'Mei', '06' => 'Juni',
-        '07' => 'Juli', '08' => 'Agustus', '09' => 'September',
-        '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
-    ][$bulan];
+    // Determine filename based on filter
+    $periodLabel = '';
     
-    $kelas = $kelas_id ? Kelas::find($kelas_id)->nama_kelas : 'Semua Kelas';
+    if ($semester !== 'none') {
+        if ($semester === 'semester1') {
+            $periodLabel = "Semester_1_{$tahun}";
+        } else if ($semester === 'semester2') {
+            $periodLabel = "Semester_2_{$tahun}";
+        }
+    } else if ($bulan === 'all') {
+        $periodLabel = "Tahun_{$tahun}";
+    } else {
+        $bulanName = [
+            '01' => 'Januari', '02' => 'Februari', '03' => 'Maret',
+            '04' => 'April', '05' => 'Mei', '06' => 'Juni',
+            '07' => 'Juli', '08' => 'Agustus', '09' => 'September',
+            '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+        ][$bulan];
+        $periodLabel = "{$bulanName}_{$tahun}";
+    }
     
-    $filename = "Absensi_{$authSchool->nama_sekolah}_{$kelas}_{$bulanName}_{$tahun}.xlsx";
+    $kelas = $kelas_id ? Kelas::find($kelas_id)->nama_kelas : 'Semua_Kelas';
     
-    return Excel::download(new AbsensiExport($sekolah_id, $kelas_id, $bulan, $tahun), $filename);
+    $filename = "Absensi_{$authSchool->nama_sekolah}_{$kelas}_{$periodLabel}.xlsx";
+    
+    return Excel::download(new AbsensiExport($sekolah_id, $kelas_id, $bulan, $tahun, $semester), $filename);
 }
+
 public function generatePDF(Request $request)
 {
     $authSchool = $this->getAuthenticatedSchool();
@@ -671,8 +754,9 @@ public function generatePDF(Request $request)
     $kelas_id = $request->kelas_id;
     $bulan = $request->bulan ?? Carbon::now()->format('m');
     $tahun = $request->tahun ?? Carbon::now()->format('Y');
+    $semester = $request->semester ?? 'none';
     
-    // Get statistics data (same logic as statistics method)
+    // Get statistics data
     $siswas = DataSiswa::where('sekolah_id', $sekolah_id)
         ->when($kelas_id, function($query) use ($kelas_id) {
             return $query->where('kelas_id', $kelas_id);
@@ -682,11 +766,47 @@ public function generatePDF(Request $request)
     $statistics = [];
     
     foreach ($siswas as $siswa) {
-        // Get all attendance records for this student in the selected month/year
-        $absensiData = Absensi::where('siswa_id', $siswa->id)
-            ->whereYear('waktu_scan', $tahun)
-            ->whereMonth('waktu_scan', $bulan)
-            ->get();
+        // Check filter type
+        $isAllMonths = $bulan === 'all';
+        $isSemester = $semester !== 'none';
+        
+        // Get all attendance records based on filter
+        $absensiQuery = Absensi::where('siswa_id', $siswa->id);
+        
+        if ($isSemester) {
+            // Filter by semester (academic year, not calendar year)
+            $absensiQuery->whereYear('waktu_scan', $tahun);
+            
+            if ($semester === 'semester1') {
+                // Semester 1: July-December
+                $absensiQuery->whereIn('waktu_scan', function($query) use ($tahun) {
+                    $query->selectRaw('waktu_scan')
+                          ->from('absensi')
+                          ->whereMonth('waktu_scan', '>=', 7)
+                          ->whereMonth('waktu_scan', '<=', 12)
+                          ->whereYear('waktu_scan', $tahun);
+                });
+            } else if ($semester === 'semester2') {
+                // Semester 2: January-June
+                $absensiQuery->whereIn('waktu_scan', function($query) use ($tahun) {
+                    $query->selectRaw('waktu_scan')
+                          ->from('absensi')
+                          ->whereMonth('waktu_scan', '>=', 1)
+                          ->whereMonth('waktu_scan', '<=', 6)
+                          ->whereYear('waktu_scan', $tahun);
+                });
+            }
+        } else {
+            // Filter by year
+            $absensiQuery->whereYear('waktu_scan', $tahun);
+            
+            // Filter by month if not "all months"
+            if (!$isAllMonths) {
+                $absensiQuery->whereMonth('waktu_scan', $bulan);
+            }
+        }
+        
+        $absensiData = $absensiQuery->get();
         
         $hadir = $absensiData->where('status', 'Hadir')->count();
         $terlambat = $absensiData->where('status', 'Terlambat')->count();
@@ -694,18 +814,40 @@ public function generatePDF(Request $request)
         $izin = $absensiData->where('status', 'Izin')->count();
         $alpa = $absensiData->where('status', 'Alpa')->count();
         
-        // Calculate total days in the month
-        $daysInMonth = Carbon::createFromDate($tahun, $bulan, 1)->daysInMonth;
-        
-        // Count weekdays (assuming school days are Monday-Friday)
+        // Calculate total school days based on filter
         $totalSchoolDays = 0;
-        for ($day = 1; $day <= $daysInMonth; $day++) {
-            $date = Carbon::createFromDate($tahun, $bulan, $day);
-            $dayOfWeek = $date->dayOfWeek;
+        
+        // Define months to process based on filter
+        $monthsToProcess = [];
+        
+        if ($isSemester) {
+            if ($semester === 'semester1') {
+                // Semester 1: July-December
+                $monthsToProcess = range(7, 12);
+            } else if ($semester === 'semester2') {
+                // Semester 2: January-June
+                $monthsToProcess = range(1, 6);
+            }
+        } else if ($isAllMonths) {
+            // All months
+            $monthsToProcess = range(1, 12);
+        } else {
+            // Specific month
+            $monthsToProcess = [(int)$bulan];
+        }
+        
+        // Calculate school days for the selected months
+        foreach ($monthsToProcess as $monthNum) {
+            $daysInMonth = Carbon::createFromDate($tahun, $monthNum, 1)->daysInMonth;
             
-            // If day is not Saturday (6) or Sunday (0)
-            if ($dayOfWeek !== 0 && $dayOfWeek !== 6) {
-                $totalSchoolDays++;
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $date = Carbon::createFromDate($tahun, $monthNum, $day);
+                $dayOfWeek = $date->dayOfWeek;
+                
+                // If day is not Saturday (6) or Sunday (0)
+                if ($dayOfWeek !== 0 && $dayOfWeek !== 6) {
+                    $totalSchoolDays++;
+                }
             }
         }
         
@@ -728,12 +870,26 @@ public function generatePDF(Request $request)
         ];
     }
     
-    $bulanName = [
-        '01' => 'Januari', '02' => 'Februari', '03' => 'Maret',
-        '04' => 'April', '05' => 'Mei', '06' => 'Juni',
-        '07' => 'Juli', '08' => 'Agustus', '09' => 'September',
-        '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
-    ][$bulan];
+    // Determine period label for PDF title
+    $periodLabel = '';
+    
+    if ($semester !== 'none') {
+        if ($semester === 'semester1') {
+            $periodLabel = "Semester 1 ({$tahun})";
+        } else if ($semester === 'semester2') {
+            $periodLabel = "Semester 2 ({$tahun})";
+        }
+    } else if ($bulan === 'all') {
+        $periodLabel = "Tahun {$tahun}";
+    } else {
+        $bulanName = [
+            '01' => 'Januari', '02' => 'Februari', '03' => 'Maret',
+            '04' => 'April', '05' => 'Mei', '06' => 'Juni',
+            '07' => 'Juli', '08' => 'Agustus', '09' => 'September',
+            '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+        ][$bulan];
+        $periodLabel = "{$bulanName} {$tahun}";
+    }
     
     $kelas = $kelas_id ? Kelas::find($kelas_id)->nama_kelas : 'Semua Kelas';
     
@@ -741,12 +897,11 @@ public function generatePDF(Request $request)
         'statistics' => $statistics,
         'sekolah' => $authSchool,
         'kelas' => $kelas,
-        'bulan' => $bulanName,
-        'tahun' => $tahun
+        'periodLabel' => $periodLabel,
     ];
     
     $pdf = PDF::loadView('absensi.pdf', $data);
     
-    return $pdf->download("Laporan_Absensi_{$authSchool->nama_sekolah}_{$kelas}_{$bulanName}_{$tahun}.pdf");
+    return $pdf->download("Laporan_Absensi_{$authSchool->nama_sekolah}_{$kelas}_{$periodLabel}.pdf");
 }
 }

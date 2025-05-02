@@ -100,7 +100,7 @@ class SchoolRegistrationController extends Controller
                  'foto' => $fotoPath,
                  'is_active' => false,
                  'latitude' => $request->latitude,
-        'longitude' => $request->longitude, 
+                 'longitude' => $request->longitude, 
              ]);
  
              $otp = $this->generateOTPCode($user);

@@ -335,7 +335,7 @@
             </div>
             <h2>LAPORAN KEHADIRAN SISWA</h2>
             <h3>{{ $sekolah->nama_sekolah }}</h3>
-            <p>Periode: {{ $bulan }} {{ $tahun }} | Kelas: {{ $kelas }}</p>
+            <p>Periode: {{ $periodLabel }}</p>
         </div>
 
         <div class="attendance-legend">

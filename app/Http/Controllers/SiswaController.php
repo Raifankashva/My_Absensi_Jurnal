@@ -11,6 +11,17 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Pdf;
+use App\Models\Siswa;
+use App\Models\Kelas;
+use App\Models\Sekolah;
+use App\Models\JadwalPelajaran;
+use App\Models\DataSiswa;
+use App\Models\Absensi;
+use App\Models\Setting;
+use App\Models\Province;
+use App\Models\Regency;
+use App\Models\District;
+use App\Models\Village;
 
 
 
@@ -69,7 +80,9 @@ class SiswaController extends Controller
     // Get the QR code URL for view
     $qrCodeUrl = Storage::url('qrcodes/siswa-' . $dataSiswa->id . '.png');
 
-    return view('siswa.dashboard', compact('user', 'jadwalPerHari', 'absensi', 'qrCodeUrl'));
+    $pengumuman = $user->dataSiswa->sekolah->pengumuman;
+
+    return view('siswa.dashboard', compact('user', 'jadwalPerHari', 'absensi', 'qrCodeUrl', 'pengumuman'));
 }
 
 
@@ -99,6 +112,33 @@ public function profile()
     return view('siswa.profile', compact('dataSiswa'));
 }
 
+public function editProfile()
+{
+    $user = User::find(auth()->id())->load('dataSiswa');
+    $dataSiswa = $user->dataSiswa;
+    
+    // Load provinces for the dropdown
+    $provinces = Province::all();
+    
+    // Load cities, districts, and villages if the student already has location data
+    $cities = collect();
+    $districts = collect();
+    $villages = collect();
+    
+    if ($dataSiswa->province_id) {
+        $cities = Regency::where('province_id', $dataSiswa->province_id)->get();
+        
+        if ($dataSiswa->regency_id) {
+            $districts = District::where('regency_id', $dataSiswa->regency_id)->get();
+            
+            if ($dataSiswa->district_id) {
+                $villages = Village::where('district_id', $dataSiswa->district_id)->get();
+            }
+        }
+    }
+    
+    return view('siswa.edit-profile', compact('dataSiswa', 'provinces', 'cities', 'districts', 'villages'));
+}
 // Update student's profile
 public function updateProfile(Request $request)
 {
