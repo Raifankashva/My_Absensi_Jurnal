@@ -31,6 +31,7 @@ use App\Http\Controllers\PrestasiSekolahController;
 use App\Http\Controllers\PemeliharaanFasilitasController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\SettingDailyController;
+use App\Http\Controllers\WellcomeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -42,9 +43,16 @@ use App\Http\Controllers\SettingDailyController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Welcome page route
+Route::get('/', [WellcomeController::class, 'index'])->name('welcome');
+
+// Contact form submission route
+Route::post('/contact', [WellcomeController::class, 'sendContactEmail'])->name('contact.send');
+
+// Admin route to manually send welcome email
+Route::get('/send-welcome-email/{email}/{name}', [WellcomeController::class, 'sendWelcomeEmail'])
+    ->name('send.welcome.email')
+    ->middleware('auth');
 Route::get('getcities/{province}', [SekolahController::class, 'getCities']);
 Route::get('getdistricts/{city}', [SekolahController::class, 'getDistricts']);
 Route::get('getvillages/{district}', [SekolahController::class, 'getVillages']);

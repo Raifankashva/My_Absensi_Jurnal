@@ -509,6 +509,62 @@
             box-shadow: 0 2px 5px rgba(239, 68, 68, 0.5);
             animation: pulse 2s infinite;
         }
+        
+        /* Mobile sidebar backdrop */
+        .sidebar-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            background-color: rgba(15, 23, 42, 0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 100;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            font-size: 0.75rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 100%;
+            margin-top: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent rgba(15, 23, 42, 0.9) transparent transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .dark .tooltip .tooltip-text {
+            background-color: rgba(30, 41, 59, 0.9);
+        }
+
+        .dark .tooltip .tooltip-text::after {
+            border-color: transparent rgba(30, 41, 59, 0.9) transparent transparent;
+        }
     </style>
     <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
 </head>
@@ -516,11 +572,20 @@
 <body class="font-sans animated-bg min-h-screen" x-data="{ 
     darkMode: false,
     sidebarOpen: window.innerWidth >= 768,
+    sidebarMode: window.innerWidth >= 768 ? 'expanded' : 'hidden', // 'expanded', 'icon', 'hidden'
+    isMobile: window.innerWidth < 768,
     notifications: [],
     initTheme() {
         if (localStorage.getItem('darkMode') === 'true') {
             this.darkMode = true;
             document.documentElement.classList.add('dark');
+        }
+        
+        // Initialize sidebar state from localStorage if available
+        const savedSidebarMode = localStorage.getItem('sidebarMode');
+        if (savedSidebarMode && !this.isMobile) {
+            this.sidebarMode = savedSidebarMode;
+            this.sidebarOpen = savedSidebarMode !== 'hidden';
         }
     },
     toggleDarkMode() {
@@ -531,8 +596,31 @@
         } else {
             document.documentElement.classList.remove('dark');
         }
+    },
+    toggleSidebar() {
+        if (this.isMobile) {
+            // On mobile, toggle between hidden and expanded
+            this.sidebarOpen = !this.sidebarOpen;
+            this.sidebarMode = this.sidebarOpen ? 'expanded' : 'hidden';
+        } else {
+            // On desktop, cycle between expanded and icon modes
+            if (this.sidebarMode === 'expanded') {
+                this.sidebarMode = 'icon';
+            } else {
+                this.sidebarMode = 'expanded';
+            }
+            this.sidebarOpen = true;
+            localStorage.setItem('sidebarMode', this.sidebarMode);
+        }
+    },
+    checkScreenSize() {
+        this.isMobile = window.innerWidth < 768;
+        if (!this.isMobile && this.sidebarMode === 'hidden') {
+            this.sidebarMode = 'expanded';
+            this.sidebarOpen = true;
+        }
     }
-}" x-init="initTheme()">
+}" x-init="initTheme(); checkScreenSize(); window.addEventListener('resize', checkScreenSize)">
     <!-- Page Loader with Enhanced Animation -->
     <div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center animated-bg transition-opacity duration-500">
         <div class="relative w-28 h-28 mb-6">
@@ -551,11 +639,30 @@
         </div>
     </div>
 
+    <!-- Mobile Sidebar Backdrop - Only visible when sidebar is open on mobile -->
+    <div 
+        x-cloak
+        x-show="sidebarOpen && isMobile" 
+        @click="sidebarOpen = false; sidebarMode = 'hidden';"
+        class="fixed inset-0 z-30 sidebar-backdrop"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0">
+    </div>
+
     <!-- Sidebar with Enhanced Design -->
     <aside
         x-cloak
-        :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}"
-        class="fixed inset-y-0 left-0 w-72 sidebar-bg shadow-2xl transform transition-all duration-300 ease-in-out z-40 backdrop-blur-lg">
+        :class="{
+            'w-72': sidebarMode === 'expanded',
+            'w-20': sidebarMode === 'icon',
+            'translate-x-0': sidebarOpen,
+            '-translate-x-full': !sidebarOpen && isMobile
+        }"
+        class="fixed inset-y-0 left-0 sidebar-bg shadow-2xl transform transition-all duration-300 ease-in-out z-40 backdrop-blur-lg">
         
         <!-- Logo Section with Enhanced Design -->
         <div class="relative overflow-hidden">
@@ -563,11 +670,11 @@
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-400 via-primary-500 to-primary-400"></div>
             
             <div class="flex items-center h-20 px-6 border-b border-primary-700/30 backdrop-blur-md">
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center" :class="{'space-x-3': sidebarMode === 'expanded', 'justify-center w-full': sidebarMode === 'icon'}">
                     <div class="p-3 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl shadow-lg transform transition-transform duration-300 hover:scale-105 group">
                         <i class='bx bxs-school text-2xl text-white group-hover:animate-pulse'></i>
                     </div>
-                    <div>
+                    <div x-show="sidebarMode === 'expanded'" x-transition>
                         <h1 class="text-xl font-bold text-white">Absensi Jurnal</h1>
                         <div class="flex items-center">
                             <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse"></span>
@@ -576,7 +683,8 @@
                     </div>
                 </div>
                 <button
-                    @click="sidebarOpen = false"
+                    @click="sidebarOpen = false; sidebarMode = 'hidden';"
+                    x-show="isMobile"
                     class="md:hidden ml-auto text-white hover:text-primary-200 transition">
                     <i class='bx bx-x text-2xl'></i>
                 </button>
@@ -588,7 +696,8 @@
             @if (auth()->check())
             <div class="mb-6 animate-fade-in">
                 <!-- User Profile Card with Enhanced Design -->
-                <div class="px-4 py-5 bg-gradient-to-r from-primary-800/80 to-primary-700/80 rounded-xl mb-4 
+                <div x-show="sidebarMode === 'expanded'" 
+                     class="px-4 py-5 bg-gradient-to-r from-primary-800/80 to-primary-700/80 rounded-xl mb-4 
                             shadow-lg group hover:scale-[1.02] transition-all duration-300 backdrop-blur-sm border border-primary-600/20">
                     <div class="flex items-center space-x-4">
                         <div class="relative">
@@ -615,6 +724,20 @@
                     </div>
                 </div>
 
+                <!-- Compact User Profile for Icon Mode -->
+                <div x-show="sidebarMode === 'icon'" 
+                     class="flex justify-center mb-4">
+                    <div class="relative tooltip">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center 
+                                  shadow-lg hover:scale-110 transition-all duration-300 border-2 border-primary-300/20">
+                            <i class='bx bxs-user text-xl text-white'></i>
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full 
+                                  border-2 border-primary-800 animate-pulse"></div>
+                        <span class="tooltip-text">{{ auth()->user()->name }} ({{ ucfirst(auth()->user()->role) }})</span>
+                    </div>
+                </div>
+
                 <!-- Enhanced Sidebar Menu -->
                 <div class="space-y-5 animate-slide-in" style="--delay: 0.2s">
                     @php
@@ -626,25 +749,27 @@
 
                         return <<< HTML
                             <a href="$url"
-                            class="sidebar-menu-item flex items-center px-4 py-3 rounded-xl transition-all duration-300 
-                                    $activeClass group relative overflow-hidden">
+                               class="sidebar-menu-item flex items-center px-4 py-3 rounded-xl transition-all duration-300 
+                                      $activeClass group relative overflow-hidden tooltip">
                                 <div class="sidebar-icon-container bg-primary-800/50 p-2.5 rounded-lg shadow-inner mr-3 
                                             group-hover:bg-primary-700/70 transition-all duration-300 relative">
                                     <i class='bx $icon text-xl'></i>
                                     $badgeHtml
                                 </div>
-                                <span class="font-medium">$label</span>
+                                <span class="font-medium sidebar-label">$label</span>
                                 <div class="ml-auto opacity-0 transform translate-x-2 
-                                            group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                                            group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 sidebar-arrow">
                                     <i class='bx bx-chevron-right'></i>
                                 </div>
+                                <span class="tooltip-text">$label</span>
                             </a>
                         HTML;
                     }
                     @endphp
                     @if (auth()->user()->role == 'admin')
                     <div class="mb-6">
-                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center"
+                            x-show="sidebarMode === 'expanded'">
                             <i class='bx bx-category-alt mr-2'></i> Main Menu
                         </h2>
                         <div class="space-y-1 pl-1">
@@ -653,7 +778,8 @@
                     </div>
 
                     <div class="mb-6">
-                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center"
+                            x-show="sidebarMode === 'expanded'">
                             <i class='bx bx-cog mr-2'></i> Management
                         </h2>
                         <div class="space-y-1 pl-1">
@@ -662,12 +788,12 @@
                     </div>
                     @elseif (auth()->user()->role == 'guru')
                     <div class="mb-6">
-                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center"
+                            x-show="sidebarMode === 'expanded'">
                             <i class='bx bx-chalkboard mr-2'></i> Teacher Menu
                         </h2>
                         <div class="space-y-1 pl-1">
                             {!! renderEnhancedSidebarLink(('guru.dashboard'), 'bxs-dashboard', 'Dashboard') !!}
-                            {!! renderEnhancedSidebarLink(('jadwal-pelajaran.index'), 'bx-calendar-check', 'Jadwal Pelajaran') !!}
                             {!! renderEnhancedSidebarLink(('jadwal-pelajaran.index'), 'bx-calendar-check', 'Jadwal Pelajaran') !!}
                             {!! renderEnhancedSidebarLink(('jurnal-guru.index'), 'bx-book-open', 'Jurnal Mengajar') !!}
                             {!! renderEnhancedSidebarLink(('absensi.select.school'), 'bx-user-check', 'Absensi') !!}
@@ -675,7 +801,8 @@
                     </div>
                     @elseif (auth()->user()->role == 'siswa')
                     <div class="mb-6">
-                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center"
+                            x-show="sidebarMode === 'expanded'">
                             <i class='bx bx-book-reader mr-2'></i> Student Menu
                         </h2>
                         <div class="space-y-1 pl-1">
@@ -686,7 +813,8 @@
                     </div>
                     @elseif (auth()->user()->role == 'sekolah')
                     <div class="mb-6">
-                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center">
+                        <h2 class="sidebar-category px-4 text-xs font-semibold text-primary-300 uppercase tracking-wider mb-3 flex items-center"
+                            x-show="sidebarMode === 'expanded'">
                             <i class='bx bx-building-house mr-2'></i> Sekolah Menu
                         </h2>
                         <div class="space-y-1 pl-1">
@@ -711,21 +839,36 @@
             </div>
             @endif
         </nav>
-
-        
     </aside>
 
-    <div :class="{'md:ml-72': sidebarOpen, 'ml-0': !sidebarOpen}"
+    <div :class="{
+            'md:ml-72': sidebarMode === 'expanded',
+            'md:ml-20': sidebarMode === 'icon',
+            'ml-0': !sidebarOpen || (isMobile && sidebarMode === 'hidden')
+        }"
         class="transition-all duration-300 ease-in-out">
         <header class="h-16 glass-morphism dark:glass-morphism-dark border-b border-primary-100 dark:border-primary-800 flex items-center 
                        justify-between px-6 shadow-sm sticky top-0 z-30">
             <div class="flex items-center space-x-4">
+                <!-- Mobile sidebar toggle button -->
+                <button 
+                    @click="toggleSidebar()" 
+                    class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors duration-300 focus:outline-none"
+                    aria-label="Toggle Sidebar">
+                    <i class='bx text-2xl' :class="sidebarMode === 'expanded' ? 'bx-menu-alt-left' : 'bx-menu'"></i>
+                </button>
                 <span class="text-xl font-semibold gradient-text">@yield('title')</span>
             </div>
 
             @if (auth()->check())
             <div class="flex items-center space-x-4">
-
+                <!-- Dark mode toggle button -->
+                <button 
+                    @click="toggleDarkMode()" 
+                    class="p-2 rounded-full hover:bg-primary-100 dark:hover:bg-primary-800 transition-colors duration-300 focus:outline-none"
+                    aria-label="Toggle Dark Mode">
+                    <i class='bx text-xl' :class="darkMode ? 'bx-sun text-yellow-400' : 'bx-moon text-primary-600'"></i>
+                </button>
 
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
@@ -758,8 +901,6 @@
                 @yield('content')
             </div>
         </main>
-
-        
     </div>
 
     <div id="toast-container"
@@ -793,14 +934,58 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('app', {
-
+                // App-wide state can go here
             });
         });
 
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                Alpine.store('sidebarOpen', true);
-            }
+        // Apply styles for icon-only mode
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add CSS to handle icon-only mode
+            const style = document.createElement('style');
+            style.textContent = `
+                [x-data] .sidebar-menu-item {
+                    justify-content: flex-start;
+                }
+                
+                [x-data][x-cloak] {
+                    display: none;
+                }
+                
+                @media (min-width: 768px) {
+                    [x-data] .sidebar-menu-item[x-cloak] {
+                        display: flex;
+                    }
+                    
+                    [x-data] .sidebar-menu-item {
+                        transition: all 0.3s ease;
+                    }
+                    
+                    [x-data] .sidebar-menu-item .sidebar-label,
+                    [x-data] .sidebar-menu-item .sidebar-arrow {
+                        transition: opacity 0.2s ease, transform 0.2s ease;
+                    }
+                    
+                    [x-data][x-ref="sidebar"][x-bind\\:class*="sidebarMode === 'icon'"] .sidebar-menu-item {
+                        justify-content: center;
+                        padding-left: 0;
+                        padding-right: 0;
+                    }
+                    
+                    [x-data][x-ref="sidebar"][x-bind\\:class*="sidebarMode === 'icon'"] .sidebar-menu-item .sidebar-icon-container {
+                        margin-right: 0;
+                    }
+                    
+                    [x-data][x-ref="sidebar"][x-bind\\:class*="sidebarMode === 'icon'"] .sidebar-menu-item .sidebar-label,
+                    [x-data][x-ref="sidebar"][x-bind\\:class*="sidebarMode === 'icon'"] .sidebar-menu-item .sidebar-arrow {
+                        opacity: 0;
+                        width: 0;
+                        transform: translateX(10px);
+                        overflow: hidden;
+                        white-space: nowrap;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         });
 
         function showNotification(message, type = 'success') {
