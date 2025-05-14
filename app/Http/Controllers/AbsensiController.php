@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\AbsensiNotification;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SettingDaily;
-
+use App\Models\HariLibur;
 class AbsensiController extends Controller
 {
     public function __construct()
@@ -85,6 +85,14 @@ class AbsensiController extends Controller
     $today = Carbon::now();
     $dayName = $this->getDayNameIndonesian($today->dayOfWeek);
     
+    // Cek apakah hari ini libur
+    $isHoliday = HariLibur::where('sekolah_id', $authSchool->id)
+        ->where('tanggal', $today->format('Y-m-d'))
+        ->exists();
+        
+    if ($isHoliday) {
+        return redirect()->back()->with('error', 'Hari ini adalah hari libur. Tidak ada absensi.');
+    } 
     // Ambil pengaturan untuk hari ini dari setting_daily
     $settingDaily = SettingDaily::where('sekolah_id', $authSchool->id)
         ->where('hari', $dayName)

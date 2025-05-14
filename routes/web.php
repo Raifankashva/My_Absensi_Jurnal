@@ -392,7 +392,9 @@ Route::get('/absensi/check-student', [AbsensiController::class, 'checkStudent'])
 Route::get('/absensi/statistics', [AbsensiController::class, 'statistics'])->name('absensi.statistics');
 Route::get('/absensi/export', [AbsensiController::class, 'export'])->name('absensi.export');
 Route::get('/absensi/pdf', [AbsensiController::class, 'generatePDF'])->name('absensi.pdf');
-Route::get('/settings/daily', [App\Http\Controllers\SettingDailyController::class, 'index'])->name('settings.daily.index');
-    Route::post('/settings/daily', [App\Http\Controllers\SettingDailyController::class, 'store'])->name('settings.daily.store');
-Route::get('/settings/view1', [SettingDailyController::class, 'viewSettings'])->name('settings.daily.view');
-Route::get('/scan/selector', [AbsensiController::class, 'scanSelector'])->name('absensi.scan.selector');
+// Pengaturan Jadwal Harian
+Route::prefix('settings')->group(function () {
+    Route::get('/daily', [SettingDailyController::class, 'index'])->name('settings.daily.view');
+    Route::post('/daily', [SettingDailyController::class, 'store'])->name('settings.daily.store');
+    Route::post('/daily/hari-libur', [SettingDailyController::class, 'storeHariLibur'])->name('settings.daily.store-hari-libur');
+});Route::get('/scan/selector', [AbsensiController::class, 'scanSelector'])->name('absensi.scan.selector');

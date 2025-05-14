@@ -112,6 +112,7 @@ class JurnalGuruController extends Controller
     public function update(Request $request, $id)
     {
         $jurnal = JurnalGuru::findOrFail($id);
+     
         
         $request->validate([
             'jadwal_pelajaran_id' => 'required|exists:jadwal_pelajaran,id',
