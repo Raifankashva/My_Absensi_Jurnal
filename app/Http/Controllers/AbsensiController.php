@@ -179,27 +179,22 @@ private function getDayNameIndonesian($dayOfWeek)
 }
 public function scanqr()
 {
-    // Get school session value
-    $sekolahId = session('scan_sekolah_id');
+    // Get current user's school
+    $userSchool = Sekolah::where('user_id', Auth::id())->first();
     
-    if (!$sekolahId) {
-        return redirect()->route('school.dashboard');
+    if (!$userSchool) {
+        return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke data sekolah');
     }
     
-    // Get school information
-    $sekolah = Sekolah::find($sekolahId);
-    
-    if (!$sekolah) {
-        return redirect()->route('school.dashboard')
-            ->with('error', 'Sekolah tidak ditemukan, silakan pilih kembali');
-    }
+    // Store the school ID in session (this replaces the need for separate auth)
+    session(['scan_sekolah_id' => $userSchool->id]);
     
     // Get current day name
     $today = Carbon::now();
     $dayName = $this->getDayNameIndonesian($today->dayOfWeek);
     
     // Get daily settings for today
-    $settingDaily = SettingDaily::where('sekolah_id', $sekolahId)
+    $settingDaily = SettingDaily::where('sekolah_id', $userSchool->id)
         ->where('hari', $dayName)
         ->first();
     
@@ -218,7 +213,36 @@ public function scanqr()
     // Calculate current attendance status
     $currentStatus = $this->calculateAttendanceStatus($settingDaily);
     
-    return view('absensi.scan', compact('sekolah', 'settingDaily', 'dayName', 'currentStatus'));
+    return view('absensi.scan', compact('userSchool', 'settingDaily', 'dayName', 'currentStatus'));
+}
+
+public function showScanPage(Request $request)
+{
+    // Get current user's school
+    $userSchool = Sekolah::where('user_id', Auth::id())->first();
+    
+    if (!$userSchool) {
+        return redirect()->route('dashboard')->with('error', 'Anda tidak memiliki akses ke data sekolah');
+    }
+    
+    // Store school ID in session
+    $sekolah_id = $userSchool->id;
+    session(['scan_sekolah_id' => $sekolah_id]);
+    
+    // Get token from database for this school
+    $tokenSetting = SettingAbsensi::where('sekolah_id', $sekolah_id)
+                                ->where('key', 'scan_access_token')
+                                ->first();
+    
+    if (!$tokenSetting) {
+        return redirect()->route('absensi.token.management')
+            ->with('error', 'Token akses belum dibuat untuk sekolah ini.');
+    }
+    
+    // Set token in session to skip authentication
+    session(['scan_access_token_' . $sekolah_id => $tokenSetting->value]);
+    
+    return view('absensi.scan', compact('userSchool'));
 }
 
 /**
@@ -256,60 +280,6 @@ private function calculateAttendanceStatus($settingDaily)
     }
 }
 
-    public function showScanPage(Request $request)
-    {
-        
-        if (!$request->has('sekolah_id') && !session()->has('scan_sekolah_id')) {
-            $sekolah = Sekolah::all();
-            return view('absensi.select_school', compact('sekolah'));
-        }
-        
-        // Get sekolah_id from request or session
-        $sekolah_id = $request->sekolah_id ?? session('scan_sekolah_id');
-        
-        // Store sekolah_id in session
-        session(['scan_sekolah_id' => $sekolah_id]);
-        
-        // Get token from database for this school
-        $tokenSetting = SettingAbsensi::where('sekolah_id', $sekolah_id)
-                                    ->where('key', 'scan_access_token')
-                                    ->first();
-        
-        if (!$tokenSetting) {
-            return redirect()->route('absensi.token.management')
-                ->with('error', 'Token akses belum dibuat untuk sekolah ini.');
-        }
-        
-        $validToken = $tokenSetting->value;
-        $sekolah = Sekolah::findOrFail($sekolah_id);
-        
-        // Check if token is provided in the request
-        if ($request->has('token')) {
-            $providedToken = $request->token;
-            
-            // Validate the token
-            if ($providedToken !== $validToken) {
-                return redirect()->route('absensi.scan.auth')
-                    ->with('error', 'Token akses tidak valid');
-            }
-            
-            // If token is valid, store it in session to maintain access
-            session(['scan_access_token_' . $sekolah_id => $providedToken]);
-            
-            return view('absensi.scan', compact('sekolah'));
-        }
-        
-        // Check if token is already in session
-        if (session()->has('scan_access_token_' . $sekolah_id)) {
-            $sessionToken = session('scan_access_token_' . $sekolah_id);
-            
-            if ($sessionToken === $validToken) {
-                return view('absensi.scan', compact('sekolah'));
-            }
-        }
-        
-        return redirect()->route('absensi.scan.auth');
-    }
 
 
     public function scanAuth()
@@ -350,7 +320,7 @@ private function calculateAttendanceStatus($settingDaily)
         session()->forget('token_sekolah_id');
         
         // Redirect to the welcome page - we no longer need to select a school
-        return redirect()->route('welcome')
+        return redirect()->route('sekolah.dashboard')
             ->with('success', 'Berhasil keluar dari pengelolaan token.');
     }
 
@@ -447,7 +417,7 @@ private function calculateAttendanceStatus($settingDaily)
         }
         
         // Redirect to the welcome page
-        return redirect()->route('/')
+        return redirect()->route('school.dashboard')
             ->with('success', 'Berhasil keluar dari fitur scan.');
     }
 

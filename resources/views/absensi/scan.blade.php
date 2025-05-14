@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="max-w-lg mx-auto bg-white shadow-lg p-6 rounded-lg">
-    <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Scan QR Code Absensi - {{$sekolah->nama_sekolah}}</h2>
+    <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Scan QR Code Absensi - {{$userSchool->nama_sekolah}}</h2>
     
     <div class="mb-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded shadow-md">
         <div class="flex">
@@ -27,11 +27,6 @@
         </div>
     </div>
 
-    <div class="mt-6 text-center">
-        <a href="{{ route('absensi.scan.logout') }}" class="text-gray-600 hover:text-red-600">
-            Pilih Sekolah Lain
-        </a>
-    </div>
     
     @if (session('error'))
         <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
